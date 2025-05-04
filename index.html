@@ -223,30 +223,90 @@
 			z-index: 10;
 			border-bottom: 1px solid var(--border-color);
 		}
-		table {
+		
+		/* Mobile-friendly table styles */
+		.table-responsive {
+			overflow-x: auto;
 			width: 100%;
-			border-collapse: collapse;
 		}
-		th, td {
-			padding: 8px 12px;
-			text-align: left;
-			border-bottom: 1px solid var(--table-border);
+		
+		@media (max-width: 768px) {
+			.table-container {
+				margin: 0 -15px; /* Negative margin to allow full-width scrolling */
+				overflow-x: auto;
+				-webkit-overflow-scrolling: touch;
+			}
+			
+			.mobile-table {
+				display: flex;
+				flex-direction: column;
+				margin-top: 15px;
+			}
+			
+			.mobile-table-entry {
+				border: 1px solid var(--table-border);
+				border-radius: 5px;
+				margin-bottom: 10px;
+				padding: 10px;
+				background-color: var(--container-bg);
+			}
+			
+			.mobile-table-entry.synonym-row {
+				background-color: var(--synonym-row-bg);
+			}
+			
+			.mobile-table-row {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 5px;
+				flex-wrap: wrap;
+			}
+			
+			.mobile-table-label {
+				font-weight: bold;
+				margin-right: 10px;
+				min-width: 70px;
+			}
+			
+			.mobile-table-actions {
+				display: flex;
+				gap: 5px;
+				margin-top: 10px;
+				flex-wrap: wrap;
+			}
 		}
-		th {
-			background-color: var(--table-header-bg);
-			color: var(--text-color);
-			position: sticky;
-			top: 0;
+		
+		/* Regular table for larger screens */
+		@media (min-width: 769px) {
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+			th, td {
+				padding: 8px 12px;
+				text-align: left;
+				border-bottom: 1px solid var(--table-border);
+			}
+			th {
+				background-color: var(--table-header-bg);
+				color: var(--text-color);
+				position: sticky;
+				top: 0;
+			}
+			tr:hover {
+				background-color: var(--table-hover);
+			}
+			tr.synonym-row {
+				background-color: var(--synonym-row-bg);
+			}
+			tr.synonym-row:hover {
+				background-color: var(--synonym-row-hover);
+			}
+			.mobile-table {
+				display: none;
+			}
 		}
-		tr:hover {
-			background-color: var(--table-hover);
-		}
-		tr.synonym-row {
-			background-color: var(--synonym-row-bg);
-		}
-		tr.synonym-row:hover {
-			background-color: var(--synonym-row-hover);
-		}
+		
 		.add-entry {
 			margin-top: 20px;
 			display: flex;
@@ -274,6 +334,8 @@
 		.sort-indicator {
 			display: inline-block;
 		}
+		
+		/* Dark mode toggle styles */
 		.dark-mode-toggle {
 			position: absolute;
 			top: 20px;
@@ -282,6 +344,32 @@
 			align-items: center;
 			gap: 10px;
 		}
+		
+		@media (max-width: 422px) {
+			.dark-mode-toggle {
+				top: 15px;
+				right: 15px;
+			}
+			
+			.mode-toggle-emoji {
+				cursor: pointer;
+				font-size: 24px;
+				line-height: 1;
+			}
+		}
+		
+		@media (min-width: 423px) {
+			.mode-toggle-emoji {
+				display: none;
+			}
+		}
+		
+		@media (max-width: 422px) {
+			.toggle-switch, .mode-icon {
+				display: none;
+			}
+		}
+		
 		.toggle-switch {
 			position: relative;
 			display: inline-block;
@@ -324,23 +412,45 @@
 		.mode-icon {
 			font-size: 20px;
 		}
-            /* Add these CSS rules to your existing styles */
-    @media (max-width: 768px) {
-        h1 {
-            text-align: left;
-            font-size: 1.5rem; /* Smaller size on mobile */
-            margin-bottom: 10px;
-            margin-right: 90px; /* Make space for the toggle switch */
-        }
+		
+		/* Mobile title and layout improvements */
+		@media (max-width: 768px) {
+			h1 {
+				text-align: left;
+				font-size: 1.5rem; /* Smaller size on mobile */
+				margin-bottom: 10px;
+				margin-right: 80px; /* Make space for the toggle switch */
+			}
 
-        .dark-mode-toggle {
-            top: 30px; /* Align with the title */
-        }
+			.dark-mode-toggle {
+				top: 20px; /* Align with the title */
+			}
 
-        .container {
-            padding: 15px; /* Slightly reduce padding on mobile */
-        }
-    }
+			.container {
+				padding: 15px; /* Slightly reduce padding on mobile */
+			}
+			
+			.dictionary-controls {
+				justify-content: space-between;
+			}
+			
+			.dictionary-controls button {
+				flex-grow: 1;
+				text-align: center;
+			}
+			
+			.add-entry {
+				flex-direction: column;
+			}
+			
+			.add-entry input {
+				width: 100%;
+			}
+			
+			#synonymToggle {
+				align-self: flex-start;
+			}
+		}
 	</style>
 </head>
 <body>
@@ -354,6 +464,8 @@
 				<span class="toggle-slider"></span>
 			</label>
 			<span class="mode-icon">🌙</span>
+			<!-- Added emoji toggle for smaller screens -->
+			<span class="mode-toggle-emoji" id="modeToggleEmoji">🌙</span>
 		</div>
 
 		<div class="settings">
@@ -403,18 +515,26 @@
 				<button id="addEntry">Add Entry</button>
 			</div>
 
-			<table>
-				<thead>
-					<tr>
-						<th id="englishHeader">English</th>
-						<th id="ichrolicHeader">Ichrolic</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-				<tbody id="dictionaryBody">
-					<!-- Dictionary entries will be added here -->
-				</tbody>
-			</table>
+			<!-- Regular table for desktop view -->
+			<div class="table-container">
+				<table id="desktopTable">
+					<thead>
+						<tr>
+							<th id="englishHeader">English</th>
+							<th id="ichrolicHeader">Ichrolic</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody id="dictionaryBody">
+						<!-- Dictionary entries will be added here -->
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- Mobile-friendly table layout -->
+			<div class="mobile-table" id="mobileTable">
+				<!-- Mobile entries will be added here -->
+			</div>
 
 			<div id="emptyDictionary" class="empty-dictionary">
 				No dictionary entries yet. Add some above!
@@ -425,16 +545,30 @@
 	<script>
 		// Dark mode functionality
 		const darkModeToggle = document.getElementById('darkModeToggle');
+		const modeToggleEmoji = document.getElementById('modeToggleEmoji');
 		const htmlElement = document.documentElement;
 
 		// Function to toggle dark mode
 		function toggleDarkMode() {
 			htmlElement.classList.toggle('dark-mode');
 			localStorage.setItem('darkMode', htmlElement.classList.contains('dark-mode'));
+			
+			// Update the emoji for small screens
+			if (htmlElement.classList.contains('dark-mode')) {
+				modeToggleEmoji.textContent = '🌙';
+			} else {
+				modeToggleEmoji.textContent = '☀️';
+			}
 		}
 
 		// Event listener for the toggle switch
 		darkModeToggle.addEventListener('change', toggleDarkMode);
+		
+		// Event listener for the emoji toggle (for mobile)
+		modeToggleEmoji.addEventListener('click', function() {
+			darkModeToggle.checked = !darkModeToggle.checked;
+			toggleDarkMode();
+		});
 
 		// Set initial state (dark mode by default)
 		// We've already added the 'dark-mode' class to the html element
@@ -454,6 +588,7 @@
 		const dictionaryStatus = document.getElementById('dictionaryStatus');
 		const dictionaryTable = document.getElementById('dictionaryTable');
 		const dictionaryBody = document.getElementById('dictionaryBody');
+		const mobileTable = document.getElementById('mobileTable');
 		const newEnglishInput = document.getElementById('newEnglish');
 		const newIchrolicInput = document.getElementById('newIchrolic');
 		const addEntryButton = document.getElementById('addEntry');
@@ -463,6 +598,16 @@
 		const ichrolicHeader = document.getElementById('ichrolicHeader');
 
 		let isSynonymMode = false; // Track the current mode
+
+		// Check if we're on mobile or desktop
+		function isMobileView() {
+			return window.innerWidth <= 768;
+		}
+
+		// Event listeners for window resize to update table view
+		window.addEventListener('resize', function() {
+			updateDictionaryTable();
+		});
 
 		// Event Listeners
 		englishInput.addEventListener('input', translateToIchrolic);
@@ -482,8 +627,9 @@
 			const showSynonyms = showSynonymsCheckbox.checked;
 			const searchTerm = dictionarySearchInput.value.toLowerCase();
 
-			// Clear the table
+			// Clear both table views
 			dictionaryBody.innerHTML = '';
+			mobileTable.innerHTML = '';
 
 			// Get a list of all entries to display
 			const entries = [];
@@ -533,91 +679,211 @@
 			});
 
 			// Display entries
-			for (const entry of entries) {
-				const row = document.createElement('tr');
-				if (entry.isSynonym) {
-					row.classList.add('synonym-row');
-				}
-
-				const englishCell = document.createElement('td');
-				englishCell.textContent = entry.english;
-				if (entry.isSynonym) {
-					englishCell.textContent += ` (→ ${entry.canonicalForm})`;
-				}
-
-				const ichrolicCell = document.createElement('td');
-				ichrolicCell.textContent = entry.ichrolic;
-
-				const actionsCell = document.createElement('td');
-
-				// Create delete button
-				const deleteButton = document.createElement('button');
-				deleteButton.textContent = 'Delete';
-				deleteButton.style.backgroundColor = '#ec474f';
-				deleteButton.style.marginRight = '5px';
-				deleteButton.addEventListener('click', function() {
+			const isMobile = isMobileView();
+			
+			// Update desktop view
+			if (!isMobile) {
+				for (const entry of entries) {
+					const row = document.createElement('tr');
 					if (entry.isSynonym) {
-						delete synonyms[entry.english];
-					} else {
-						delete dictionary[entry.english];
+						row.classList.add('synonym-row');
 					}
-					updateDictionaryTable();
-					translateToIchrolic();
-				});
 
-				actionsCell.appendChild(deleteButton);
+					const englishCell = document.createElement('td');
+					englishCell.textContent = entry.english;
+					if (entry.isSynonym) {
+						englishCell.textContent += ` (→ ${entry.canonicalForm})`;
+					}
 
-				// Create edit button for primary entries
-				if (!entry.isSynonym) {
-					const editButton = document.createElement('button');
-					editButton.textContent = 'Edit';
-					//editButton.style.backgroundColor = '#28a745';
-					editButton.style.marginLeft = '5px';
-					editButton.addEventListener('click', function() {
-						// Populate the input fields with the current values
-						newEnglishInput.value = entry.english;
-						newIchrolicInput.value = entry.ichrolic;
+					const ichrolicCell = document.createElement('td');
+					ichrolicCell.textContent = entry.ichrolic;
 
-						// Remove the old entry
-						delete dictionary[entry.english];
+					const actionsCell = document.createElement('td');
 
-						// Focus on the ichrolic input for editing
-						newIchrolicInput.focus();
-
-						updateDictionaryTable();
-					});
-					actionsCell.appendChild(editButton);
-				}
-
-
-
-				// Only show "Make primary" button for synonyms
-				if (entry.isSynonym) {
-					const makePrimaryButton = document.createElement('button');
-					makePrimaryButton.textContent = 'Make Primary';
-					makePrimaryButton.style.backgroundColor = '#a9bbd0';
-					makePrimaryButton.style.marginLeft = '5px';
-					makePrimaryButton.addEventListener('click', function() {
-						// Get the translation from the canonical form
-						const translation = dictionary[entry.canonicalForm];
-
-						// Remove the synonym
-						delete synonyms[entry.english];
-
-						// Add as a primary entry
-						dictionary[entry.english] = translation;
-
+					// Create delete button
+					const deleteButton = document.createElement('button');
+					deleteButton.textContent = 'Delete';
+					deleteButton.style.backgroundColor = '#ec474f';
+					deleteButton.style.marginRight = '5px';
+					deleteButton.addEventListener('click', function() {
+						if (entry.isSynonym) {
+							delete synonyms[entry.english];
+						} else {
+							delete dictionary[entry.english];
+						}
 						updateDictionaryTable();
 						translateToIchrolic();
 					});
 
-					actionsCell.appendChild(makePrimaryButton);
-				}
+					actionsCell.appendChild(deleteButton);
 
-				row.appendChild(englishCell);
-				row.appendChild(ichrolicCell);
-				row.appendChild(actionsCell);
-				dictionaryBody.appendChild(row);
+					// Create edit button for primary entries
+					if (!entry.isSynonym) {
+						const editButton = document.createElement('button');
+						editButton.textContent = 'Edit';
+						editButton.style.marginLeft = '5px';
+						editButton.addEventListener('click', function() {
+							// Populate the input fields with the current values
+							newEnglishInput.value = entry.english;
+							newIchrolicInput.value = entry.ichrolic;
+
+							// Remove the old entry
+							delete dictionary[entry.english];
+
+							// Focus on the ichrolic input for editing
+							newIchrolicInput.focus();
+
+							updateDictionaryTable();
+						});
+						actionsCell.appendChild(editButton);
+					}
+
+					// Only show "Make primary" button for synonyms
+					if (entry.isSynonym) {
+						const makePrimaryButton = document.createElement('button');
+						makePrimaryButton.textContent = 'Make Primary';
+						makePrimaryButton.style.backgroundColor = '#a9bbd0';
+						makePrimaryButton.style.marginLeft = '5px';
+						makePrimaryButton.addEventListener('click', function() {
+							// Get the translation from the canonical form
+							const translation = dictionary[entry.canonicalForm];
+
+							// Remove the synonym
+							delete synonyms[entry.english];
+
+							// Add as a primary entry
+							dictionary[entry.english] = translation;
+
+							updateDictionaryTable();
+							translateToIchrolic();
+						});
+
+						actionsCell.appendChild(makePrimaryButton);
+					}
+
+					row.appendChild(englishCell);
+					row.appendChild(ichrolicCell);
+					row.appendChild(actionsCell);
+					dictionaryBody.appendChild(row);
+				}
+			} else {
+				// Mobile view entries
+				for (const entry of entries) {
+					const entryDiv = document.createElement('div');
+					entryDiv.className = 'mobile-table-entry';
+					if (entry.isSynonym) {
+						entryDiv.classList.add('synonym-row');
+					}
+					
+					// English row
+					const englishRow = document.createElement('div');
+					englishRow.className = 'mobile-table-row';
+					
+					const englishLabel = document.createElement('div');
+					englishLabel.className = 'mobile-table-label';
+					englishLabel.textContent = 'English:';
+					
+					const englishValue = document.createElement('div');
+					englishValue.className = 'mobile-table-value';
+					englishValue.textContent = entry.english;
+					if (entry.isSynonym) {
+						englishValue.textContent += ` (→ ${entry.canonicalForm})`;
+					}
+					
+					englishRow.appendChild(englishLabel);
+					englishRow.appendChild(englishValue);
+					entryDiv.appendChild(englishRow);
+					
+					// Ichrolic row
+					const ichrolicRow = document.createElement('div');
+					ichrolicRow.className = 'mobile-table-row';
+					
+					const ichrolicLabel = document.createElement('div');
+					ichrolicLabel.className = 'mobile-table-label';
+					ichrolicLabel.textContent = 'Ichrolic:';
+					
+					const ichrolicValue = document.createElement('div');
+					ichrolicValue.className = 'mobile-table-value';
+					ichrolicValue.textContent = entry.ichrolic;
+					
+					ichrolicRow.appendChild(ichrolicLabel);
+					ichrolicRow.appendChild(ichrolicValue);
+					entryDiv.appendChild(ichrolicRow);
+					
+					// Actions row
+					const actionsDiv = document.createElement('div');
+					actionsDiv.className = 'mobile-table-actions';
+					
+					// Create delete button
+					const deleteButton = document.createElement('button');
+					deleteButton.textContent = 'Delete';
+					deleteButton.style.backgroundColor = '#ec474f';
+					deleteButton.addEventListener('click', function() {
+						if (entry.isSynonym) {
+							delete synonyms[entry.english];
+						} else {
+							delete dictionary[entry.english];
+						}
+						updateDictionaryTable();
+						translateToIchrolic();
+					});
+					
+					actionsDiv.appendChild(deleteButton);
+					
+					// Create edit button for primary entries
+					if (!entry.isSynonym) {
+						const editButton = document.createElement('button');
+						editButton.textContent = 'Edit';
+						editButton.addEventListener('click', function() {
+							// Populate the input fields with the current values
+							newEnglishInput.value = entry.english;
+							newIchrolicInput.value = entry.ichrolic;
+
+							// Remove the old entry
+							delete dictionary[entry.english];
+
+							// Focus on the ichrolic input for editing
+							newIchrolicInput.focus();
+
+							updateDictionaryTable();
+						});
+						actionsDiv.appendChild(editButton);
+					}
+					
+					// Only show "Make primary" button for synonyms
+					if (entry.isSynonym) {
+						const makePrimaryButton = document.createElement('button');
+						makePrimaryButton.textContent = 'Make Primary';
+						makePrimaryButton.style.backgroundColor = '#a9bbd0';
+						makePrimaryButton.addEventListener('click', function() {
+							// Get the translation from the canonical form
+							const translation = dictionary[entry.canonicalForm];
+
+							// Remove the synonym
+							delete synonyms[entry.english];
+
+							// Add as a primary entry
+							dictionary[entry.english] = translation;
+
+							updateDictionaryTable();
+							translateToIchrolic();
+						});
+
+						actionsDiv.appendChild(makePrimaryButton);
+					}
+					
+					entryDiv.appendChild(actionsDiv);
+					mobileTable.appendChild(entryDiv);
+				}
+			}
+
+			// Show/hide appropriate view based on screen size
+			if (isMobile) {
+				document.getElementById('desktopTable').style.display = 'none';
+				document.getElementById('mobileTable').style.display = 'block';
+			} else {
+				document.getElementById('desktopTable').style.display = 'table';
+				document.getElementById('mobileTable').style.display = 'none';
 			}
 
 			// Update empty dictionary message visibility
