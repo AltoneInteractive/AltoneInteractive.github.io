@@ -86,6 +86,7 @@
 			font-weight: bold;
 			margin-bottom: 5px;
 		}
+		/* Complete text area styling with focus states */
 		textarea {
 			height: 200px;
 			padding: 10px;
@@ -96,11 +97,21 @@
 			font-family: inherit;
 			background-color: var(--container-bg);
 			color: var(--text-color);
-		}.
-		/* Add this to your existing CSS */
+			transition: border-color 0.2s ease, outline-color 0.2s ease;
+		}
+
 		textarea:focus {
-			background-color: var(--container-bg);
-			outline-color: var(--border-color);
+			background-color: var(--container-bg) !important; /* Force override */
+			color: var(--text-color) !important; /* Force override */
+			border-color: var(--heading-color);
+			outline: 1px solid var(--heading-color);
+			outline-offset: -1px; /* Keep outline tight to the border */
+		}
+
+		/* For webkit browsers like Chrome/Safari */
+		textarea:focus-visible {
+			background-color: var(--container-bg) !important;
+			color: var(--text-color) !important;
 		}
 		.settings {
 			background-color: var(--settings-bg);
