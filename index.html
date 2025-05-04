@@ -96,8 +96,9 @@
 			font-size: 16px;
 			font-family: inherit;
 			background-color: var(--container-bg) !important;
-			color: var(--text-color);
+			color: var(--text-color) !important; /* Force text color */
 			transition: border-color 0.2s ease, outline-color 0.2s ease;
+			-webkit-text-fill-color: var(--text-color); /* For WebKit browsers */
 		}
 
 		textarea:focus {
@@ -106,11 +107,23 @@
 			border-color: var(--heading-color);
 			outline: 1px solid var(--heading-color);
 			outline-offset: -1px; /* Keep outline tight to the border */
+			-webkit-text-fill-color: var(--text-color); /* For WebKit browsers */
 		}
 
 		/* For webkit browsers like Chrome/Safari */
 		textarea:focus-visible {
 			background-color: var(--container-bg) !important;
+			color: var(--text-color) !important;
+			-webkit-text-fill-color: var(--text-color);
+		}
+		
+		/* Fix for Firefox */
+		textarea:-moz-ui-invalid {
+			box-shadow: none;
+		}
+		
+		/* Force text color for all input states */
+		textarea:active, textarea:hover, textarea:focus {
 			color: var(--text-color) !important;
 		}
 		.settings {
@@ -181,8 +194,22 @@
 			padding: 8px;
 			border: 1px solid var(--border-color);
 			border-radius: 5px;
-			background-color: var(--container-bg);
-			color: var(--text-color);
+			background-color: var(--container-bg) !important;
+			color: var(--text-color) !important;
+			-webkit-text-fill-color: var(--text-color);
+		}
+		
+		/* Fix for all input elements */
+		input[type="text"] {
+			background-color: var(--container-bg) !important;
+			color: var(--text-color) !important;
+			-webkit-text-fill-color: var(--text-color);
+		}
+		
+		input[type="text"]:focus, input[type="text"]:active, input[type="text"]:hover {
+			background-color: var(--container-bg) !important;
+			color: var(--text-color) !important;
+			-webkit-text-fill-color: var(--text-color);
 		}
 		.dictionary-search .setting {
 			margin-bottom: 0;
@@ -231,8 +258,9 @@
 			padding: 8px;
 			border: 1px solid var(--border-color);
 			border-radius: 5px;
-			background-color: var(--container-bg);
-			color: var(--text-color);
+			background-color: var(--container-bg) !important;
+			color: var(--text-color) !important;
+			-webkit-text-fill-color: var(--text-color);
 		}
 		.empty-dictionary {
 			padding: 20px;
@@ -665,7 +693,7 @@
 						updateDictionaryTable();
 						translateToIchrolic();
 						dictionaryStatus.textContent = "Default dictionary loaded successfully.";
-
+						
 						// Clear status message after 3 seconds
 						setTimeout(() => {
 							dictionaryStatus.textContent = "";
@@ -677,7 +705,7 @@
 				.catch(error => {
 					console.error('Error loading dictionary:', error);
 					dictionaryStatus.textContent = "Error loading dictionary: " + error.message + ". Using empty dictionary.";
-
+					
 					// Initialize with empty dictionary if loading fails
 					dictionary = {};
 					synonyms = {};
