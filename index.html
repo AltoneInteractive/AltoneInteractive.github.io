@@ -355,17 +355,16 @@
 				cursor: pointer;
 				font-size: 24px;
 				line-height: 1;
+				display: block;
+			}
+			
+			.toggle-switch, .mode-icon {
+				display: none !important;
 			}
 		}
 		
 		@media (min-width: 423px) {
 			.mode-toggle-emoji {
-				display: none;
-			}
-		}
-		
-		@media (max-width: 422px) {
-			.toggle-switch, .mode-icon {
 				display: none;
 			}
 		}
@@ -419,11 +418,11 @@
 				text-align: left;
 				font-size: 1.5rem; /* Smaller size on mobile */
 				margin-bottom: 10px;
-				margin-right: 80px; /* Make space for the toggle switch */
+				margin-right: 10px; /* Make space for the toggle switch */
 			}
 
 			.dark-mode-toggle {
-				top: 20px; /* Align with the title */
+				top: 30px; /* Align with the title */
 			}
 
 			.container {
