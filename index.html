@@ -95,7 +95,7 @@
 			resize: vertical;
 			font-size: 16px;
 			font-family: inherit;
-			background-color: var(--container-bg);
+			background-color: var(--container-bg) !important;
 			color: var(--text-color);
 			transition: border-color 0.2s ease, outline-color 0.2s ease;
 		}
@@ -338,9 +338,7 @@
 
 		<div class="dictionary-controls">
 			<button id="saveDictionary">Save Dictionary</button>
-			<button id="loadDictionary">Load Dictionary</button>
 			<button id="showDictionary">Show/Hide Dictionary</button>
-			<input type="file" id="dictionaryFileInput" accept=".json" style="display: none;">
 		</div>
 		<div class="dictionary-status" id="dictionaryStatus"></div>
 
@@ -407,7 +405,6 @@
 		const ignoreDiacriticsCheckbox = document.getElementById('ignoreDiacritics');
 		const useContractionsCheckbox = document.getElementById('useContractions');
 		const saveDictionaryButton = document.getElementById('saveDictionary');
-		const loadDictionaryButton = document.getElementById('loadDictionary');
 		const showDictionaryButton = document.getElementById('showDictionary');
 		const dictionaryStatus = document.getElementById('dictionaryStatus');
 		const dictionaryTable = document.getElementById('dictionaryTable');
@@ -415,7 +412,6 @@
 		const newEnglishInput = document.getElementById('newEnglish');
 		const newIchrolicInput = document.getElementById('newIchrolic');
 		const addEntryButton = document.getElementById('addEntry');
-		const fileInput = document.getElementById('dictionaryFileInput');
 		const dictionarySearchInput = document.getElementById('dictionarySearchInput');
 		const showSynonymsCheckbox = document.getElementById('showSynonyms');
 		const englishHeader = document.getElementById('englishHeader');
@@ -428,7 +424,6 @@
 		ignoreDiacriticsCheckbox.addEventListener('change', translateToIchrolic);
 		useContractionsCheckbox.addEventListener('change', translateToIchrolic);
 		saveDictionaryButton.addEventListener('click', saveDictionary);
-		loadDictionaryButton.addEventListener('click', loadDictionary);
 		showDictionaryButton.addEventListener('click', toggleDictionaryTable);
 		addEntryButton.addEventListener('click', addDictionaryEntry);
 		dictionarySearchInput.addEventListener('input', updateDictionaryTable);
@@ -437,60 +432,7 @@
 		ichrolicHeader.addEventListener('click', () => sortDictionary('ichrolic'));
 		synonymToggleButton.addEventListener('click', toggleSynonymMode);
 
-		// File input listener
-		fileInput.addEventListener('change', function(event) {
-			const file = event.target.files[0];
-			if (!file) {
-				dictionaryStatus.textContent = "No file selected.";
-				return;
-			}
-
-			// Check if it's a JSON file
-			if (file.type !== "application/json" && !file.name.endsWith('.json')) {
-				dictionaryStatus.textContent = "Selected file is not a JSON file.";
-				return;
-			}
-
-			// Read the file
-			const reader = new FileReader();
-
-			reader.onload = function(e) {
-				try {
-					const parsedData = JSON.parse(e.target.result);
-
-					if (parsedData.dictionary && parsedData.synonyms) {
-						dictionary = parsedData.dictionary;
-						synonyms = parsedData.synonyms;
-						updateDictionaryTable();
-						translateToIchrolic();
-						dictionaryStatus.textContent = "Dictionary loaded successfully from file.";
-
-						// Clear status message after 3 seconds
-						setTimeout(() => {
-							dictionaryStatus.textContent = "";
-						}, 3000);
-					} else {
-						dictionaryStatus.textContent = "Invalid dictionary format in file.";
-					}
-				} catch (error) {
-					// Get just the error message without mentioning variable names
-					const errorMsg = error.message.replace(/canonical/g, "word").replace(/\bis\b/g, "are");
-					dictionaryStatus.textContent = "Error loading dictionary: " + errorMsg;
-				}
-			};
-
-			reader.onerror = function() {
-				dictionaryStatus.textContent = "Error reading file.";
-			};
-
-			// Read the file as text
-			reader.readAsText(file);
-
-			// Reset the file input so the same file can be selected again
-			fileInput.value = '';
-		});
 		// Function to update the dictionary table
-		// Function to update the dictionary table (modified with edit buttons)
 		function updateDictionaryTable() {
 			const showSynonyms = showSynonymsCheckbox.checked;
 			const searchTerm = dictionarySearchInput.value.toLowerCase();
@@ -642,8 +584,7 @@
 			}
 		}
 
-		// Add the missing function to add dictionary entries
-		// Add this function to toggle between direct entry and synonym modes:
+		// Function to toggle between direct entry and synonym modes:
 		function toggleSynonymMode() {
 			isSynonymMode = !isSynonymMode;
 
@@ -658,7 +599,7 @@
 			}
 		}
 
-		// Replace the existing addDictionaryEntry function with this simpler version:
+		// Add dictionary entry function
 		function addDictionaryEntry() {
 			const english = newEnglishInput.value.trim();
 			const ichrolic = newIchrolicInput.value.trim();
@@ -702,16 +643,46 @@
 				dictionaryStatus.textContent = "";
 			}, 3000);
 		}
-		// Initialize with empty dictionary
-		initializeSampleDictionary();
 
-		// Function to initialize empty dictionary
-		function initializeSampleDictionary() {
-			dictionary = {};
-			synonyms = {};
+		// Automatically load the dictionary when the page loads
+		window.addEventListener('DOMContentLoaded', function() {
+			loadDefaultDictionary();
+		});
 
-			updateDictionaryTable();
-			translateToIchrolic();
+		// Function to load the default dictionary from a file in the repo
+		function loadDefaultDictionary() {
+			fetch('dictionary.json')
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Failed to load dictionary file. Status: ' + response.status);
+					}
+					return response.json();
+				})
+				.then(data => {
+					if (data.dictionary && data.synonyms) {
+						dictionary = data.dictionary;
+						synonyms = data.synonyms;
+						updateDictionaryTable();
+						translateToIchrolic();
+						dictionaryStatus.textContent = "Default dictionary loaded successfully.";
+
+						// Clear status message after 3 seconds
+						setTimeout(() => {
+							dictionaryStatus.textContent = "";
+						}, 3000);
+					} else {
+						throw new Error('Invalid dictionary format in file.');
+					}
+				})
+				.catch(error => {
+					console.error('Error loading dictionary:', error);
+					dictionaryStatus.textContent = "Error loading dictionary: " + error.message + ". Using empty dictionary.";
+
+					// Initialize with empty dictionary if loading fails
+					dictionary = {};
+					synonyms = {};
+					updateDictionaryTable();
+				});
 		}
 
 		// Function to translate English to Ichrolic
@@ -1179,12 +1150,6 @@
 			}
 
 			return result;
-		}
-
-		// Load dictionary from file
-		function loadDictionary() {
-			// Trigger the file input click when the load button is clicked
-			fileInput.click();
 		}
 
 		// Save dictionary to file
