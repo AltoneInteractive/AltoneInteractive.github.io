@@ -1002,15 +1002,42 @@
 
 		// Update the English input display with variant markup
 		function updateEnglishInputDisplay() {
-			const text = getPlainTextFromInput();
-			if (!text.trim()) return;
+			const fullText = getPlainTextFromInput();
+			const text = fullText.trim();
+			if (!text) {
+				// If no text, just clear any existing markup
+				if (englishInput.innerHTML !== '' && !englishInput.textContent.trim()) {
+					englishInput.innerHTML = '';
+				}
+				return;
+			}
 
-			// Tokenize the text while preserving spaces and punctuation
+			// Check if we actually have any variant words to mark
+			const hasVariants = text.split(/\s+/).some(word => {
+				const cleanWord = word.toLowerCase().replace(/[.,!?;:]/g, '');
+				return wordVariants[cleanWord];
+			});
+			
+			if (!hasVariants) {
+				// No variants to mark, don't rebuild HTML unnecessarily
+				return;
+			}
+
+			// Save cursor position as absolute text offset (ignoring HTML)
+			const selection = window.getSelection();
+			let cursorTextOffset = 0;
+			
+			if (selection.rangeCount > 0) {
+				const range = selection.getRangeAt(0);
+				cursorTextOffset = getAbsoluteTextOffset(englishInput, range.startContainer, range.startOffset);
+			}
+
+			// Tokenize the FULL text (including trailing spaces) while preserving spaces and punctuation
 			const tokens = [];
 			let currentWord = "";
 			const punctuationChars = [",", ".", "!", "?", ";", ":"];
 
-			for (const c of text) {
+			for (const c of fullText) {
 				if (c === " ") {
 					if (currentWord !== "") {
 						tokens.push({ type: 'word', content: currentWord });
@@ -1047,62 +1074,70 @@
 				}
 			}
 
-			// Update the content while preserving cursor position
-			const selection = window.getSelection();
-			const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-			const cursorOffset = range ? range.startOffset : 0;
-
+			// Update the content
 			englishInput.innerHTML = html;
 
-			// Restore cursor position (simplified approach)
-			if (range) {
-				try {
-					const newRange = document.createRange();
-					const textNode = findTextNodeAtOffset(englishInput, cursorOffset);
-					if (textNode.node) {
-						newRange.setStart(textNode.node, Math.min(textNode.offset, textNode.node.textContent.length));
-						newRange.setEnd(textNode.node, Math.min(textNode.offset, textNode.node.textContent.length));
-						selection.removeAllRanges();
-						selection.addRange(newRange);
-					}
-				} catch (e) {
-					// Cursor restoration failed, place at end
-					const newRange = document.createRange();
-					newRange.selectNodeContents(englishInput);
-					newRange.collapse(false);
-					selection.removeAllRanges();
-					selection.addRange(newRange);
-				}
-			}
+			// Restore cursor position using absolute text offset
+			restoreCursorToTextOffset(englishInput, cursorTextOffset);
 		}
 
-		// Helper function to find text node at specific offset
-		function findTextNodeAtOffset(element, targetOffset) {
-			let currentOffset = 0;
+		// Get absolute text position ignoring HTML markup
+		function getAbsoluteTextOffset(container, node, offset) {
 			const walker = document.createTreeWalker(
-				element,
+				container,
 				NodeFilter.SHOW_TEXT,
 				null,
 				false
 			);
 
+			let textOffset = 0;
+			let currentNode;
+			
+			while (currentNode = walker.nextNode()) {
+				if (currentNode === node) {
+					return textOffset + offset;
+				}
+				textOffset += currentNode.textContent.length;
+			}
+			
+			return textOffset;
+		}
+
+		// Restore cursor to specific text position
+		function restoreCursorToTextOffset(container, targetOffset) {
+			const walker = document.createTreeWalker(
+				container,
+				NodeFilter.SHOW_TEXT,
+				null,
+				false
+			);
+
+			let currentOffset = 0;
 			let node;
+			
 			while (node = walker.nextNode()) {
 				const nodeLength = node.textContent.length;
 				if (currentOffset + nodeLength >= targetOffset) {
-					return {
-						node: node,
-						offset: targetOffset - currentOffset
-					};
+					const selection = window.getSelection();
+					const range = document.createRange();
+					const offsetInNode = Math.min(targetOffset - currentOffset, nodeLength);
+					
+					range.setStart(node, offsetInNode);
+					range.setEnd(node, offsetInNode);
+					selection.removeAllRanges();
+					selection.addRange(range);
+					return;
 				}
 				currentOffset += nodeLength;
 			}
-
-			// If we couldn't find the exact position, return the last text node
-			return {
-				node: node || element,
-				offset: node ? node.textContent.length : 0
-			};
+			
+			// If we couldn't find the position, place cursor at end
+			const selection = window.getSelection();
+			const range = document.createRange();
+			range.selectNodeContents(container);
+			range.collapse(false);
+			selection.removeAllRanges();
+			selection.addRange(range);
 		}
 
 		// Get plain text content from the contenteditable div
@@ -1285,16 +1320,37 @@
 		});
 
 		// Check for developer mode trigger and handle input changes
-		englishInput.addEventListener('input', function() {
+		englishInput.addEventListener('input', function(e) {
 			const text = getPlainTextFromInput();
 			if (text === '/////') {
 				enterDeveloperMode();
-			} else {
-				// Debounce the display update and translation
-				clearTimeout(englishInput.updateTimeout);
-				englishInput.updateTimeout = setTimeout(() => {
+				return;
+			}
+			
+			// Always translate on input changes
+			clearTimeout(englishInput.translateTimeout);
+			englishInput.translateTimeout = setTimeout(() => {
+				translateToIchrolic();
+			}, 50);
+			
+			// Only rebuild display in specific cases to avoid cursor issues
+			if (e.inputType === 'insertText' && e.data === ' ') {
+				// User typed a space - finished a word, mark variants
+				clearTimeout(englishInput.displayTimeout);
+				englishInput.displayTimeout = setTimeout(() => {
 					updateEnglishInputDisplay();
-					translateToIchrolic();
+				}, 200);
+			} else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+				// User deleted content - may have removed variant markup
+				clearTimeout(englishInput.displayTimeout);
+				englishInput.displayTimeout = setTimeout(() => {
+					updateEnglishInputDisplay();
+				}, 300);
+			} else if (e.inputType === 'insertParagraph' || e.inputType === 'insertLineBreak') {
+				// User pressed Enter
+				clearTimeout(englishInput.displayTimeout);
+				englishInput.displayTimeout = setTimeout(() => {
+					updateEnglishInputDisplay();
 				}, 100);
 			}
 		});
@@ -1310,6 +1366,42 @@
 					cycleVariant(baseWord);
 				}
 			}
+		});
+
+		// Update display when user focuses the field (if it needs updating)
+		englishInput.addEventListener('focus', function() {
+			const text = getPlainTextFromInput().trim();
+			if (!text) return;
+			
+			const hasVariants = text.split(/\s+/).some(word => {
+				const cleanWord = word.toLowerCase().replace(/[.,!?;:]/g, '');
+				return wordVariants[cleanWord];
+			});
+			
+			if (hasVariants && englishInput.innerHTML === englishInput.textContent) {
+				// Only rebuild if we have variants but no HTML markup yet
+				updateEnglishInputDisplay();
+			}
+		});
+
+		// Update display when user leaves the field (catches words typed without spaces)
+		englishInput.addEventListener('blur', function() {
+			// Small delay to ensure focus has actually left
+			setTimeout(() => {
+				if (document.activeElement !== englishInput) {
+					const text = getPlainTextFromInput().trim();
+					if (text) {
+						const hasVariants = text.split(/\s+/).some(word => {
+							const cleanWord = word.toLowerCase().replace(/[.,!?;:]/g, '');
+							return wordVariants[cleanWord];
+						});
+						
+						if (hasVariants) {
+							updateEnglishInputDisplay();
+						}
+					}
+				}
+			}, 10);
 		});
 
 		// Handle paste events to maintain plain text
@@ -1946,7 +2038,13 @@
 						dictionary = data.dictionary;
 						synonyms = data.synonyms;
 						buildVariantMapping();
-						updateEnglishInputDisplay(); // Update display to show variants
+						
+						// Only update display if there's content to process
+						const text = getPlainTextFromInput();
+						if (text.trim()) {
+							updateEnglishInputDisplay();
+						}
+						
 						updateDictionaryTable();
 						translateToIchrolic();
 						dictionaryStatus.textContent = "Default dictionary loaded successfully.";
