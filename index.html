@@ -1081,7 +1081,9 @@
 				if (token.type === 'word') {
 					const baseWord = token.content.toLowerCase();
 					if (wordVariants[baseWord]) {
-						html += `<span class="variant-word" data-base-word="${baseWord}">${token.content}</span>`;
+						const variant = getSelectedVariant(baseWord);
+						const tooltipText = variant ? variant.type : 'VARIANT';
+						html += `<span class="variant-word" data-base-word="${baseWord}" title="${tooltipText}">${token.content}</span>`;
 					} else {
 						html += token.content;
 					}
