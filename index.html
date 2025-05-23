@@ -365,40 +365,6 @@
 			border-radius: 2px;
 		}
 
-		/* Tooltip styling */
-		.variant-tooltip {
-			position: absolute;
-			bottom: 100%;
-			left: 50%;
-			transform: translateX(-50%);
-			background-color: var(--heading-color);
-			color: var(--button-text);
-			padding: 4px 8px;
-			border-radius: 4px;
-			font-size: 12px;
-			font-weight: bold;
-			white-space: nowrap;
-			opacity: 0;
-			pointer-events: none;
-			transition: opacity 0.2s ease;
-			z-index: 1000;
-			margin-bottom: 5px;
-		}
-
-		.variant-tooltip:after {
-			content: '';
-			position: absolute;
-			top: 100%;
-			left: 50%;
-			transform: translateX(-50%);
-			border: 4px solid transparent;
-			border-top-color: var(--heading-color);
-		}
-
-		.variant-word:hover .variant-tooltip {
-			opacity: 1;
-		}
-
 		/* Special styling for the Ichrolic output textarea */
 		#ichrolicOutput {
 			cursor: pointer;
@@ -1008,6 +974,8 @@
 					selectedVariants[baseWord] = 0;
 				}
 			}
+			
+			console.log('Built variants:', Object.keys(wordVariants));
 		}
 
 		// Get the currently selected variant for a word
@@ -1023,6 +991,9 @@
 			const currentIndex = selectedVariants[baseWord] || 0;
 			const nextIndex = (currentIndex + 1) % wordVariants[baseWord].length;
 			selectedVariants[baseWord] = nextIndex;
+			
+			const newVariant = wordVariants[baseWord][nextIndex];
+			console.log(`Cycled "${baseWord}" to variant: ${newVariant.type} (${newVariant.translation})`);
 			
 			// Update display and retranslate
 			updateEnglishInputDisplay();
@@ -1067,8 +1038,7 @@
 				if (token.type === 'word') {
 					const baseWord = token.content.toLowerCase();
 					if (wordVariants[baseWord]) {
-						const variant = getSelectedVariant(baseWord);
-						html += `<span class="variant-word" data-base-word="${baseWord}">${token.content}<div class="variant-tooltip">${variant.type}</div></span>`;
+						html += `<span class="variant-word" data-base-word="${baseWord}">${token.content}</span>`;
 					} else {
 						html += token.content;
 					}
@@ -1220,8 +1190,8 @@
 			console.log('Save button updated to:', saveDictionaryButton.textContent);
 			
 			// Clear the input field only if triggered by typing "/////", not auto-login
-			if (englishInput.value === '/////') {
-				englishInput.value = '';
+			if (getPlainTextFromInput() === '/////') {
+				englishInput.innerHTML = '';
 				ichrolicOutput.value = '';
 				console.log('Cleared input fields (triggered by typing)');
 			} else {
@@ -1314,17 +1284,18 @@
 			}
 		});
 
-		// Check for developer mode trigger
+		// Check for developer mode trigger and handle input changes
 		englishInput.addEventListener('input', function() {
 			const text = getPlainTextFromInput();
 			if (text === '/////') {
 				enterDeveloperMode();
 			} else {
-				// Debounce the display update to avoid excessive DOM manipulation
+				// Debounce the display update and translation
 				clearTimeout(englishInput.updateTimeout);
 				englishInput.updateTimeout = setTimeout(() => {
 					updateEnglishInputDisplay();
-				}, 150);
+					translateToIchrolic();
+				}, 100);
 			}
 		});
 
@@ -1333,6 +1304,7 @@
 			const variantWord = e.target.closest('.variant-word');
 			if (variantWord) {
 				e.preventDefault();
+				e.stopPropagation();
 				const baseWord = variantWord.getAttribute('data-base-word');
 				if (baseWord) {
 					cycleVariant(baseWord);
@@ -1362,8 +1334,7 @@
 
 
 
-		// Event Listeners
-		englishInput.addEventListener('input', translateToIchrolic);
+		// Event Listeners (translation is handled in the input event above)
 		ignoreDiacriticsCheckbox.addEventListener('change', translateToIchrolic);
 		useContractionsCheckbox.addEventListener('change', translateToIchrolic);
 		saveDictionaryButton.addEventListener('click', saveDictionary);
@@ -1975,6 +1946,7 @@
 						dictionary = data.dictionary;
 						synonyms = data.synonyms;
 						buildVariantMapping();
+						updateEnglishInputDisplay(); // Update display to show variants
 						updateDictionaryTable();
 						translateToIchrolic();
 						dictionaryStatus.textContent = "Default dictionary loaded successfully.";
