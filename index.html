@@ -258,8 +258,11 @@
 			transition: margin-left 0.3s ease;
 		}
 
-		h1.dev-mode {
-			margin-left: 60px; /* Make room for dev menu only in dev mode */
+		/* Only apply dev mode margin on mobile/smaller screens */
+		@media (max-width: 768px) {
+			h1.dev-mode {
+				margin-left: 60px; /* Make room for dev menu only in dev mode on mobile */
+			}
 		}
 		.translator {
 			display: flex;
@@ -667,10 +670,6 @@
 				font-size: 1.5rem; /* Smaller size on mobile */
 				margin-bottom: 10px;
 				margin-right: 10px; /* Make space for the toggle switch */
-			}
-
-			h1.dev-mode {
-				margin-left: 60px; /* Keep space for dev menu on mobile too when in dev mode */
 			}
 
 			.dark-mode-toggle {
