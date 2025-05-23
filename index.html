@@ -1214,6 +1214,11 @@
 			localStorage.removeItem('github_user');
 			updateSignInState();
 			
+			// Exit developer mode when signing out
+			if (isDeveloperMode) {
+				exitDeveloperMode();
+			}
+			
 			dictionaryStatus.textContent = "Signed out";
 			setTimeout(() => {
 				dictionaryStatus.textContent = "";
