@@ -1182,8 +1182,8 @@
     }
 
     function handleVariantClick(e) {
-      //e.preventDefault();
-      //e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
       const baseWord = e.target.getAttribute('data-base-word');
       if (baseWord) {
         cycleVariant(baseWord);
@@ -1261,6 +1261,10 @@
 
     // Restore cursor to specific text position
     function restoreCursorToTextOffset(container, targetOffset) {
+      // Only restore cursor if the container is already focused
+      if (document.activeElement !== container) {
+        return; // Don't steal focus from other elements
+      }
       const walker = document.createTreeWalker(
         container,
         NodeFilter.SHOW_TEXT,
