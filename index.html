@@ -1995,7 +1995,7 @@
 			return processedSegments.join(" ").trim();
 		}
 
-				// Process contractions within a single segment
+		// Process contractions within a single segment
 		function processSegmentContractions(segment, capitalizationMap, resultToEnglishIndex) {
 			// List of mergable words
 			const mergableWords = [
@@ -2015,6 +2015,14 @@
 				"íka",
 				"yuhni"
 			];
+		
+			// Helper function to check if a word is "special" (mergeable, prefix, or suffix)
+			const isSpecialWord = (word) => {
+				const lowerWord = word.toLowerCase();
+				return mergableWords.includes(lowerWord) || 
+					   prefixes.includes(lowerWord) || 
+					   suffixes.includes(lowerWord);
+			};
 		
 			const words = segment.trim().split(" ");
 			const result = [];
@@ -2049,10 +2057,19 @@
 					combined = true;
 				}
 		
-				// Check for suffixes on the previous word
+				// Check for suffixes on the previous word - but look ahead for special words
 				if (!combined && suffixes.includes(currentWord.toLowerCase()) && i > 0 && result.length > 0) {
-					// Don't merge if the previous result position is already a merged word
-					if (!mergedPositions.has(result.length - 1)) {
+					// Look ahead to see if the next word is special and would want to merge with current word
+					let shouldDeferToNext = false;
+					if (i < words.length - 1) {
+						const nextWord = words[i + 1];
+						if (isSpecialWord(nextWord)) {
+							shouldDeferToNext = true;
+						}
+					}
+		
+					// Don't merge if the previous result position is already a merged word or if we should defer
+					if (!mergedPositions.has(result.length - 1) && !shouldDeferToNext) {
 						const prevWord = result[result.length - 1];
 		
 						// Check if the corresponding English word is capitalized
