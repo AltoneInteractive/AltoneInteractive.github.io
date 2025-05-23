@@ -943,6 +943,7 @@
 
 		// Developer mode functionality
 		function enterDeveloperMode() {
+			console.log('=== Entering Developer Mode ===');
 			isDeveloperMode = true;
 			
 			// Add dev mode class to title and dev menu toggle
@@ -954,14 +955,21 @@
 			
 			// Show developer menu
 			devMenu.classList.add('show');
+			console.log('Dev menu shown, button should be visible');
 			
 			// Change save button text and style
 			saveDictionaryButton.textContent = 'Update Dictionary';
 			saveDictionaryButton.classList.add('goldenrod-button');
+			console.log('Save button updated to:', saveDictionaryButton.textContent);
 			
-			// Clear the input field
-			englishInput.value = '';
-			ichrolicOutput.value = '';
+			// Clear the input field only if triggered by typing "/////", not auto-login
+			if (englishInput.value === '/////') {
+				englishInput.value = '';
+				ichrolicOutput.value = '';
+				console.log('Cleared input fields (triggered by typing)');
+			} else {
+				console.log('Auto-login detected, keeping input fields as-is');
+			}
 		}
 
 		function exitDeveloperMode() {
