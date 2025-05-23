@@ -2138,13 +2138,13 @@
 				const githubDict = await fetchCurrentDictionary();
 				const githubContent = JSON.parse(atob(githubDict.content));
 
-				// Prepare local dictionary for comparison
+				// Prepare local dictionary for comparison (exact same format as GitHub)
 				const localContent = {
 					dictionary: {},
 					synonyms: {}
 				};
 
-				// Sort local dictionaries for consistent comparison
+				// Sort local dictionaries exactly like GitHub version
 				const sortedKeys = Object.keys(dictionary).sort();
 				for (const key of sortedKeys) {
 					localContent.dictionary[key] = dictionary[key];
@@ -2155,12 +2155,18 @@
 					localContent.synonyms[key] = synonyms[key];
 				}
 
-				// Compare dictionaries
-				const githubJson = JSON.stringify(githubContent, null, 2);
-				const localJson = JSON.stringify(localContent, null, 2);
+				// Normalize both for comparison (remove any formatting differences)
+				const normalizeForComparison = (obj) => JSON.stringify(obj, Object.keys(obj).sort());
+				
+				const githubNormalized = normalizeForComparison(githubContent);
+				const localNormalized = normalizeForComparison(localContent);
 
-				if (githubJson === localJson) {
-					dictionaryStatus.textContent = "Dictionary is already up to date!";
+				console.log('Comparing dictionaries...');
+				console.log('GitHub keys:', Object.keys(githubContent.dictionary || {}).length, 'dictionary,', Object.keys(githubContent.synonyms || {}).length, 'synonyms');
+				console.log('Local keys:', Object.keys(localContent.dictionary).length, 'dictionary,', Object.keys(localContent.synonyms).length, 'synonyms');
+
+				if (githubNormalized === localNormalized) {
+					dictionaryStatus.textContent = "Dictionary is already up to date! No changes detected.";
 					setTimeout(() => {
 						dictionaryStatus.textContent = "";
 					}, 3000);
