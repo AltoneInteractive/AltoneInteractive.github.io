@@ -715,6 +715,152 @@
 			#synonymToggle {
 				align-self: flex-start;
 			}
+					/* Enhanced English display styles */
+			.enhanced-english-display {
+				height: 200px;
+				padding: 10px;
+				border: 1px solid var(--border-color);
+				border-radius: 5px;
+				font-size: 16px;
+				font-family: inherit;
+				background-color: var(--container-bg);
+				color: var(--text-color);
+				overflow-y: auto;
+				cursor: text;
+				line-height: 1.5;
+				white-space: pre-wrap;
+				word-wrap: break-word;
+				display: none; /* Hidden by default */
+			}
+			
+			/* Word variant container */
+			.word-variant {
+				position: relative;
+				display: inline-block;
+				cursor: pointer;
+				margin: 0 1px;
+				padding: 2px 4px;
+				border-radius: 3px;
+				transition: all 0.2s ease;
+				border-bottom: 2px solid var(--heading-color);
+				background-color: rgba(125, 190, 144, 0.1);
+			}
+			
+			.word-variant:hover {
+				background-color: rgba(125, 190, 144, 0.2);
+				transform: translateY(-1px);
+			}
+			
+			/* The actual word text */
+			.variant-word {
+				display: block;
+				font-weight: 500;
+			}
+			
+			/* The variant label (NOUN, VERB, etc.) */
+			.variant-label {
+				position: absolute;
+				bottom: -18px;
+				left: 50%;
+				transform: translateX(-50%);
+				font-size: 9px;
+				font-weight: bold;
+				color: var(--heading-color);
+				background-color: var(--container-bg);
+				padding: 1px 4px;
+				border-radius: 2px;
+				border: 1px solid var(--heading-color);
+				white-space: nowrap;
+				opacity: 0.8;
+				pointer-events: none;
+				z-index: 10;
+			}
+			
+			/* Dark mode adjustments */
+			html.dark-mode .word-variant {
+				background-color: rgba(125, 190, 144, 0.15);
+				border-bottom-color: var(--heading-color);
+			}
+			
+			html.dark-mode .word-variant:hover {
+				background-color: rgba(125, 190, 144, 0.25);
+			}
+			
+			html.dark-mode .variant-label {
+				background-color: var(--container-bg);
+				color: var(--heading-color);
+				border-color: var(--heading-color);
+			}
+			
+			/* Ensure proper spacing around variants */
+			.enhanced-english-display .word-variant + .word-variant {
+				margin-left: 3px;
+			}
+			
+			/* Click feedback animation */
+			.word-variant.clicked {
+				animation: variant-click 0.3s ease;
+			}
+			
+			@keyframes variant-click {
+				0% { transform: translateY(0) scale(1); }
+				50% { transform: translateY(-2px) scale(1.05); }
+				100% { transform: translateY(0) scale(1); }
+			}
+			
+			/* Tooltip for variant options */
+			.word-variant::before {
+				content: attr(data-tooltip);
+				position: absolute;
+				bottom: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				background-color: var(--heading-color);
+				color: var(--button-text);
+				padding: 4px 8px;
+				border-radius: 4px;
+				font-size: 11px;
+				white-space: nowrap;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.2s ease;
+				z-index: 100;
+				margin-bottom: 5px;
+			}
+			
+			.word-variant:hover::before {
+				opacity: 1;
+			}
+			
+			/* Mobile responsiveness */
+			@media (max-width: 768px) {
+				.variant-label {
+					font-size: 8px;
+					bottom: -16px;
+					padding: 0.5px 3px;
+				}
+				
+				.word-variant {
+					margin: 0 0.5px;
+					padding: 1px 3px;
+				}
+				
+				.enhanced-english-display {
+					height: 150px;
+					font-size: 14px;
+				}
+			}
+			
+			/* Accessibility improvements */
+			.word-variant:focus {
+				outline: 2px solid var(--heading-color);
+				outline-offset: 2px;
+			}
+			
+			/* Make variant words keyboard accessible */
+			.word-variant[tabindex="0"]:focus {
+				background-color: rgba(125, 190, 144, 0.3);
+			}
 		}
 	</style>
 </head>
@@ -1730,38 +1876,155 @@
 				});
 		}
 
-		// Function to translate English to Ichrolic
+				// Enhanced translation function with word variant selection
 		function translateToIchrolic() {
 			const english = englishInput.value.trim();
 			if (english === "") {
 				ichrolicOutput.value = "";
+				englishInput.innerHTML = ""; // Clear any existing markup
 				return;
 			}
-
+		
 			const ignoreDiacritics = ignoreDiacriticsCheckbox.checked;
 			const useContractions = useContractionsCheckbox.checked;
-
-			// Keep track of capitalization for each word
+		
+			// Keep track of capitalization and word variants
 			const englishWords = english.split(" ");
 			const capitalizationMap = {};
-
+			const wordVariants = {}; // Track which variants are selected for ambiguous words
+		
 			for (let i = 0; i < englishWords.length; i++) {
 				const word = englishWords[i];
 				if (word.length > 0) {
 					capitalizationMap[i] = word[0] === word[0].toUpperCase();
 				}
 			}
-
+		
+			// Function to find word variants in dictionary
+			function findWordVariants(baseWord) {
+				const variants = [];
+				const lowerBase = baseWord.toLowerCase();
+				
+				// Look for variants like "word/noun", "word/verb", etc.
+				for (const key in dictionary) {
+					if (key.startsWith(lowerBase + "/")) {
+						const variant = key.substring(lowerBase.length + 1);
+						variants.push({
+							key: key,
+							variant: variant,
+							translation: dictionary[key]
+						});
+					}
+				}
+				
+				// Sort variants to prioritize certain types (noun first, then verb, etc.)
+				variants.sort((a, b) => {
+					const priority = { "noun": 0, "verb": 1, "adj": 2, "adv": 3 };
+					const aPriority = priority[a.variant] ?? 999;
+					const bPriority = priority[b.variant] ?? 999;
+					return aPriority - bPriority;
+				});
+				
+				return variants;
+			}
+		
+			// Enhanced canonical form function with variant handling
+			function getCanonicalFormWithVariants(word, wordIndex) {
+				const lowercaseWord = word.toLowerCase();
+		
+				// Check if word already exists in main dictionary (exact match)
+				if (dictionary.hasOwnProperty(lowercaseWord)) {
+					return { key: lowercaseWord, hasVariants: false };
+				}
+		
+				// Check if word is a synonym
+				if (synonyms.hasOwnProperty(lowercaseWord)) {
+					return { key: synonyms[lowercaseWord], hasVariants: false };
+				}
+		
+				// Look for word variants
+				const variants = findWordVariants(lowercaseWord);
+				if (variants.length > 0) {
+					// Check if user has already selected a variant for this word position
+					const selectedVariant = wordVariants[wordIndex];
+					if (selectedVariant && variants.find(v => v.variant === selectedVariant)) {
+						const variant = variants.find(v => v.variant === selectedVariant);
+						return { 
+							key: variant.key, 
+							hasVariants: true, 
+							selectedVariant: selectedVariant,
+							availableVariants: variants.map(v => v.variant)
+						};
+					}
+					
+					// Default to first variant and store it
+					wordVariants[wordIndex] = variants[0].variant;
+					return { 
+						key: variants[0].key, 
+						hasVariants: true, 
+						selectedVariant: variants[0].variant,
+						availableVariants: variants.map(v => v.variant)
+					};
+				}
+		
+				return { key: lowercaseWord, hasVariants: false };
+			}
+		
+			// Create enhanced HTML output for English input with variant indicators
+			function createEnhancedEnglishDisplay() {
+				const words = english.split(/(\s+)/); // Split but keep spaces
+				let html = "";
+				let wordIndex = 0;
+		
+				for (let i = 0; i < words.length; i++) {
+					const segment = words[i];
+					
+					if (segment.trim() === "") {
+						// It's whitespace, add as-is
+						html += segment;
+					} else {
+						// It's a word, check for variants
+						const cleanWord = segment.toLowerCase();
+						const variants = findWordVariants(cleanWord);
+						
+						if (variants.length > 0) {
+							const selectedVariant = wordVariants[wordIndex] || variants[0].variant;
+							html += `<span class="word-variant" data-word-index="${wordIndex}" data-base-word="${cleanWord}">`;
+							html += `<span class="variant-word">${segment}</span>`;
+							html += `<span class="variant-label">${selectedVariant.toUpperCase()}</span>`;
+							html += `</span>`;
+						} else {
+							html += segment;
+						}
+						wordIndex++;
+					}
+				}
+		
+				return html;
+			}
+		
+			// Update the English input display (we'll need to change this to a div or use contentEditable)
+			// For now, let's create a new display element
+			let enhancedDisplay = document.getElementById('enhancedEnglishDisplay');
+			if (!enhancedDisplay) {
+				enhancedDisplay = document.createElement('div');
+				enhancedDisplay.id = 'enhancedEnglishDisplay';
+				enhancedDisplay.className = 'enhanced-english-display';
+				englishInput.parentNode.insertBefore(enhancedDisplay, englishInput.nextSibling);
+			}
+		
+			// [Rest of the translation logic remains the same, but using the enhanced getCanonicalFormWithVariants]
+			
 			// Sort dictionary keys by length (descending) to prioritize longer phrases
 			const sortedKeys = Object.keys(dictionary).sort((a, b) =>
 				b.split(" ").length - a.split(" ").length
 			);
-
+		
 			// Tokenize the English text, preserving punctuation
 			const tokens = [];
 			let currentWord = "";
 			const punctuationChars = [",", ".", "!", "?", ";", ":"];
-
+		
 			for (const c of english) {
 				if (c === " ") {
 					if (currentWord !== "") {
@@ -1779,68 +2042,68 @@
 					currentWord += c;
 				}
 			}
-
+		
 			if (currentWord !== "") {
 				tokens.push(currentWord);
 			}
-
-			// Find multi-word phrases and translate
+		
+			// Find multi-word phrases and translate (enhanced with variant support)
 			let i = 0;
 			const result = [];
 			const resultToEnglishIndex = {};
 			let englishIndex = 0;
-
+		
 			while (i < tokens.length) {
 				let foundPhrase = false;
-
+		
 				// Skip spaces
 				if (tokens[i] === " ") {
 					result.push(" ");
 					i++;
 					continue;
 				}
-
+		
 				// Check if punctuation
 				if (tokens[i].length === 1 && punctuationChars.includes(tokens[i])) {
 					result.push(tokens[i]);
 					i++;
 					continue;
 				}
-
-				// Try to match multi-word phrases
+		
+				// Try to match multi-word phrases (same logic as before)
 				for (const key of sortedKeys) {
 					if (key.includes(" ")) {  // Multi-word phrase
 						const phraseWords = key.split(" ");
 						let potentialMatch = true;
 						const phraseTokens = [];
 						let j = i;
-
+		
 						// Collect tokens that might form the phrase
 						for (const word of phraseWords) {
 							if (j >= tokens.length || tokens[j] === " " || punctuationChars.includes(tokens[j])) {
 								j++;
 								continue;
 							}
-
+		
 							phraseTokens.push(tokens[j].toLowerCase());
 							j++;
-
+		
 							// Skip spaces
 							if (j < tokens.length && tokens[j] === " ") {
 								j++;
 							}
 						}
-
+		
 						// Check if we have a match
 						if (phraseTokens.length === phraseWords.length) {
 							const matchStr = phraseTokens.join(" ");
 							if (matchStr.toLowerCase() === key.toLowerCase()) {
 								foundPhrase = true;
 								result.push(dictionary[key]);
-
+		
 								// Map this result to the English word
 								resultToEnglishIndex[result.length - 1] = englishIndex;
-
+		
 								// Skip the matched tokens
 								for (let k = 0; k < phraseWords.length * 2 - 1; k++) {
 									if (i < tokens.length) {
@@ -1850,53 +2113,55 @@
 										i++;
 									}
 								}
-
+		
 								break;
 							}
 						}
 					}
 				}
-
-				// If no phrase match, process as regular word
+		
+				// If no phrase match, process as regular word with variant support
 				if (!foundPhrase && i < tokens.length) {
 					const token = tokens[i];
-
+		
 					// Skip spaces
 					if (token === " ") {
 						result.push(" ");
 						i++;
 						continue;
 					}
-
+		
 					// Process punctuation
 					if (token.length === 1 && punctuationChars.includes(token)) {
 						result.push(token);
 						i++;
 						continue;
 					}
-
-					// Process regular word
+		
+					// Process regular word with variant support
 					const cleanWord = token.toLowerCase();
-					const canonicalWord = getCanonicalForm(cleanWord);
-
-					if (dictionary.hasOwnProperty(canonicalWord)) {
-						result.push(dictionary[canonicalWord]);
+					const canonicalInfo = getCanonicalFormWithVariants(cleanWord, englishIndex);
+		
+					if (dictionary.hasOwnProperty(canonicalInfo.key)) {
+						result.push(dictionary[canonicalInfo.key]);
 						resultToEnglishIndex[result.length - 1] = englishIndex;
 					} else {
 						result.push("[" + token + "]");
 						resultToEnglishIndex[result.length - 1] = englishIndex;
 					}
-
+		
 					englishIndex++;
 					i++;
 				}
 			}
-
+		
+			// [Rest of the translation process remains the same...]
+			
 			// Join the result, properly handling spaces and punctuation
 			let finalResult = "";
 			for (let j = 0; j < result.length; j++) {
 				const token = result[j];
-
+		
 				if (token === " ") {
 					finalResult += " ";
 				} else if (token.length === 1 && punctuationChars.includes(token)) {
@@ -1910,10 +2175,10 @@
 					finalResult += token;
 				}
 			}
-
+		
 			let ichrolic = finalResult.trim();
-
-			// Apply synonym handling for phrases
+		
+			// Apply synonym handling for phrases (same as before)
 			for (const synonymKey in synonyms) {
 				if (synonymKey.includes(" ")) {
 					const canonicalKey = synonyms[synonymKey];
@@ -1929,37 +2194,107 @@
 					}
 				}
 			}
-
+		
 			// Apply contractions if the option is enabled
 			if (useContractions) {
 				ichrolic = applyContractions(ichrolic, capitalizationMap, resultToEnglishIndex);
 			}
-
+		
 			// Remove diacritics if the option is enabled
 			if (ignoreDiacritics) {
 				ichrolic = removeDiacritics(ichrolic);
 			}
-
+		
+			// Update outputs
 			ichrolicOutput.value = ichrolic;
+			enhancedDisplay.innerHTML = createEnhancedEnglishDisplay();
+			
+			// Hide original input and show enhanced display
+			englishInput.style.display = 'none';
+			enhancedDisplay.style.display = 'block';
 		}
-
-		// Function to get canonical form from synonyms
-		function getCanonicalForm(word) {
-			const lowercaseWord = word.toLowerCase();
-
-			// Check if word already exists in main dictionary
-			if (dictionary.hasOwnProperty(lowercaseWord)) {
-				return lowercaseWord;
+		
+		// Function to toggle word variant
+		function toggleWordVariant(wordIndex, baseWord) {
+			const variants = [];
+			const lowerBase = baseWord.toLowerCase();
+			
+			// Find all variants for this word
+			for (const key in dictionary) {
+				if (key.startsWith(lowerBase + "/")) {
+					const variant = key.substring(lowerBase.length + 1);
+					variants.push(variant);
+				}
 			}
-
-			// Check if word is a synonym
-			if (synonyms.hasOwnProperty(lowercaseWord)) {
-				return synonyms[lowercaseWord];
-			}
-
-			return lowercaseWord;  // Return original if not found
+			
+			if (variants.length <= 1) return; // No variants to toggle
+			
+			// Sort variants consistently
+			variants.sort((a, b) => {
+				const priority = { "noun": 0, "verb": 1, "adj": 2, "adv": 3 };
+				const aPriority = priority[a] ?? 999;
+				const bPriority = priority[b] ?? 999;
+				return aPriority - bPriority;
+			});
+			
+			// Get current variant and find next one
+			const currentVariant = wordVariants[wordIndex] || variants[0];
+			const currentIndex = variants.indexOf(currentVariant);
+			const nextIndex = (currentIndex + 1) % variants.length;
+			
+			// Update the selected variant
+			wordVariants[wordIndex] = variants[nextIndex];
+			
+			// Re-translate to update everything
+			translateToIchrolic();
 		}
-
+		
+		// Event listener for variant clicking
+		document.addEventListener('click', function(e) {
+			if (e.target.closest('.word-variant')) {
+				const variantElement = e.target.closest('.word-variant');
+				const wordIndex = parseInt(variantElement.dataset.wordIndex);
+				const baseWord = variantElement.dataset.baseWord;
+				
+				toggleWordVariant(wordIndex, baseWord);
+			}
+		});
+		
+		// Function to show/hide enhanced display based on input focus
+		function toggleEnhancedDisplay() {
+			const enhancedDisplay = document.getElementById('enhancedEnglishDisplay');
+			if (enhancedDisplay) {
+				if (englishInput.value.trim() === "") {
+					// Show input, hide enhanced display
+					englishInput.style.display = 'block';
+					enhancedDisplay.style.display = 'none';
+				} else {
+					// Show enhanced display, hide input (but keep it functional)
+					englishInput.style.display = 'none';
+					enhancedDisplay.style.display = 'block';
+				}
+			}
+		}
+		
+		// Enhanced input event listener
+		englishInput.addEventListener('input', function() {
+			translateToIchrolic();
+			toggleEnhancedDisplay();
+		});
+		
+		englishInput.addEventListener('focus', function() {
+			// When focusing on input, show the input field temporarily
+			const enhancedDisplay = document.getElementById('enhancedEnglishDisplay');
+			if (enhancedDisplay && englishInput.value.trim() !== "") {
+				englishInput.style.display = 'block';
+				enhancedDisplay.style.display = 'none';
+			}
+		});
+		
+		englishInput.addEventListener('blur', function() {
+			// When losing focus, show enhanced display if there's content
+			setTimeout(() => toggleEnhancedDisplay(), 100); // Small delay to allow for clicks
+		});
 		// Function to apply contractions
 		function applyContractions(text, capitalizationMap, resultToEnglishIndex) {
 			if (!useContractionsCheckbox.checked) {
