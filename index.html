@@ -363,52 +363,11 @@
       text-decoration-color: var(--heading-color) !important;
       cursor: pointer;
       position: relative;
-      display: inline-block;
     }
 
     .english-input-editor .variant-word:hover {
       background-color: var(--table-hover);
       border-radius: 2px;
-    }
-
-    /* Custom tooltip styles */
-    .variant-word .tooltiptext {
-      visibility: hidden;
-      width: 120px;
-      background-color: var(--heading-color);
-      color: var(--button-text);
-      text-align: center;
-      border-radius: 6px;
-      padding: 5px 0;
-      font-size: 12px;
-      font-weight: normal;
-      text-decoration: none !important;
-      
-      /* Position the tooltip */
-      position: absolute;
-      z-index: 1000;
-      top: 100%;
-      left: 50%;
-      margin-left: -60px;
-      margin-top: 5px;
-      
-      /* Add a small arrow pointing up */
-      box-shadow: 0 2px 8px var(--box-shadow);
-    }
-
-    .variant-word .tooltiptext::before {
-      content: "";
-      position: absolute;
-      top: -5px;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 0 5px 5px 5px;
-      border-style: solid;
-      border-color: transparent transparent var(--heading-color) transparent;
-    }
-
-    .variant-word:hover .tooltiptext {
-      visibility: visible;
     }
 
     /* Special styling for the Ichrolic output textarea */
@@ -1133,10 +1092,7 @@
             const tooltipText = variant ? escapeHtml(variant.type) : 'VARIANT';
             const escapedBaseWord = escapeHtml(baseWord);
             const escapedContent = escapeHtml(token.content);
-            html += `<span class="variant-word" data-base-word="${escapedBaseWord}">
-              ${escapedContent}
-              <span class="tooltiptext">${tooltipText}</span>
-            </span>`;
+            html += `<span class="variant-word" data-base-word="${escapedBaseWord}" title="${tooltipText}">${escapedContent}</span>`;
           } else {
             html += escapeHtml(token.content);
           }
