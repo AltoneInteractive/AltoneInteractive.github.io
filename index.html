@@ -1630,7 +1630,10 @@
 
 		// Function to load the default dictionary from a file in the repo
 		function loadDefaultDictionary() {
-			fetch('dictionary.json')
+			// Add cache-busting parameter to always get fresh data
+			const cacheBuster = '?t=' + new Date().getTime();
+			
+			fetch('dictionary.json' + cacheBuster)
 				.then(response => {
 					if (!response.ok) {
 						throw new Error('Failed to load dictionary file. Status: ' + response.status);
