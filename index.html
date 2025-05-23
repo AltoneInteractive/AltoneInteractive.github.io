@@ -408,6 +408,51 @@
       opacity: 1;
     }
 
+    /* Custom tooltip styles */
+    .tooltip-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .custom-tooltip {
+      position: absolute;
+      visibility: hidden;
+      background-color: var(--text-color);
+      color: var(--container-bg);
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+      z-index: 1001;
+      box-shadow: 0 2px 8px var(--box-shadow);
+      transition: opacity 0.1s ease;
+      opacity: 0;
+    }
+
+    .custom-tooltip.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Arrow pointing up to the word */
+    .custom-tooltip::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 0 5px 5px 5px;
+      border-style: solid;
+      border-color: transparent transparent var(--text-color) transparent;
+    }
+
     .settings {
       background-color: var(--settings-bg);
       padding: 15px;
@@ -813,7 +858,15 @@
       <div class="text-areas">
         <div class="text-column">
           <div class="header">English</div>
-          <div id="englishInput" class="english-input-editor" contenteditable="true"></div>
+          <div style="position: relative;">
+            <div id="englishInput" class="english-input-editor" contenteditable="true"></div>
+            <!-- Tooltip overlay positioned above the text area -->
+            <div id="tooltipOverlay" class="tooltip-overlay">
+              <div id="customTooltip" class="custom-tooltip">
+                <span id="tooltipText"></span>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="text-column" style="position: relative;">
           <div class="header">Ichrolic <span class="copy-header">(Click to Copy)</span></div>
@@ -1000,6 +1053,9 @@
       const newVariant = wordVariants[baseWord][nextIndex];
       console.log(`Cycled "${baseWord}" to variant: ${newVariant.type} (${newVariant.translation})`);
       
+      // Update tooltip immediately if this word is currently being hovered
+      updateCurrentTooltip();
+      
       // Update display and retranslate
       updateEnglishInputDisplay();
       translateToIchrolic();
@@ -1088,11 +1144,9 @@
         if (token.type === 'word') {
           const baseWord = token.content.toLowerCase();
           if (wordVariants[baseWord]) {
-            const variant = getSelectedVariant(baseWord);
-            const tooltipText = variant ? escapeHtml(variant.type) : 'VARIANT';
             const escapedBaseWord = escapeHtml(baseWord);
             const escapedContent = escapeHtml(token.content);
-            html += `<span class="variant-word" data-base-word="${escapedBaseWord}" title="${tooltipText}">${escapedContent}</span>`;
+            html += `<span class="variant-word" data-base-word="${escapedBaseWord}">${escapedContent}</span>`;
           } else {
             html += escapeHtml(token.content);
           }
@@ -1104,8 +1158,83 @@
       // Update the content
       englishInput.innerHTML = html;
 
+      // Add event listeners for custom tooltips
+      setupTooltipHandlers();
+
       // Restore cursor position using absolute text offset
       restoreCursorToTextOffset(englishInput, cursorTextOffset);
+    }
+
+    // Custom tooltip system
+    const tooltipOverlay = document.getElementById('tooltipOverlay');
+    const customTooltip = document.getElementById('customTooltip');
+    const tooltipText = document.getElementById('tooltipText');
+    let currentTooltipWord = null;
+
+    function setupTooltipHandlers() {
+      const variantWords = englishInput.querySelectorAll('.variant-word');
+      
+      variantWords.forEach(word => {
+        word.addEventListener('mouseenter', showTooltip);
+        word.addEventListener('mouseleave', hideTooltip);
+        word.addEventListener('click', handleVariantClick);
+      });
+    }
+
+    function handleVariantClick(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const baseWord = e.target.getAttribute('data-base-word');
+      if (baseWord) {
+        cycleVariant(baseWord);
+      }
+    }
+
+    function showTooltip(e) {
+      const variantWord = e.target;
+      const baseWord = variantWord.getAttribute('data-base-word');
+      if (!baseWord) return;
+
+      currentTooltipWord = baseWord;
+      updateTooltipContent(baseWord);
+      positionTooltip(variantWord);
+      customTooltip.classList.add('show');
+    }
+
+    function hideTooltip() {
+      currentTooltipWord = null;
+      customTooltip.classList.remove('show');
+    }
+
+    function updateTooltipContent(baseWord) {
+      const variant = getSelectedVariant(baseWord);
+      const text = variant ? variant.type : 'VARIANT';
+      tooltipText.textContent = text;
+    }
+
+    function positionTooltip(targetElement) {
+      const inputRect = englishInput.getBoundingClientRect();
+      const targetRect = targetElement.getBoundingClientRect();
+      
+      // Calculate position relative to the input container
+      const relativeLeft = targetRect.left - inputRect.left;
+      const relativeTop = targetRect.top - inputRect.top;
+      const targetWidth = targetRect.width;
+      
+      // Position tooltip above the word, centered
+      const tooltipLeft = relativeLeft + (targetWidth / 2);
+      const tooltipTop = relativeTop - 10; // 10px above the word
+      
+      customTooltip.style.left = tooltipLeft + 'px';
+      customTooltip.style.top = tooltipTop + 'px';
+      customTooltip.style.transform = 'translateX(-50%)'; // Center horizontally
+    }
+
+    // Update tooltip immediately when variant changes
+    function updateCurrentTooltip() {
+      if (currentTooltipWord) {
+        updateTooltipContent(currentTooltipWord);
+      }
     }
 
     // Get absolute text position ignoring HTML markup
@@ -1427,19 +1556,6 @@
         englishInput.displayTimeout = setTimeout(() => {
           updateEnglishInputDisplay();
         }, 100);
-      }
-    });
-
-    // Add click handler for variant cycling
-    englishInput.addEventListener('click', function(e) {
-      const variantWord = e.target.closest('.variant-word');
-      if (variantWord) {
-        e.preventDefault();
-        e.stopPropagation();
-        const baseWord = variantWord.getAttribute('data-base-word');
-        if (baseWord) {
-          cycleVariant(baseWord);
-        }
       }
     });
 
