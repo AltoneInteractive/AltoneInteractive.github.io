@@ -2134,20 +2134,17 @@
 			dictionaryStatus.textContent = "Checking for changes...";
 
 			try {
-				// Fetch current dictionary from GitHub API (for SHA and comparison)
+				// Fetch current dictionary from GitHub
 				const githubDict = await fetchCurrentDictionary();
-				
-				// But also fetch the actual content directly to avoid encoding issues
-				const directResponse = await fetch('dictionary.json');
-				const githubContent = await directResponse.json();
+				const githubContent = JSON.parse(atob(githubDict.content));
 
-				// Prepare local dictionary for comparison (exact same format as GitHub)
+				// Prepare local dictionary for comparison
 				const localContent = {
 					dictionary: {},
 					synonyms: {}
 				};
 
-				// Sort local dictionaries exactly like GitHub version
+				// Sort local dictionaries for consistent comparison
 				const sortedKeys = Object.keys(dictionary).sort();
 				for (const key of sortedKeys) {
 					localContent.dictionary[key] = dictionary[key];
@@ -2158,18 +2155,12 @@
 					localContent.synonyms[key] = synonyms[key];
 				}
 
-				// Normalize both for comparison (remove any formatting differences)
-				const normalizeForComparison = (obj) => JSON.stringify(obj, Object.keys(obj).sort());
-				
-				const githubNormalized = normalizeForComparison(githubContent);
-				const localNormalized = normalizeForComparison(localContent);
+				// Compare dictionaries
+				const githubJson = JSON.stringify(githubContent, null, 2);
+				const localJson = JSON.stringify(localContent, null, 2);
 
-				console.log('Comparing dictionaries...');
-				console.log('GitHub keys:', Object.keys(githubContent.dictionary || {}).length, 'dictionary,', Object.keys(githubContent.synonyms || {}).length, 'synonyms');
-				console.log('Local keys:', Object.keys(localContent.dictionary).length, 'dictionary,', Object.keys(localContent.synonyms).length, 'synonyms');
-
-				if (githubNormalized === localNormalized) {
-					dictionaryStatus.textContent = "Dictionary is already up to date! No changes detected.";
+				if (githubJson === localJson) {
+					dictionaryStatus.textContent = "Dictionary is already up to date!";
 					setTimeout(() => {
 						dictionaryStatus.textContent = "";
 					}, 3000);
