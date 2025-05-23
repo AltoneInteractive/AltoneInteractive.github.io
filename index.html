@@ -1114,7 +1114,17 @@
 
 		async function updateDictionaryOnGitHub(newContent, currentSha) {
 			try {
-				const base64Content = btoa(JSON.stringify(newContent, null, 2));
+				// Create the JSON string
+				const jsonString = JSON.stringify(newContent, null, 2);
+				
+				// Properly encode UTF-8 to base64
+				// First encode as UTF-8 bytes, then convert to base64
+				const utf8Bytes = new TextEncoder().encode(jsonString);
+				let binaryString = '';
+				for (let i = 0; i < utf8Bytes.length; i++) {
+					binaryString += String.fromCharCode(utf8Bytes[i]);
+				}
+				const base64Content = btoa(binaryString);
 				
 				const response = await fetch('https://api.github.com/repos/AltoneInteractive/AltoneInteractive.github.io/contents/dictionary.json', {
 					method: 'PUT',
