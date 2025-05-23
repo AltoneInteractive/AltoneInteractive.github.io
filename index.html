@@ -2020,6 +2020,7 @@
 			const result = [];
 			let i = 0;
 			const skipIndices = new Set();
+			const mergedIndices = new Set(); // Track which indices have been involved in merging
 
 			while (i < words.length) {
 				// Skip if this index has been marked for skipping
@@ -2031,8 +2032,8 @@
 				const currentWord = words[i];
 				let combined = false;
 
-				// Check for prefixes
-				if (i < words.length - 1 && prefixes.includes(currentWord.toLowerCase())) {
+				// Check for prefixes (only if current word hasn't been merged)
+				if (!mergedIndices.has(i) && i < words.length - 1 && prefixes.includes(currentWord.toLowerCase())) {
 					const nextWord = words[i+1];
 
 					// Check if the corresponding English word is capitalized
@@ -2043,29 +2044,34 @@
 
 					result.push(mergeWords(currentWord, nextWord, isCapitalized, false));
 					skipIndices.add(i + 1);
+					mergedIndices.add(i);
+					mergedIndices.add(i + 1);
 					i++;
 					combined = true;
 				}
 
-				// Check for suffixes on the previous word
-				if (!combined && suffixes.includes(currentWord.toLowerCase()) && i > 0 && result.length > 0) {
-					const prevWord = result[result.length - 1];
-
-					// Check if the corresponding English word is capitalized
-					let isCapitalized = false;
-					if (resultToEnglishIndex.hasOwnProperty(i - 1)) {
-						isCapitalized = capitalizationMap[resultToEnglishIndex[i - 1]] || false;
+				// Check for suffixes on the previous word (only if current word hasn't been merged)
+				if (!combined && !mergedIndices.has(i) && suffixes.includes(currentWord.toLowerCase()) && i > 0 && result.length > 0) {
+					// Check if the previous word was already merged
+					const prevResultIndex = result.length - 1;
+					let prevWasMerged = false;
+					
+					// Check if any previous index that contributed to the last result was merged
+					for (let j = 0; j < i; j++) {
+						if (!skipIndices.has(j) && mergedIndices.has(j)) {
+							// Count non-skipped words to see if this corresponds to our previous result
+							let nonSkippedCount = 0;
+							for (let k = 0; k < i; k++) {
+								if (!skipIndices.has(k)) nonSkippedCount++;
+							}
+							if (nonSkippedCount - 1 === prevResultIndex) {
+								prevWasMerged = true;
+								break;
+							}
+						}
 					}
 
-					result.pop();
-					result.push(mergeWords(prevWord, currentWord, isCapitalized, false));
-					combined = true;
-				}
-
-				// Check if current word is a mergable word
-				if (!combined && mergableWords.includes(currentWord.toLowerCase())) {
-					// Check if we can combine with previous word
-					if (i > 0 && result.length > 0) {
+					if (!prevWasMerged) {
 						const prevWord = result[result.length - 1];
 
 						// Check if the corresponding English word is capitalized
@@ -2074,14 +2080,58 @@
 							isCapitalized = capitalizationMap[resultToEnglishIndex[i - 1]] || false;
 						}
 
-						// Remove the last added word and combine
 						result.pop();
-						result.push(mergeWords(prevWord, currentWord, isCapitalized));
+						result.push(mergeWords(prevWord, currentWord, isCapitalized, false));
+						mergedIndices.add(i - 1);
+						mergedIndices.add(i);
 						combined = true;
 					}
+				}
 
-					// Check if we can combine with next word (if not already combined)
-					if (!combined && i < words.length - 1) {
+				// Check if current word is a mergable word (only if not already merged)
+				if (!combined && !mergedIndices.has(i) && mergableWords.includes(currentWord.toLowerCase())) {
+					// Check if we can combine with previous word (priority to suffix mergable words)
+					if (i > 0 && result.length > 0) {
+						// Check if the previous word was already merged
+						let prevWasMerged = false;
+						for (let j = 0; j < i; j++) {
+							if (!skipIndices.has(j) && mergedIndices.has(j)) {
+								let nonSkippedCount = 0;
+								for (let k = 0; k < i; k++) {
+									if (!skipIndices.has(k)) nonSkippedCount++;
+								}
+								if (nonSkippedCount - 1 === result.length - 1) {
+									prevWasMerged = true;
+									break;
+								}
+							}
+						}
+
+						// Check if next word is also mergable (suffix priority)
+						const nextIsMergableSuffix = i < words.length - 1 && 
+							!mergedIndices.has(i + 1) && 
+							suffixes.includes(words[i + 1].toLowerCase());
+
+						if (!prevWasMerged && !nextIsMergableSuffix) {
+							const prevWord = result[result.length - 1];
+
+							// Check if the corresponding English word is capitalized
+							let isCapitalized = false;
+							if (resultToEnglishIndex.hasOwnProperty(i - 1)) {
+								isCapitalized = capitalizationMap[resultToEnglishIndex[i - 1]] || false;
+							}
+
+							// Remove the last added word and combine
+							result.pop();
+							result.push(mergeWords(prevWord, currentWord, isCapitalized));
+							mergedIndices.add(i - 1);
+							mergedIndices.add(i);
+							combined = true;
+						}
+					}
+
+					// Check if we can combine with next word (if not already combined and next hasn't been merged)
+					if (!combined && i < words.length - 1 && !mergedIndices.has(i + 1)) {
 						const nextWord = words[i+1];
 
 						// Check if the corresponding English word is capitalized
@@ -2093,6 +2143,8 @@
 						// Combine and skip the next word
 						result.push(mergeWords(currentWord, nextWord, isCapitalized));
 						skipIndices.add(i + 1);
+						mergedIndices.add(i);
+						mergedIndices.add(i + 1);
 						i++;
 						combined = true;
 					}
