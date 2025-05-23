@@ -104,7 +104,7 @@
 			border: 1px solid var(--border-color);
 			border-radius: 5px;
 			box-shadow: 0 4px 8px var(--box-shadow);
-			min-width: 120px;
+			min-width: 160px;
 			z-index: 1000;
 			display: none;
 		}
@@ -118,6 +118,7 @@
 			cursor: pointer;
 			border-bottom: 1px solid var(--border-color);
 			transition: background-color 0.2s ease;
+			white-space: nowrap;
 		}
 
 		.dev-menu-item:last-child {
@@ -239,7 +240,6 @@
 		.signed-in-indicator {
 			color: #28a745;
 			font-size: 12px;
-			margin-left: 5px;
 		}
 
 		/* Goldenrod button style for developer mode */
@@ -283,6 +283,16 @@
 		.header {
 			font-weight: bold;
 			margin-bottom: 5px;
+		}
+		
+		/* Click to copy header styling */
+		.copy-header {
+			font-size: 0.85em;
+			color: #666;
+		}
+		
+		html.dark-mode .copy-header {
+			color: #999;
 		}
 		/* Complete text area styling with focus states */
 		textarea {
@@ -702,9 +712,8 @@
 			<div class="dev-menu-dropdown" id="devMenuDropdown">
 				<div class="dev-menu-item" id="devSignIn">
 					<span id="signInText">Sign In</span>
-					<span class="signed-in-indicator" id="signedInIndicator" style="display: none;">✓</span>
 				</div>
-				<div class="dev-menu-item" id="devClose">Close</div>
+				<div class="dev-menu-item" id="devClose">Reset</div>
 			</div>
 		</div>
 
@@ -755,7 +764,7 @@
 					<textarea id="englishInput" placeholder="Enter English text here..."></textarea>
 				</div>
 				<div class="text-column" style="position: relative;">
-					<div class="header">Ichrolic (Click to Copy)</div>
+					<div class="header">Ichrolic <span class="copy-header">(Click to Copy)</span></div>
 					<textarea id="ichrolicOutput" placeholder="Ichrolic translation will appear here..." readonly title="Click to copy to clipboard"></textarea>
 					<div class="copy-feedback" id="copyFeedback">Copied! ✓</div>
 				</div>
@@ -1171,11 +1180,9 @@
 
 		function updateSignInState() {
 			if (githubToken && currentUser) {
-				signInText.textContent = `${currentUser.login}`;
-				signedInIndicator.style.display = 'inline';
+				signInText.innerHTML = `${currentUser.login} <span class="signed-in-indicator">✓</span>`;
 			} else {
 				signInText.textContent = 'Sign In';
-				signedInIndicator.style.display = 'none';
 			}
 		}
 
