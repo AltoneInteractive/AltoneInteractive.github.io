@@ -92,7 +92,7 @@
 			padding: 10px;
 			border: 1px solid var(--border-color);
 			border-radius: 5px;
-			resize: vertical;
+			resize: none;
 			font-size: 16px;
 			font-family: inherit;
 			background-color: var(--container-bg) !important;
@@ -126,6 +126,45 @@
 		textarea:active, textarea:hover, textarea:focus {
 			color: var(--text-color) !important;
 		}
+
+		/* Special styling for the Ichrolic output textarea */
+		#ichrolicOutput {
+			cursor: pointer;
+			user-select: none;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			position: relative;
+			transition: all 0.2s ease;
+		}
+
+		#ichrolicOutput:hover {
+			background-color: var(--table-hover) !important;
+			border-color: var(--heading-color);
+		}
+
+		/* Copy feedback styling */
+		.copy-feedback {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background-color: var(--heading-color);
+			color: var(--button-text);
+			padding: 8px 16px;
+			border-radius: 20px;
+			font-size: 14px;
+			font-weight: bold;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.3s ease;
+			z-index: 100;
+		}
+
+		.copy-feedback.show {
+			opacity: 1;
+		}
+
 		.settings {
 			background-color: var(--settings-bg);
 			padding: 15px;
@@ -485,9 +524,10 @@
 					<div class="header">English</div>
 					<textarea id="englishInput" placeholder="Enter English text here..."></textarea>
 				</div>
-				<div class="text-column">
-					<div class="header">Ichrolic</div>
-					<textarea id="ichrolicOutput" placeholder="Ichrolic translation will appear here..." readonly></textarea>
+				<div class="text-column" style="position: relative;">
+					<div class="header">Ichrolic (Click to Copy)</div>
+					<textarea id="ichrolicOutput" placeholder="Ichrolic translation will appear here..." readonly title="Click to copy to clipboard"></textarea>
+					<div class="copy-feedback" id="copyFeedback">Copied! ✓</div>
 				</div>
 			</div>
 		</div>
@@ -595,8 +635,64 @@
 		const showSynonymsCheckbox = document.getElementById('showSynonyms');
 		const englishHeader = document.getElementById('englishHeader');
 		const ichrolicHeader = document.getElementById('ichrolicHeader');
+		const copyFeedback = document.getElementById('copyFeedback');
 
 		let isSynonymMode = false; // Track the current mode
+
+		// Copy to clipboard functionality
+		ichrolicOutput.addEventListener('click', function() {
+			const text = ichrolicOutput.value;
+			if (text.trim() === '') {
+				return; // Don't copy if there's no text
+			}
+
+			// Use the modern clipboard API if available
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(text).then(function() {
+					showCopyFeedback();
+				}).catch(function() {
+					// Fallback to the older method
+					fallbackCopyTextToClipboard(text);
+				});
+			} else {
+				// Fallback for older browsers
+				fallbackCopyTextToClipboard(text);
+			}
+		});
+
+		// Fallback copy method for older browsers
+		function fallbackCopyTextToClipboard(text) {
+			const textArea = document.createElement("textarea");
+			textArea.value = text;
+			
+			// Avoid scrolling to bottom
+			textArea.style.top = "0";
+			textArea.style.left = "0";
+			textArea.style.position = "fixed";
+
+			document.body.appendChild(textArea);
+			textArea.focus();
+			textArea.select();
+
+			try {
+				const successful = document.execCommand('copy');
+				if (successful) {
+					showCopyFeedback();
+				}
+			} catch (err) {
+				console.error('Fallback: Oops, unable to copy', err);
+			}
+
+			document.body.removeChild(textArea);
+		}
+
+		// Show copy feedback animation
+		function showCopyFeedback() {
+			copyFeedback.classList.add('show');
+			setTimeout(() => {
+				copyFeedback.classList.remove('show');
+			}, 1500);
+		}
 
 		// Check if we're on mobile or desktop
 		function isMobileView() {
@@ -665,17 +761,60 @@
 				}
 			}
 
-			// Sort entries based on current sort settings
-			entries.sort((a, b) => {
-				const fieldA = currentSortField === 'english' ? a.english.toLowerCase() : a.ichrolic.toLowerCase();
-				const fieldB = currentSortField === 'english' ? b.english.toLowerCase() : b.ichrolic.toLowerCase();
+			// Sort entries with smart search relevance
+			if (searchTerm !== '') {
+				// Smart search sorting: exact match -> starts with -> contains
+				entries.sort((a, b) => {
+					const aEnglish = a.english.toLowerCase();
+					const bEnglish = b.english.toLowerCase();
+					const aIchrolic = a.ichrolic.toLowerCase();
+					const bIchrolic = b.ichrolic.toLowerCase();
+					
+					// Calculate relevance scores
+					const getRelevanceScore = (english, ichrolic) => {
+						// Exact match gets highest score
+						if (english === searchTerm || ichrolic === searchTerm) return 100;
+						
+						// Starts with search term gets high score
+						if (english.startsWith(searchTerm) || ichrolic.startsWith(searchTerm)) return 50;
+						
+						// Contains search term gets lower score
+						if (english.includes(searchTerm) || ichrolic.includes(searchTerm)) return 10;
+						
+						return 0;
+					};
+					
+					const scoreA = getRelevanceScore(aEnglish, aIchrolic);
+					const scoreB = getRelevanceScore(bEnglish, bIchrolic);
+					
+					// If scores are different, sort by relevance (higher score first)
+					if (scoreA !== scoreB) {
+						return scoreB - scoreA;
+					}
+					
+					// If same relevance score, fall back to alphabetical sorting
+					const fieldA = currentSortField === 'english' ? aEnglish : aIchrolic;
+					const fieldB = currentSortField === 'english' ? bEnglish : bIchrolic;
+					
+					if (sortDirection === 'asc') {
+						return fieldA.localeCompare(fieldB);
+					} else {
+						return fieldB.localeCompare(fieldA);
+					}
+				});
+			} else {
+				// No search term, use regular sorting
+				entries.sort((a, b) => {
+					const fieldA = currentSortField === 'english' ? a.english.toLowerCase() : a.ichrolic.toLowerCase();
+					const fieldB = currentSortField === 'english' ? b.english.toLowerCase() : b.ichrolic.toLowerCase();
 
-				if (sortDirection === 'asc') {
-					return fieldA.localeCompare(fieldB);
-				} else {
-					return fieldB.localeCompare(fieldA);
-				}
-			});
+					if (sortDirection === 'asc') {
+						return fieldA.localeCompare(fieldB);
+					} else {
+						return fieldB.localeCompare(fieldA);
+					}
+				});
+			}
 
 			// Display entries
 			const isMobile = isMobileView();
