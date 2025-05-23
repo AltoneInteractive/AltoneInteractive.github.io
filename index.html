@@ -349,6 +349,59 @@
 			transition: all 0.2s ease;
 		}
 
+		/* Word variant styling */
+		.word-variant {
+			position: relative;
+			display: inline;
+			border-bottom: 2px dotted var(--heading-color);
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.word-variant:hover {
+			background-color: var(--table-hover);
+			border-bottom-style: solid;
+		}
+
+		/* Tooltip for word variants */
+		.variant-tooltip {
+			position: absolute;
+			bottom: 100%;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: var(--heading-color);
+			color: var(--button-text);
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-size: 12px;
+			font-weight: bold;
+			white-space: nowrap;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.2s ease;
+			z-index: 1000;
+			margin-bottom: 5px;
+		}
+
+		.variant-tooltip::after {
+			content: '';
+			position: absolute;
+			top: 100%;
+			left: 50%;
+			transform: translateX(-50%);
+			border: 4px solid transparent;
+			border-top-color: var(--heading-color);
+		}
+
+		.word-variant:hover .variant-tooltip {
+			opacity: 1;
+		}
+
+		/* Enhanced English input styling */
+		#englishInput {
+			position: relative;
+		}
+
 		#ichrolicOutput:hover {
 			background-color: var(--table-hover) !important;
 			border-color: var(--heading-color);
@@ -373,56 +426,6 @@
 		}
 
 		.copy-feedback.show {
-			opacity: 1;
-		}
-
-		/* Ambiguous word styling */
-		.ambiguous-word {
-			text-decoration: underline;
-			text-decoration-style: dotted;
-			text-decoration-color: var(--heading-color);
-			cursor: pointer;
-			position: relative;
-			padding: 1px 2px;
-			border-radius: 3px;
-			transition: background-color 0.2s ease;
-		}
-
-		.ambiguous-word:hover {
-			background-color: var(--table-hover);
-		}
-
-		/* Tooltip styling */
-		.word-tooltip {
-			position: absolute;
-			bottom: 100%;
-			left: 50%;
-			transform: translateX(-50%);
-			background-color: var(--heading-color);
-			color: var(--button-text);
-			padding: 4px 8px;
-			border-radius: 4px;
-			font-size: 11px;
-			font-weight: bold;
-			white-space: nowrap;
-			opacity: 0;
-			pointer-events: none;
-			transition: opacity 0.2s ease;
-			z-index: 200;
-			margin-bottom: 5px;
-		}
-
-		.word-tooltip::after {
-			content: '';
-			position: absolute;
-			top: 100%;
-			left: 50%;
-			transform: translateX(-50%);
-			border: 4px solid transparent;
-			border-top-color: var(--heading-color);
-		}
-
-		.ambiguous-word:hover .word-tooltip {
 			opacity: 1;
 		}
 
@@ -924,6 +927,11 @@
 		// Main dictionary and synonyms objects
 		let dictionary = {};
 		let synonyms = {};
+		
+		// Word variant tracking
+		let wordVariants = {}; // Stores available variants for each base word
+		let selectedVariants = {}; // Stores currently selected variant for each word position
+		let variantElements = []; // Stores DOM elements for interactive variants
 
 		// DOM Elements
 		const synonymToggleButton = document.getElementById('synonymToggle');
@@ -965,7 +973,6 @@
 		let isDeveloperMode = false; // Track developer mode
 		let githubToken = localStorage.getItem('github_token'); // GitHub token
 		let currentUser = null; // Store user info
-		let wordVariantSelections = {}; // Track which variant is selected for each ambiguous word
 
 		// Copy to clipboard functionality
 		ichrolicOutput.addEventListener('click', function() {
@@ -1147,16 +1154,166 @@
 				enterDeveloperMode();
 			}
 		});
+		// Function to build word variants mapping from dictionary
+		function buildWordVariants() {
+			wordVariants = {};
+			
+			for (const key in dictionary) {
+				if (key.includes('/')) {
+					const [baseWord, variant] = key.split('/');
+					if (!wordVariants[baseWord.toLowerCase()]) {
+						wordVariants[baseWord.toLowerCase()] = [];
+					}
+					wordVariants[baseWord.toLowerCase()].push({
+						key: key,
+						variant: variant.toUpperCase(),
+						translation: dictionary[key]
+					});
+				}
+			}
+			
+			// Sort variants alphabetically for consistent ordering
+			for (const baseWord in wordVariants) {
+				wordVariants[baseWord].sort((a, b) => a.variant.localeCompare(b.variant));
+			}
+		}
+
 		function isMobileView() {
 			return window.innerWidth <= 768;
+		}
+
+		// Function to clear selected variants when input changes significantly
+		function clearSelectedVariants() {
+			selectedVariants = {};
+			// Also remove any existing overlay when clearing variants
+			const existingOverlay = document.getElementById('wordOverlay');
+			if (existingOverlay) {
+				existingOverlay.remove();
+			}
+		}
+		function createWordOverlay() {
+			// Remove existing overlay
+			const existingOverlay = document.getElementById('wordOverlay');
+			if (existingOverlay) {
+				existingOverlay.remove();
+			}
+			
+			// Clear variant elements
+			variantElements = [];
+			
+			const english = englishInput.value.trim();
+			if (english === "") {
+				return;
+			}
+			
+			// Create overlay container
+			const overlay = document.createElement('div');
+			overlay.id = 'wordOverlay';
+			overlay.style.cssText = `
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				font-family: inherit;
+				font-size: 16px;
+				padding: 10px;
+				line-height: 1.4;
+				white-space: pre-wrap;
+				overflow: hidden;
+				background: transparent;
+				border: none;
+				resize: none;
+				box-sizing: border-box;
+			`;
+			
+			// Parse text and create interactive elements
+			const words = english.split(/(\s+)/);
+			let overlayHTML = '';
+			let wordIndex = 0;
+			
+			for (let i = 0; i < words.length; i++) {
+				const word = words[i];
+				
+				if (word.trim() === '') {
+					// Preserve whitespace
+					overlayHTML += word;
+				} else {
+					const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+					
+					if (wordVariants[cleanWord] && wordVariants[cleanWord].length > 1) {
+						// This word has variants
+						const currentVariantIndex = selectedVariants[`${cleanWord}_${wordIndex}`] || 0;
+						const currentVariant = wordVariants[cleanWord][currentVariantIndex];
+						
+						overlayHTML += `<span class="word-variant" data-base-word="${cleanWord}" data-word-index="${wordIndex}" style="pointer-events: auto;">
+							${word}
+							<span class="variant-tooltip">${currentVariant.variant}</span>
+						</span>`;
+						
+						wordIndex++;
+					} else {
+						// Regular word
+						overlayHTML += word;
+						if (cleanWord !== '') wordIndex++;
+					}
+				}
+			}
+			
+			overlay.innerHTML = overlayHTML;
+			
+			// Position overlay over the input
+			const inputRect = englishInput.getBoundingClientRect();
+			const containerRect = englishInput.parentElement.getBoundingClientRect();
+			
+			overlay.style.position = 'absolute';
+			overlay.style.top = '0';
+			overlay.style.left = '0';
+			
+			// Add click handlers for variant cycling
+			overlay.querySelectorAll('.word-variant').forEach(element => {
+				element.addEventListener('click', function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					
+					const baseWord = this.dataset.baseWord;
+					const wordIndex = this.dataset.wordIndex;
+					const key = `${baseWord}_${wordIndex}`;
+					
+					// Cycle to next variant
+					const variants = wordVariants[baseWord];
+					const currentIndex = selectedVariants[key] || 0;
+					const nextIndex = (currentIndex + 1) % variants.length;
+					selectedVariants[key] = nextIndex;
+					
+					// Update tooltip
+					const tooltip = this.querySelector('.variant-tooltip');
+					tooltip.textContent = variants[nextIndex].variant;
+					
+					// Retranslate
+					translateToIchrolic();
+				});
+			});
+			
+			// Add overlay to input container
+			englishInput.parentElement.style.position = 'relative';
+			englishInput.parentElement.appendChild(overlay);
 		}
 
 
 
 		// Event Listeners
+		let lastInputLength = 0;
 		englishInput.addEventListener('input', function() {
+			// Clear variants if significant change in input length (words added/removed)
+			const currentLength = englishInput.value.trim().split(/\s+/).length;
+			if (Math.abs(currentLength - lastInputLength) > 0) {
+				clearSelectedVariants();
+			}
+			lastInputLength = currentLength;
+			
 			translateToIchrolic();
-			updateEnglishInputDisplay();
 		});
 		ignoreDiacriticsCheckbox.addEventListener('change', translateToIchrolic);
 		useContractionsCheckbox.addEventListener('change', translateToIchrolic);
@@ -1478,6 +1635,8 @@
 						} else {
 							delete dictionary[entry.english];
 						}
+						buildWordVariants(); // Rebuild variants after deletion
+						clearSelectedVariants(); // Clear any selected variants
 						updateDictionaryTable();
 						translateToIchrolic();
 					});
@@ -1500,6 +1659,8 @@
 							// Focus on the ichrolic input for editing
 							newIchrolicInput.focus();
 
+							buildWordVariants(); // Rebuild variants after removal
+							clearSelectedVariants(); // Clear any selected variants
 							updateDictionaryTable();
 						});
 						actionsCell.appendChild(editButton);
@@ -1521,6 +1682,7 @@
 							// Add as a primary entry
 							dictionary[entry.english] = translation;
 
+							buildWordVariants(); // Rebuild variants after change
 							updateDictionaryTable();
 							translateToIchrolic();
 						});
@@ -1591,6 +1753,8 @@
 						} else {
 							delete dictionary[entry.english];
 						}
+						buildWordVariants(); // Rebuild variants after deletion
+						clearSelectedVariants(); // Clear any selected variants
 						updateDictionaryTable();
 						translateToIchrolic();
 					});
@@ -1612,6 +1776,8 @@
 							// Focus on the ichrolic input for editing
 							newIchrolicInput.focus();
 
+							buildWordVariants(); // Rebuild variants after removal
+							clearSelectedVariants(); // Clear any selected variants
 							updateDictionaryTable();
 						});
 						actionsDiv.appendChild(editButton);
@@ -1632,6 +1798,7 @@
 							// Add as a primary entry
 							dictionary[entry.english] = translation;
 
+							buildWordVariants(); // Rebuild variants after change
 							updateDictionaryTable();
 							translateToIchrolic();
 						});
@@ -1661,3 +1828,856 @@
 				emptyDictionary.style.display = 'none';
 			}
 		}
+
+		// Function to toggle between direct entry and synonym modes:
+		function toggleSynonymMode() {
+			isSynonymMode = !isSynonymMode;
+
+			if (isSynonymMode) {
+				synonymToggleButton.textContent = "→";
+				newIchrolicInput.placeholder = "Synonym for";
+				synonymToggleButton.title = "Currently in synonym mode";
+			} else {
+				synonymToggleButton.textContent = "=";
+				newIchrolicInput.placeholder = "Ichrolic translation";
+				synonymToggleButton.title = "Currently in direct translation mode";
+			}
+		}
+
+		// Add dictionary entry function
+		function addDictionaryEntry() {
+			const english = newEnglishInput.value.trim();
+			const ichrolic = newIchrolicInput.value.trim();
+
+			if (english === '') {
+				dictionaryStatus.textContent = "English field must be filled.";
+				return;
+			}
+
+			if (ichrolic === '' && !isSynonymMode) {
+				dictionaryStatus.textContent = "Ichrolic translation field must be filled.";
+				return;
+			}
+
+			if (isSynonymMode) {
+				// In synonym mode, add as a synonym for the existing entry
+				if (!dictionary.hasOwnProperty(ichrolic)) {
+					dictionaryStatus.textContent = `Error: "${ichrolic}" is not in the dictionary as a primary entry.`;
+					return;
+				}
+
+				// Add as a synonym
+				synonyms[english.toLowerCase()] = ichrolic.toLowerCase();
+				dictionaryStatus.textContent = `Added "${english}" as a synonym for "${ichrolic}".`;
+			} else {
+				// In direct translation mode, add as a primary entry
+				dictionary[english.toLowerCase()] = ichrolic;
+				dictionaryStatus.textContent = `Added "${english}" to the dictionary.`;
+			}
+
+			// Clear the input fields
+			newEnglishInput.value = '';
+			newIchrolicInput.value = '';
+
+			// Update the table and translation
+			buildWordVariants(); // Rebuild variants after adding entry
+			updateDictionaryTable();
+			translateToIchrolic();
+
+			// Clear status message after 3 seconds
+			setTimeout(() => {
+				dictionaryStatus.textContent = "";
+			}, 3000);
+		}
+
+		// Automatically load the dictionary when the page loads
+		window.addEventListener('DOMContentLoaded', function() {
+			loadDefaultDictionary();
+		
+			// Check for existing GitHub token and auto-login
+			const storedToken = localStorage.getItem('github_token');
+			const storedUser = localStorage.getItem('github_user');
+			
+			if (storedToken && storedUser) {
+				try {
+					githubToken = storedToken;
+					currentUser = JSON.parse(storedUser);
+					updateSignInState();
+					enterDeveloperMode(); // Auto-enter dev mode if we have credentials
+					console.log('Auto-logged in as:', currentUser.login);
+				} catch (error) {
+					console.error('Failed to parse stored user data:', error);
+					// Clear corrupted data
+					localStorage.removeItem('github_token');
+					localStorage.removeItem('github_user');
+				}
+			}
+		});
+		// Function to load the default dictionary from a file in the repo
+		function loadDefaultDictionary() {
+			// Add cache-busting parameter to always get fresh data
+			const cacheBuster = '?t=' + new Date().getTime();
+			
+			fetch('dictionary.json' + cacheBuster)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Failed to load dictionary file. Status: ' + response.status);
+					}
+					return response.json();
+				})
+				.then(data => {
+					if (data.dictionary && data.synonyms) {
+						dictionary = data.dictionary;
+						synonyms = data.synonyms;
+						buildWordVariants(); // Build variants after loading dictionary
+						updateDictionaryTable();
+						translateToIchrolic();
+						dictionaryStatus.textContent = "Default dictionary loaded successfully.";
+						
+						// Clear status message after 3 seconds
+						setTimeout(() => {
+							dictionaryStatus.textContent = "";
+						}, 3000);
+					} else {
+						throw new Error('Invalid dictionary format in file.');
+					}
+				})
+				.catch(error => {
+					console.error('Error loading dictionary:', error);
+					dictionaryStatus.textContent = "Error loading dictionary: " + error.message + ". Using empty dictionary.";
+					
+					// Initialize with empty dictionary if loading fails
+					dictionary = {};
+					synonyms = {};
+					updateDictionaryTable();
+				});
+		}
+
+		// Function to translate English to Ichrolic
+		function translateToIchrolic() {
+			const english = englishInput.value.trim();
+			if (english === "") {
+				ichrolicOutput.value = "";
+				// Remove overlay when input is empty
+				const existingOverlay = document.getElementById('wordOverlay');
+				if (existingOverlay) {
+					existingOverlay.remove();
+				}
+				return;
+			}
+
+			// Build word variants mapping
+			buildWordVariants();
+
+			const ignoreDiacritics = ignoreDiacriticsCheckbox.checked;
+			const useContractions = useContractionsCheckbox.checked;
+
+			// Keep track of capitalization for each word
+			const englishWords = english.split(" ");
+			const capitalizationMap = {};
+
+			for (let i = 0; i < englishWords.length; i++) {
+				const word = englishWords[i];
+				if (word.length > 0) {
+					capitalizationMap[i] = word[0] === word[0].toUpperCase();
+				}
+			}
+
+			// Sort dictionary keys by length (descending) to prioritize longer phrases
+			const sortedKeys = Object.keys(dictionary).sort((a, b) =>
+				b.split(" ").length - a.split(" ").length
+			);
+
+			// Tokenize the English text, preserving punctuation
+			const tokens = [];
+			let currentWord = "";
+			const punctuationChars = [",", ".", "!", "?", ";", ":"];
+
+			for (const c of english) {
+				if (c === " ") {
+					if (currentWord !== "") {
+						tokens.push(currentWord);
+						currentWord = "";
+					}
+					tokens.push(" ");
+				} else if (punctuationChars.includes(c)) {
+					if (currentWord !== "") {
+						tokens.push(currentWord);
+						currentWord = "";
+					}
+					tokens.push(c);
+				} else {
+					currentWord += c;
+				}
+			}
+
+			if (currentWord !== "") {
+				tokens.push(currentWord);
+			}
+
+			// Find multi-word phrases and translate
+			let i = 0;
+			const result = [];
+			const resultToEnglishIndex = {};
+			let englishIndex = 0;
+			let wordIndex = 0; // Track position for variant selection
+
+			while (i < tokens.length) {
+				let foundPhrase = false;
+
+				// Skip spaces
+				if (tokens[i] === " ") {
+					result.push(" ");
+					i++;
+					continue;
+				}
+
+				// Check if punctuation
+				if (tokens[i].length === 1 && punctuationChars.includes(tokens[i])) {
+					result.push(tokens[i]);
+					i++;
+					continue;
+				}
+
+				// Try to match multi-word phrases
+				for (const key of sortedKeys) {
+					if (key.includes(" ")) {  // Multi-word phrase
+						const phraseWords = key.split(" ");
+						let potentialMatch = true;
+						const phraseTokens = [];
+						let j = i;
+
+						// Collect tokens that might form the phrase
+						for (const word of phraseWords) {
+							if (j >= tokens.length || tokens[j] === " " || punctuationChars.includes(tokens[j])) {
+								j++;
+								continue;
+							}
+
+							phraseTokens.push(tokens[j].toLowerCase());
+							j++;
+
+							// Skip spaces
+							if (j < tokens.length && tokens[j] === " ") {
+								j++;
+							}
+						}
+
+						// Check if we have a match
+						if (phraseTokens.length === phraseWords.length) {
+							const matchStr = phraseTokens.join(" ");
+							if (matchStr.toLowerCase() === key.toLowerCase()) {
+								foundPhrase = true;
+								result.push(dictionary[key]);
+
+								// Map this result to the English word
+								resultToEnglishIndex[result.length - 1] = englishIndex;
+
+								// Skip the matched tokens
+								for (let k = 0; k < phraseWords.length * 2 - 1; k++) {
+									if (i < tokens.length) {
+										if (tokens[i] !== " " && !punctuationChars.includes(tokens[i])) {
+											englishIndex++;
+											wordIndex++;
+										}
+										i++;
+									}
+								}
+
+								break;
+							}
+						}
+					}
+				}
+
+				// If no phrase match, process as regular word
+				if (!foundPhrase && i < tokens.length) {
+					const token = tokens[i];
+
+					// Skip spaces
+					if (token === " ") {
+						result.push(" ");
+						i++;
+						continue;
+					}
+
+					// Process punctuation
+					if (token.length === 1 && punctuationChars.includes(token)) {
+						result.push(token);
+						i++;
+						continue;
+					}
+
+					// Process regular word
+					const cleanWord = token.toLowerCase().replace(/[^\w]/g, '');
+					const canonicalWord = getCanonicalForm(cleanWord, wordIndex);
+
+					if (dictionary.hasOwnProperty(canonicalWord)) {
+						result.push(dictionary[canonicalWord]);
+						resultToEnglishIndex[result.length - 1] = englishIndex;
+					} else {
+						result.push("[" + token + "]");
+						resultToEnglishIndex[result.length - 1] = englishIndex;
+					}
+
+					englishIndex++;
+					wordIndex++;
+					i++;
+				}
+			}
+
+			// Join the result, properly handling spaces and punctuation
+			let finalResult = "";
+			for (let j = 0; j < result.length; j++) {
+				const token = result[j];
+
+				if (token === " ") {
+					finalResult += " ";
+				} else if (token.length === 1 && punctuationChars.includes(token)) {
+					// Don't add space before punctuation
+					finalResult += token;
+				} else {
+					// Add space before words if needed
+					if (j > 0 && result[j-1] !== " " && !(result[j-1].length === 1 && punctuationChars.includes(result[j-1]))) {
+						finalResult += " ";
+					}
+					finalResult += token;
+				}
+			}
+
+			let ichrolic = finalResult.trim();
+
+			// Apply synonym handling for phrases
+			for (const synonymKey in synonyms) {
+				if (synonymKey.includes(" ")) {
+					const canonicalKey = synonyms[synonymKey];
+					if (dictionary.hasOwnProperty(canonicalKey)) {
+						const pattern = "\\[" + synonymKey.replace(/ /g, "\\] \\[") + "\\]";
+						const regex = new RegExp(pattern, "g");
+						const matches = ichrolic.match(regex);
+						if (matches && matches.length > 0) {
+							for (const match of matches) {
+								ichrolic = ichrolic.replace(match, dictionary[canonicalKey]);
+							}
+						}
+					}
+				}
+			}
+
+			// Apply contractions if the option is enabled
+			if (useContractions) {
+				ichrolic = applyContractions(ichrolic, capitalizationMap, resultToEnglishIndex);
+			}
+
+			// Remove diacritics if the option is enabled
+			if (ignoreDiacritics) {
+				ichrolic = removeDiacritics(ichrolic);
+			}
+
+			ichrolicOutput.value = ichrolic;
+
+			// Create interactive word overlay
+			createWordOverlay();
+		}
+
+		// Function to get canonical form from synonyms and variants
+		function getCanonicalForm(word, wordIndex = 0) {
+			const lowercaseWord = word.toLowerCase();
+
+			// Check if word has variants
+			if (wordVariants[lowercaseWord] && wordVariants[lowercaseWord].length > 0) {
+				const variantKey = `${lowercaseWord}_${wordIndex}`;
+				const selectedIndex = selectedVariants[variantKey] || 0;
+				const selectedVariant = wordVariants[lowercaseWord][selectedIndex];
+				return selectedVariant.key;
+			}
+
+			// Check if word already exists in main dictionary
+			if (dictionary.hasOwnProperty(lowercaseWord)) {
+				return lowercaseWord;
+			}
+
+			// Check if word is a synonym
+			if (synonyms.hasOwnProperty(lowercaseWord)) {
+				return synonyms[lowercaseWord];
+			}
+
+			return lowercaseWord;  // Return original if not found
+		}
+
+		// Function to apply contractions
+		function applyContractions(text, capitalizationMap, resultToEnglishIndex) {
+			if (!useContractionsCheckbox.checked) {
+				return text;
+			}
+
+			// Split text by terminal punctuation
+			const terminalPunctuation = [".", "!", "?", ","];
+			const segments = [];
+			let currentSegment = "";
+
+			for (let i = 0; i < text.length; i++) {
+				const char = text[i];
+				currentSegment += char;
+
+				if (terminalPunctuation.includes(char)) {
+					segments.push(currentSegment);
+					currentSegment = "";
+				}
+			}
+
+			// Add any remaining text
+			if (currentSegment !== "") {
+				segments.push(currentSegment);
+			}
+
+			// Process each segment separately
+			const processedSegments = segments.map(segment =>
+				processSegmentContractions(segment, capitalizationMap, resultToEnglishIndex)
+			);
+
+			// Join the segments
+			return processedSegments.join(" ").trim();
+		}
+
+		// Process contractions within a single segment
+		function processSegmentContractions(segment, capitalizationMap, resultToEnglishIndex) {
+			// List of mergable words
+			const mergableWords = [
+				"ali",
+				"ìkè"
+			];
+		
+			// Prefixes that should always combine with the following word
+			const prefixes = [
+				"èden",
+				"al-",
+				"yana"
+			];
+		
+			// Suffixes that should always combine with the preceding word
+			const suffixes = [
+				"íka",
+				"yuhni"
+			];
+		
+			// Helper function to check if a word is "special" (mergeable, prefix, or suffix)
+			const isSpecialWord = (word) => {
+				const lowerWord = word.toLowerCase();
+				return mergableWords.includes(lowerWord) || 
+					   prefixes.includes(lowerWord) || 
+					   suffixes.includes(lowerWord);
+			};
+		
+			const words = segment.trim().split(" ");
+			const result = [];
+			let i = 0;
+			const skipIndices = new Set();
+			const mergedPositions = new Set(); // Track which result positions contain merged words
+		
+			while (i < words.length) {
+				// Skip if this index has been marked for skipping
+				if (skipIndices.has(i)) {
+					i++;
+					continue;
+				}
+		
+				const currentWord = words[i];
+				let combined = false;
+		
+				// Check for prefixes
+				if (i < words.length - 1 && prefixes.includes(currentWord.toLowerCase())) {
+					const nextWord = words[i+1];
+		
+					// Check if the corresponding English word is capitalized
+					let isCapitalized = false;
+					if (resultToEnglishIndex.hasOwnProperty(i)) {
+						isCapitalized = capitalizationMap[resultToEnglishIndex[i]] || false;
+					}
+		
+					result.push(mergeWords(currentWord, nextWord, isCapitalized, false));
+					mergedPositions.add(result.length - 1); // Mark this position as merged
+					skipIndices.add(i + 1);
+					i++;
+					combined = true;
+				}
+		
+				// Check for suffixes on the previous word - but look ahead for special words
+				if (!combined && suffixes.includes(currentWord.toLowerCase()) && i > 0 && result.length > 0) {
+					// Look ahead to see if the next word is special and would want to merge with current word
+					let shouldDeferToNext = false;
+					if (i < words.length - 1) {
+						const nextWord = words[i + 1];
+						if (isSpecialWord(nextWord)) {
+							shouldDeferToNext = true;
+						}
+					}
+		
+					// Don't merge if the previous result position is already a merged word or if we should defer
+					if (!mergedPositions.has(result.length - 1) && !shouldDeferToNext) {
+						const prevWord = result[result.length - 1];
+		
+						// Check if the corresponding English word is capitalized
+						let isCapitalized = false;
+						if (resultToEnglishIndex.hasOwnProperty(i - 1)) {
+							isCapitalized = capitalizationMap[resultToEnglishIndex[i - 1]] || false;
+						}
+		
+						result.pop();
+						result.push(mergeWords(prevWord, currentWord, isCapitalized, false));
+						mergedPositions.add(result.length - 1); // Mark this position as merged
+						combined = true;
+					}
+				}
+		
+				// Check if current word is a mergable word
+				if (!combined && mergableWords.includes(currentWord.toLowerCase())) {
+					// Check if we can combine with previous word
+					if (i > 0 && result.length > 0 && !mergedPositions.has(result.length - 1)) {
+						const prevWord = result[result.length - 1];
+		
+						// Check if the corresponding English word is capitalized
+						let isCapitalized = false;
+						if (resultToEnglishIndex.hasOwnProperty(i - 1)) {
+							isCapitalized = capitalizationMap[resultToEnglishIndex[i - 1]] || false;
+						}
+		
+						// Remove the last added word and combine
+						result.pop();
+						result.push(mergeWords(prevWord, currentWord, isCapitalized));
+						mergedPositions.add(result.length - 1); // Mark this position as merged
+						combined = true;
+					}
+		
+					// Check if we can combine with next word (if not already combined)
+					if (!combined && i < words.length - 1) {
+						const nextWord = words[i+1];
+		
+						// Check if the corresponding English word is capitalized
+						let isCapitalized = false;
+						if (resultToEnglishIndex.hasOwnProperty(i)) {
+							isCapitalized = capitalizationMap[resultToEnglishIndex[i]] || false;
+						}
+		
+						// Combine and skip the next word
+						result.push(mergeWords(currentWord, nextWord, isCapitalized));
+						mergedPositions.add(result.length - 1); // Mark this position as merged
+						skipIndices.add(i + 1);
+						i++;
+						combined = true;
+					}
+		
+					// If no combination happened, add the word as is
+					if (!combined) {
+						result.push(currentWord);
+					}
+				} else {
+					// Not a mergable word, add as is if not already combined
+					if (!combined) {
+						result.push(currentWord);
+					}
+				}
+		
+				i++;
+			}
+		
+			return result.join(" ");
+		}
+
+		// Helper function to merge words handling vowel overrides
+		function mergeWords(word1, word2, isFirstCapitalized, atJunction = true) {
+			// Check if we need to handle duplicate letters at junction
+			if (atJunction && word1.length > 0 && word2.length > 0 &&
+				word1[word1.length - 1].toLowerCase() === word2[0].toLowerCase()) {
+				return word1 + word2.substring(1);
+			}
+
+			// Get base vowels (without diacritics)
+			const vowels = ["a", "e", "i", "o", "u"];
+			const vowelMap = {
+				"a": ["á", "à", "â", "ä"],
+				"e": ["é", "è", "ê", "ë"],
+				"i": ["í", "ì", "î", "ï"],
+				"o": ["ó", "ò", "ô", "ö"],
+				"u": ["ú", "ù", "û", "ü"]
+			};
+
+			// Create a reverse lookup from accented vowel to base vowel
+			const accentedToBase = {};
+			for (const base in vowelMap) {
+				for (const accented of vowelMap[base]) {
+					accentedToBase[accented] = base;
+				}
+			}
+
+			// Check junction point for vowel clash
+			if (word1.length > 0 && word2.length > 0) {
+				const lastChar = word1[word1.length - 1].toLowerCase();
+				const firstChar = word2[0].toLowerCase();
+
+				// Check if there's a vowel clash
+				const isLastVowel = vowels.includes(lastChar) || accentedToBase.hasOwnProperty(lastChar);
+				const isFirstVowel = vowels.includes(firstChar) || accentedToBase.hasOwnProperty(firstChar);
+
+				if (isLastVowel && isFirstVowel) {
+					// Determine which vowel to use based on priority and English capitalization
+					let useSecondVowel = true;
+
+					// If the first word corresponds to a capitalized English word, preserve its vowel
+					if (isFirstCapitalized) {
+						useSecondVowel = false;
+					}
+
+					if (useSecondVowel) {
+						// Use the second word's vowel (possibly with diacritics)
+						return word1.substring(0, word1.length - 1) + word2;
+					} else {
+						// Use the first word's vowel (possibly with diacritics)
+						return word1 + word2.substring(1);
+					}
+				}
+			}
+
+			if (word1.length > 0 && word2.length > 0 &&
+				word1[word1.length - 1].toLowerCase() === word2[0].toLowerCase()) {
+				// Remove the duplicate letter
+				return word1 + word2.substring(1);
+			}
+
+			return word1 + word2;
+		}
+
+		// Function to remove diacritics from Ichrolic text
+		function removeDiacritics(text) {
+			if (!text) return text;
+
+			// Map of characters with diacritics to their base form
+			const diacriticMap = {
+				"í": "i", "é": "e", "á": "a", "ó": "o", "ú": "u",
+				"ì": "i", "è": "e", "à": "a", "ò": "o", "ù": "u",
+				"î": "i", "ê": "e", "â": "a", "ô": "o", "û": "u",
+				"ï": "i", "ë": "e", "ä": "a", "ö": "o", "ü": "u"
+			};
+
+			let result = text;
+			for (const diacritic in diacriticMap) {
+				result = result.split(diacritic).join(diacriticMap[diacritic]);
+			}
+
+			return result;
+		}
+
+		// Dictionary update functionality
+		async function handleDictionaryUpdate() {
+			if (!githubToken || !currentUser) {
+				alert('Please sign in first to update the dictionary');
+				return;
+			}
+
+			// Show loading state
+			saveDictionaryButton.classList.add('loading');
+			saveDictionaryButton.disabled = true;
+			dictionaryStatus.textContent = "Checking for changes...";
+
+			try {
+				// Fetch current dictionary from GitHub API (for SHA)
+				const githubDict = await fetchCurrentDictionary();
+				
+				// Decode the content using proper UTF-8 handling
+				const githubContentRaw = atob(githubDict.content);
+				// Convert to Uint8Array and then decode as UTF-8
+				const bytes = new Uint8Array(githubContentRaw.length);
+				for (let i = 0; i < githubContentRaw.length; i++) {
+					bytes[i] = githubContentRaw.charCodeAt(i);
+				}
+				const githubContentString = new TextDecoder('utf-8').decode(bytes);
+				const githubContent = JSON.parse(githubContentString);
+
+				// Prepare local dictionary for comparison
+				const localContent = {
+					dictionary: {},
+					synonyms: {}
+				};
+
+				// Sort local dictionaries exactly like GitHub version
+				const sortedKeys = Object.keys(dictionary).sort();
+				for (const key of sortedKeys) {
+					localContent.dictionary[key] = dictionary[key];
+				}
+
+				const sortedSynKeys = Object.keys(synonyms).sort();
+				for (const key of sortedSynKeys) {
+					localContent.synonyms[key] = synonyms[key];
+				}
+
+				console.log('Comparing dictionaries...');
+				console.log('GitHub dictionary entries:', Object.keys(githubContent.dictionary || {}).length);
+				console.log('GitHub synonym entries:', Object.keys(githubContent.synonyms || {}).length);
+				console.log('Local dictionary entries:', Object.keys(localContent.dictionary).length);
+				console.log('Local synonym entries:', Object.keys(localContent.synonyms).length);
+				
+				// Log sample entries to check UTF-8 handling
+				const githubDictKeys = Object.keys(githubContent.dictionary || {}).slice(0, 3);
+				const localDictKeys = Object.keys(localContent.dictionary).slice(0, 3);
+				console.log('Sample GitHub entries:', githubDictKeys.map(k => `${k}: ${githubContent.dictionary[k]}`));
+				console.log('Sample Local entries:', localDictKeys.map(k => `${k}: ${localContent.dictionary[k]}`));
+
+				// Simple comparison - if the counts are different, definitely need to update
+				const githubDictCount = Object.keys(githubContent.dictionary || {}).length;
+				const githubSynCount = Object.keys(githubContent.synonyms || {}).length;
+				const localDictCount = Object.keys(localContent.dictionary).length;
+				const localSynCount = Object.keys(localContent.synonyms).length;
+
+				if (githubDictCount !== localDictCount || githubSynCount !== localSynCount) {
+					console.log('Count mismatch detected - updating...');
+				} else if (forceSyncCheckbox.checked) {
+					console.log('Force sync enabled - updating...');
+				} else {
+					// Counts match, do deep comparison with proper UTF-8
+					const normalizeForComparison = (obj) => JSON.stringify(obj, Object.keys(obj).sort());
+					const githubNormalized = normalizeForComparison(githubContent);
+					const localNormalized = normalizeForComparison(localContent);
+
+					if (githubNormalized === localNormalized) {
+						dictionaryStatus.textContent = "Dictionary is already up to date! No changes detected.";
+						setTimeout(() => {
+							dictionaryStatus.textContent = "";
+						}, 3000);
+						return;
+					} else {
+						console.log('Content differences detected - updating...');
+					}
+				}
+
+				// Dictionaries are different, update GitHub
+				dictionaryStatus.textContent = "Updating dictionary on GitHub...";
+				
+				const updateResult = await updateDictionaryOnGitHub(localContent, githubDict.sha);
+
+				dictionaryStatus.textContent = `Dictionary updated successfully! Commit: ${updateResult.commit.sha.substring(0, 7)}`;
+				setTimeout(() => {
+					dictionaryStatus.textContent = "";
+				}, 5000);
+
+			} catch (error) {
+				console.error('Dictionary update error:', error);
+				dictionaryStatus.textContent = `Update failed: ${error.message}`;
+				setTimeout(() => {
+					dictionaryStatus.textContent = "";
+				}, 5000);
+			} finally {
+				saveDictionaryButton.classList.remove('loading');
+				saveDictionaryButton.disabled = false;
+			}
+		}
+
+		// Modified save dictionary function to handle both modes
+		function saveDictionary() {
+			if (isDeveloperMode && githubToken) {
+				// Developer mode with GitHub token - update repository
+				handleDictionaryUpdate();
+			} else {
+				// Normal mode - download file
+				saveLocalDictionary();
+			}
+		}
+
+		// Renamed original save function
+		function saveLocalDictionary() {
+			try {
+				// Create sorted copies of the dictionaries
+				const sortedDictionary = {};
+				const sortedKeys = Object.keys(dictionary).sort();
+				for (const key of sortedKeys) {
+					sortedDictionary[key] = dictionary[key];
+				}
+
+				const sortedSynonyms = {};
+				const sortedSynKeys = Object.keys(synonyms).sort();
+				for (const key of sortedSynKeys) {
+					sortedSynonyms[key] = synonyms[key];
+				}
+
+				// Create the data structure to save
+				const saveData = {
+					dictionary: sortedDictionary,
+					synonyms: sortedSynonyms
+				};
+
+				// Convert to JSON
+				const jsonString = JSON.stringify(saveData, null, 2);
+
+				// Create a blob and download link
+				const blob = new Blob([jsonString], {type: 'application/json'});
+				const url = URL.createObjectURL(blob);
+
+				// Create a temporary download link
+				const downloadLink = document.createElement('a');
+				downloadLink.href = url;
+				downloadLink.download = 'ichrolic_dictionary.json';
+
+				// Append to body, click, and remove
+				document.body.appendChild(downloadLink);
+				downloadLink.click();
+				document.body.removeChild(downloadLink);
+
+				// Release the object URL
+				URL.revokeObjectURL(url);
+
+				dictionaryStatus.textContent = "Dictionary saved successfully to file.";
+
+				// Clear status message after 3 seconds
+				setTimeout(() => {
+					dictionaryStatus.textContent = "";
+				}, 3000);
+			} catch (error) {
+				dictionaryStatus.textContent = "Error saving dictionary: " + error.message;
+			}
+		}
+
+		// Toggle dictionary table visibility
+		function toggleDictionaryTable() {
+			if (dictionaryTable.style.display === "none") {
+				dictionaryTable.style.display = "block";
+				updateDictionaryTable();
+			} else {
+				dictionaryTable.style.display = "none";
+			}
+		}
+
+		// Dictionary sorting parameters
+		let currentSortField = 'english'; // Default sort by English
+		let sortDirection = 'asc'; // Default sort direction
+
+		// Function to toggle sort direction and field
+		function sortDictionary(field) {
+			if (currentSortField === field) {
+				// Toggle direction if clicking same field
+				sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+			} else {
+				// Set new field and reset direction to ascending
+				currentSortField = field;
+				sortDirection = 'asc';
+			}
+
+			updateSortIndicators();
+			updateDictionaryTable();
+		}
+
+		// Function to update sort indicators in table headers
+		function updateSortIndicators() {
+			// Update the English header
+			englishHeader.innerHTML = "English";
+			if (currentSortField === 'english') {
+				englishHeader.innerHTML += ` <span class="sort-indicator">${sortDirection === 'asc' ? '▲' : '▼'}</span>`;
+			}
+
+			// Update the Ichrolic header
+			ichrolicHeader.innerHTML = "Ichrolic";
+			if (currentSortField === 'ichrolic') {
+				ichrolicHeader.innerHTML += ` <span class="sort-indicator">${sortDirection === 'asc' ? '▲' : '▼'}</span>`;
+			}
+		}
+	</script>
+</body>
+</html>
