@@ -253,6 +253,7 @@
 		.dictionary-search .setting {
 			margin-bottom: 0;
 			white-space: nowrap;
+			padding-right: 8px;
 		}
 		.dictionary-fixed-header {
 			position: sticky;
@@ -525,7 +526,7 @@
 					<textarea id="englishInput" placeholder="Enter English text here..."></textarea>
 				</div>
 				<div class="text-column" style="position: relative;">
-					<div class="header">Ichrolic (Click to Copy)</div>
+					<div class="header">Ichrolic</div>
 					<textarea id="ichrolicOutput" placeholder="Ichrolic translation will appear here..." readonly title="Click to copy to clipboard"></textarea>
 					<div class="copy-feedback" id="copyFeedback">Copied! ✓</div>
 				</div>
@@ -717,6 +718,26 @@
 		ichrolicHeader.addEventListener('click', () => sortDictionary('ichrolic'));
 		synonymToggleButton.addEventListener('click', toggleSynonymMode);
 
+		// Function to remove diacritics for search comparison
+		function removeDiacriticsForSearch(text) {
+			if (!text) return text;
+
+			// Map of characters with diacritics to their base form
+			const diacriticMap = {
+				"í": "i", "é": "e", "á": "a", "ó": "o", "ú": "u",
+				"ì": "i", "è": "e", "à": "a", "ò": "o", "ù": "u",
+				"î": "i", "ê": "e", "â": "a", "ô": "o", "û": "u",
+				"ï": "i", "ë": "e", "ä": "a", "ö": "o", "ü": "u"
+			};
+
+			let result = text.toLowerCase();
+			for (const diacritic in diacriticMap) {
+				result = result.split(diacritic).join(diacriticMap[diacritic]);
+			}
+
+			return result;
+		}
+
 		// Function to update the dictionary table
 		function updateDictionaryTable() {
 			const showSynonyms = showSynonymsCheckbox.checked;
@@ -731,9 +752,13 @@
 
 			// Add main dictionary entries
 			for (const english in dictionary) {
+				const normalizedEnglish = removeDiacriticsForSearch(english);
+				const normalizedIchrolic = removeDiacriticsForSearch(dictionary[english]);
+				const normalizedSearch = removeDiacriticsForSearch(searchTerm);
+				
 				if (searchTerm === '' ||
-					english.toLowerCase().includes(searchTerm) ||
-					dictionary[english].toLowerCase().includes(searchTerm)) {
+					normalizedEnglish.includes(normalizedSearch) ||
+					normalizedIchrolic.includes(normalizedSearch)) {
 					entries.push({
 						english: english,
 						ichrolic: dictionary[english],
@@ -747,9 +772,13 @@
 				for (const synonym in synonyms) {
 					const canonicalForm = synonyms[synonym];
 					if (dictionary.hasOwnProperty(canonicalForm)) {
+						const normalizedSynonym = removeDiacriticsForSearch(synonym);
+						const normalizedIchrolic = removeDiacriticsForSearch(dictionary[canonicalForm]);
+						const normalizedSearch = removeDiacriticsForSearch(searchTerm);
+						
 						if (searchTerm === '' ||
-							synonym.toLowerCase().includes(searchTerm) ||
-							dictionary[canonicalForm].toLowerCase().includes(searchTerm)) {
+							normalizedSynonym.includes(normalizedSearch) ||
+							normalizedIchrolic.includes(normalizedSearch)) {
 							entries.push({
 								english: synonym,
 								ichrolic: dictionary[canonicalForm],
@@ -765,21 +794,22 @@
 			if (searchTerm !== '') {
 				// Smart search sorting: exact match -> starts with -> contains
 				entries.sort((a, b) => {
-					const aEnglish = a.english.toLowerCase();
-					const bEnglish = b.english.toLowerCase();
-					const aIchrolic = a.ichrolic.toLowerCase();
-					const bIchrolic = b.ichrolic.toLowerCase();
+					const aEnglish = removeDiacriticsForSearch(a.english);
+					const bEnglish = removeDiacriticsForSearch(b.english);
+					const aIchrolic = removeDiacriticsForSearch(a.ichrolic);
+					const bIchrolic = removeDiacriticsForSearch(b.ichrolic);
+					const normalizedSearch = removeDiacriticsForSearch(searchTerm);
 					
 					// Calculate relevance scores
 					const getRelevanceScore = (english, ichrolic) => {
 						// Exact match gets highest score
-						if (english === searchTerm || ichrolic === searchTerm) return 100;
+						if (english === normalizedSearch || ichrolic === normalizedSearch) return 100;
 						
 						// Starts with search term gets high score
-						if (english.startsWith(searchTerm) || ichrolic.startsWith(searchTerm)) return 50;
+						if (english.startsWith(normalizedSearch) || ichrolic.startsWith(normalizedSearch)) return 50;
 						
 						// Contains search term gets lower score
-						if (english.includes(searchTerm) || ichrolic.includes(searchTerm)) return 10;
+						if (english.includes(normalizedSearch) || ichrolic.includes(normalizedSearch)) return 10;
 						
 						return 0;
 					};
