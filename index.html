@@ -1639,8 +1639,26 @@
 		// Automatically load the dictionary when the page loads
 		window.addEventListener('DOMContentLoaded', function() {
 			loadDefaultDictionary();
+		
+			// Check for existing GitHub token and auto-login
+			const storedToken = localStorage.getItem('github_token');
+			const storedUser = localStorage.getItem('github_user');
+			
+			if (storedToken && storedUser) {
+				try {
+					githubToken = storedToken;
+					currentUser = JSON.parse(storedUser);
+					updateSignInState();
+					enterDeveloperMode(); // Auto-enter dev mode if we have credentials
+					console.log('Auto-logged in as:', currentUser.login);
+				} catch (error) {
+					console.error('Failed to parse stored user data:', error);
+					// Clear corrupted data
+					localStorage.removeItem('github_token');
+					localStorage.removeItem('github_user');
+				}
+			}
 		});
-
 		// Function to load the default dictionary from a file in the repo
 		function loadDefaultDictionary() {
 			// Add cache-busting parameter to always get fresh data
