@@ -2137,10 +2137,17 @@
 				// Fetch current dictionary from GitHub API (for SHA)
 				const githubDict = await fetchCurrentDictionary();
 				
-				// Decode the GitHub content properly
-				const githubContent = JSON.parse(atob(githubDict.content));
+				// Decode the content using proper UTF-8 handling
+				const githubContentRaw = atob(githubDict.content);
+				// Convert to Uint8Array and then decode as UTF-8
+				const bytes = new Uint8Array(githubContentRaw.length);
+				for (let i = 0; i < githubContentRaw.length; i++) {
+					bytes[i] = githubContentRaw.charCodeAt(i);
+				}
+				const githubContentString = new TextDecoder('utf-8').decode(bytes);
+				const githubContent = JSON.parse(githubContentString);
 
-				// Prepare local dictionary for comparison (exact same format as GitHub)
+				// Prepare local dictionary for comparison
 				const localContent = {
 					dictionary: {},
 					synonyms: {}
@@ -2157,30 +2164,41 @@
 					localContent.synonyms[key] = synonyms[key];
 				}
 
-				// Normalize both for comparison (remove any formatting differences)
-				const normalizeForComparison = (obj) => JSON.stringify(obj, Object.keys(obj).sort());
-				
-				const githubNormalized = normalizeForComparison(githubContent);
-				const localNormalized = normalizeForComparison(localContent);
-
 				console.log('Comparing dictionaries...');
 				console.log('GitHub dictionary entries:', Object.keys(githubContent.dictionary || {}).length);
 				console.log('GitHub synonym entries:', Object.keys(githubContent.synonyms || {}).length);
 				console.log('Local dictionary entries:', Object.keys(localContent.dictionary).length);
 				console.log('Local synonym entries:', Object.keys(localContent.synonyms).length);
 				
-				// Log a few sample entries for debugging
+				// Log sample entries to check UTF-8 handling
 				const githubDictKeys = Object.keys(githubContent.dictionary || {}).slice(0, 3);
 				const localDictKeys = Object.keys(localContent.dictionary).slice(0, 3);
 				console.log('Sample GitHub entries:', githubDictKeys.map(k => `${k}: ${githubContent.dictionary[k]}`));
 				console.log('Sample Local entries:', localDictKeys.map(k => `${k}: ${localContent.dictionary[k]}`));
 
-				if (githubNormalized === localNormalized) {
-					dictionaryStatus.textContent = "Dictionary is already up to date! No changes detected.";
-					setTimeout(() => {
-						dictionaryStatus.textContent = "";
-					}, 3000);
-					return;
+				// Simple comparison - if the counts are different, definitely need to update
+				const githubDictCount = Object.keys(githubContent.dictionary || {}).length;
+				const githubSynCount = Object.keys(githubContent.synonyms || {}).length;
+				const localDictCount = Object.keys(localContent.dictionary).length;
+				const localSynCount = Object.keys(localContent.synonyms).length;
+
+				if (githubDictCount !== localDictCount || githubSynCount !== localSynCount) {
+					console.log('Count mismatch detected - updating...');
+				} else {
+					// Counts match, do deep comparison with proper UTF-8
+					const normalizeForComparison = (obj) => JSON.stringify(obj, Object.keys(obj).sort());
+					const githubNormalized = normalizeForComparison(githubContent);
+					const localNormalized = normalizeForComparison(localContent);
+
+					if (githubNormalized === localNormalized) {
+						dictionaryStatus.textContent = "Dictionary is already up to date! No changes detected.";
+						setTimeout(() => {
+							dictionaryStatus.textContent = "";
+						}, 3000);
+						return;
+					} else {
+						console.log('Content differences detected - updating...');
+					}
 				}
 
 				// Dictionaries are different, update GitHub
