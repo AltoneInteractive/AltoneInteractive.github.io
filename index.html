@@ -2134,12 +2134,11 @@
 			dictionaryStatus.textContent = "Checking for changes...";
 
 			try {
-				// Fetch current dictionary from GitHub API (for SHA and comparison)
+				// Fetch current dictionary from GitHub API (for SHA)
 				const githubDict = await fetchCurrentDictionary();
 				
-				// But also fetch the actual content directly to avoid encoding issues
-				const directResponse = await fetch('dictionary.json');
-				const githubContent = await directResponse.json();
+				// Decode the GitHub content properly
+				const githubContent = JSON.parse(atob(githubDict.content));
 
 				// Prepare local dictionary for comparison (exact same format as GitHub)
 				const localContent = {
@@ -2165,8 +2164,16 @@
 				const localNormalized = normalizeForComparison(localContent);
 
 				console.log('Comparing dictionaries...');
-				console.log('GitHub keys:', Object.keys(githubContent.dictionary || {}).length, 'dictionary,', Object.keys(githubContent.synonyms || {}).length, 'synonyms');
-				console.log('Local keys:', Object.keys(localContent.dictionary).length, 'dictionary,', Object.keys(localContent.synonyms).length, 'synonyms');
+				console.log('GitHub dictionary entries:', Object.keys(githubContent.dictionary || {}).length);
+				console.log('GitHub synonym entries:', Object.keys(githubContent.synonyms || {}).length);
+				console.log('Local dictionary entries:', Object.keys(localContent.dictionary).length);
+				console.log('Local synonym entries:', Object.keys(localContent.synonyms).length);
+				
+				// Log a few sample entries for debugging
+				const githubDictKeys = Object.keys(githubContent.dictionary || {}).slice(0, 3);
+				const localDictKeys = Object.keys(localContent.dictionary).slice(0, 3);
+				console.log('Sample GitHub entries:', githubDictKeys.map(k => `${k}: ${githubContent.dictionary[k]}`));
+				console.log('Sample Local entries:', localDictKeys.map(k => `${k}: ${localContent.dictionary[k]}`));
 
 				if (githubNormalized === localNormalized) {
 					dictionaryStatus.textContent = "Dictionary is already up to date! No changes detected.";
