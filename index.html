@@ -298,7 +298,7 @@
 			color: #999;
 		}
 		/* Complete text area styling with focus states */
-		textarea {
+		textarea, .english-input-editor {
 			height: 200px;
 			padding: 10px;
 			border: 1px solid var(--border-color);
@@ -312,7 +312,19 @@
 			-webkit-text-fill-color: var(--text-color); /* For WebKit browsers */
 		}
 
-		textarea:focus {
+		.english-input-editor {
+			overflow-y: auto;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
+
+		.english-input-editor:empty:before {
+			content: "Enter English text here...";
+			color: #999;
+			pointer-events: none;
+		}
+
+		textarea:focus, .english-input-editor:focus {
 			background-color: var(--container-bg) !important; /* Force override */
 			color: var(--text-color) !important; /* Force override */
 			border-color: var(--heading-color);
@@ -322,7 +334,7 @@
 		}
 
 		/* For webkit browsers like Chrome/Safari */
-		textarea:focus-visible {
+		textarea:focus-visible, .english-input-editor:focus-visible {
 			background-color: var(--container-bg) !important;
 			color: var(--text-color) !important;
 			-webkit-text-fill-color: var(--text-color);
@@ -334,36 +346,26 @@
 		}
 		
 		/* Force text color for all input states */
-		textarea:active, textarea:hover, textarea:focus {
+		textarea:active, textarea:hover, textarea:focus,
+		.english-input-editor:active, .english-input-editor:hover, .english-input-editor:focus {
 			color: var(--text-color) !important;
 		}
 
-		/* Special styling for the Ichrolic output textarea */
-		#ichrolicOutput {
+		/* Variant word styling */
+		.variant-word {
+			text-decoration: underline;
+			text-decoration-style: dashed;
+			text-decoration-color: var(--heading-color);
 			cursor: pointer;
-			user-select: none;
-			-webkit-user-select: none;
-			-moz-user-select: none;
-			-ms-user-select: none;
 			position: relative;
-			transition: all 0.2s ease;
 		}
 
-		/* Word variant styling */
-		.word-variant {
-			position: relative;
-			display: inline;
-			border-bottom: 2px dotted var(--heading-color);
-			cursor: pointer;
-			transition: all 0.2s ease;
-		}
-
-		.word-variant:hover {
+		.variant-word:hover {
 			background-color: var(--table-hover);
-			border-bottom-style: solid;
+			border-radius: 2px;
 		}
 
-		/* Tooltip for word variants */
+		/* Tooltip styling */
 		.variant-tooltip {
 			position: absolute;
 			bottom: 100%;
@@ -383,7 +385,7 @@
 			margin-bottom: 5px;
 		}
 
-		.variant-tooltip::after {
+		.variant-tooltip:after {
 			content: '';
 			position: absolute;
 			top: 100%;
@@ -393,13 +395,19 @@
 			border-top-color: var(--heading-color);
 		}
 
-		.word-variant:hover .variant-tooltip {
+		.variant-word:hover .variant-tooltip {
 			opacity: 1;
 		}
 
-		/* Enhanced English input styling */
-		#englishInput {
+		/* Special styling for the Ichrolic output textarea */
+		#ichrolicOutput {
+			cursor: pointer;
+			user-select: none;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
 			position: relative;
+			transition: all 0.2s ease;
 		}
 
 		#ichrolicOutput:hover {
@@ -834,7 +842,7 @@
 			<div class="text-areas">
 				<div class="text-column">
 					<div class="header">English</div>
-					<textarea id="englishInput" placeholder="Enter English text here..."></textarea>
+					<div id="englishInput" class="english-input-editor" contenteditable="true"></div>
 				</div>
 				<div class="text-column" style="position: relative;">
 					<div class="header">Ichrolic <span class="copy-header">(Click to Copy)</span></div>
@@ -927,11 +935,6 @@
 		// Main dictionary and synonyms objects
 		let dictionary = {};
 		let synonyms = {};
-		
-		// Word variant tracking
-		let wordVariants = {}; // Stores available variants for each base word
-		let selectedVariants = {}; // Stores currently selected variant for each word position
-		let variantElements = []; // Stores DOM elements for interactive variants
 
 		// DOM Elements
 		const synonymToggleButton = document.getElementById('synonymToggle');
@@ -973,6 +976,169 @@
 		let isDeveloperMode = false; // Track developer mode
 		let githubToken = localStorage.getItem('github_token'); // GitHub token
 		let currentUser = null; // Store user info
+
+		// Variant tracking system
+		let wordVariants = {}; // Maps base words to their variants
+		let selectedVariants = {}; // Maps base words to currently selected variant
+
+		// Build variant mapping from dictionary
+		function buildVariantMapping() {
+			wordVariants = {};
+			
+			// Find all dictionary keys with variants (containing "/")
+			for (const key in dictionary) {
+				if (key.includes('/')) {
+					const [baseWord, variantType] = key.split('/');
+					if (!wordVariants[baseWord]) {
+						wordVariants[baseWord] = [];
+					}
+					wordVariants[baseWord].push({
+						key: key,
+						type: variantType.toUpperCase(),
+						translation: dictionary[key]
+					});
+				}
+			}
+			
+			// Sort variants alphabetically by type for consistent ordering
+			for (const baseWord in wordVariants) {
+				wordVariants[baseWord].sort((a, b) => a.type.localeCompare(b.type));
+				// Set default selection to first variant
+				if (!selectedVariants[baseWord]) {
+					selectedVariants[baseWord] = 0;
+				}
+			}
+		}
+
+		// Get the currently selected variant for a word
+		function getSelectedVariant(baseWord) {
+			if (!wordVariants[baseWord]) return null;
+			const variantIndex = selectedVariants[baseWord] || 0;
+			return wordVariants[baseWord][variantIndex];
+		}
+
+		// Cycle to next variant for a word
+		function cycleVariant(baseWord) {
+			if (!wordVariants[baseWord]) return;
+			const currentIndex = selectedVariants[baseWord] || 0;
+			const nextIndex = (currentIndex + 1) % wordVariants[baseWord].length;
+			selectedVariants[baseWord] = nextIndex;
+			
+			// Update display and retranslate
+			updateEnglishInputDisplay();
+			translateToIchrolic();
+		}
+
+		// Update the English input display with variant markup
+		function updateEnglishInputDisplay() {
+			const text = getPlainTextFromInput();
+			if (!text.trim()) return;
+
+			// Tokenize the text while preserving spaces and punctuation
+			const tokens = [];
+			let currentWord = "";
+			const punctuationChars = [",", ".", "!", "?", ";", ":"];
+
+			for (const c of text) {
+				if (c === " ") {
+					if (currentWord !== "") {
+						tokens.push({ type: 'word', content: currentWord });
+						currentWord = "";
+					}
+					tokens.push({ type: 'space', content: " " });
+				} else if (punctuationChars.includes(c)) {
+					if (currentWord !== "") {
+						tokens.push({ type: 'word', content: currentWord });
+						currentWord = "";
+					}
+					tokens.push({ type: 'punctuation', content: c });
+				} else {
+					currentWord += c;
+				}
+			}
+
+			if (currentWord !== "") {
+				tokens.push({ type: 'word', content: currentWord });
+			}
+
+			// Build HTML with variant markup
+			let html = "";
+			for (const token of tokens) {
+				if (token.type === 'word') {
+					const baseWord = token.content.toLowerCase();
+					if (wordVariants[baseWord]) {
+						const variant = getSelectedVariant(baseWord);
+						html += `<span class="variant-word" data-base-word="${baseWord}">${token.content}<div class="variant-tooltip">${variant.type}</div></span>`;
+					} else {
+						html += token.content;
+					}
+				} else {
+					html += token.content;
+				}
+			}
+
+			// Update the content while preserving cursor position
+			const selection = window.getSelection();
+			const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+			const cursorOffset = range ? range.startOffset : 0;
+
+			englishInput.innerHTML = html;
+
+			// Restore cursor position (simplified approach)
+			if (range) {
+				try {
+					const newRange = document.createRange();
+					const textNode = findTextNodeAtOffset(englishInput, cursorOffset);
+					if (textNode.node) {
+						newRange.setStart(textNode.node, Math.min(textNode.offset, textNode.node.textContent.length));
+						newRange.setEnd(textNode.node, Math.min(textNode.offset, textNode.node.textContent.length));
+						selection.removeAllRanges();
+						selection.addRange(newRange);
+					}
+				} catch (e) {
+					// Cursor restoration failed, place at end
+					const newRange = document.createRange();
+					newRange.selectNodeContents(englishInput);
+					newRange.collapse(false);
+					selection.removeAllRanges();
+					selection.addRange(newRange);
+				}
+			}
+		}
+
+		// Helper function to find text node at specific offset
+		function findTextNodeAtOffset(element, targetOffset) {
+			let currentOffset = 0;
+			const walker = document.createTreeWalker(
+				element,
+				NodeFilter.SHOW_TEXT,
+				null,
+				false
+			);
+
+			let node;
+			while (node = walker.nextNode()) {
+				const nodeLength = node.textContent.length;
+				if (currentOffset + nodeLength >= targetOffset) {
+					return {
+						node: node,
+						offset: targetOffset - currentOffset
+					};
+				}
+				currentOffset += nodeLength;
+			}
+
+			// If we couldn't find the exact position, return the last text node
+			return {
+				node: node || element,
+				offset: node ? node.textContent.length : 0
+			};
+		}
+
+		// Get plain text content from the contenteditable div
+		function getPlainTextFromInput() {
+			return englishInput.textContent || englishInput.innerText || "";
+		}
 
 		// Copy to clipboard functionality
 		ichrolicOutput.addEventListener('click', function() {
@@ -1150,173 +1316,54 @@
 
 		// Check for developer mode trigger
 		englishInput.addEventListener('input', function() {
-			if (englishInput.value === '/////') {
+			const text = getPlainTextFromInput();
+			if (text === '/////') {
 				enterDeveloperMode();
+			} else {
+				// Debounce the display update to avoid excessive DOM manipulation
+				clearTimeout(englishInput.updateTimeout);
+				englishInput.updateTimeout = setTimeout(() => {
+					updateEnglishInputDisplay();
+				}, 150);
 			}
 		});
-		// Function to build word variants mapping from dictionary
-		function buildWordVariants() {
-			wordVariants = {};
-			
-			for (const key in dictionary) {
-				if (key.includes('/')) {
-					const [baseWord, variant] = key.split('/');
-					if (!wordVariants[baseWord.toLowerCase()]) {
-						wordVariants[baseWord.toLowerCase()] = [];
-					}
-					wordVariants[baseWord.toLowerCase()].push({
-						key: key,
-						variant: variant.toUpperCase(),
-						translation: dictionary[key]
-					});
+
+		// Add click handler for variant cycling
+		englishInput.addEventListener('click', function(e) {
+			const variantWord = e.target.closest('.variant-word');
+			if (variantWord) {
+				e.preventDefault();
+				const baseWord = variantWord.getAttribute('data-base-word');
+				if (baseWord) {
+					cycleVariant(baseWord);
 				}
 			}
-			
-			// Sort variants alphabetically for consistent ordering
-			for (const baseWord in wordVariants) {
-				wordVariants[baseWord].sort((a, b) => a.variant.localeCompare(b.variant));
-			}
-		}
+		});
 
+		// Handle paste events to maintain plain text
+		englishInput.addEventListener('paste', function(e) {
+			e.preventDefault();
+			const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+			document.execCommand('insertText', false, text);
+		});
+
+		// Prevent rich formatting
+		englishInput.addEventListener('keydown', function(e) {
+			// Prevent formatting shortcuts
+			if (e.ctrlKey || e.metaKey) {
+				if (['b', 'i', 'u'].includes(e.key.toLowerCase())) {
+					e.preventDefault();
+				}
+			}
+		});
 		function isMobileView() {
 			return window.innerWidth <= 768;
-		}
-
-		// Function to clear selected variants when input changes significantly
-		function clearSelectedVariants() {
-			selectedVariants = {};
-			// Also remove any existing overlay when clearing variants
-			const existingOverlay = document.getElementById('wordOverlay');
-			if (existingOverlay) {
-				existingOverlay.remove();
-			}
-		}
-		function createWordOverlay() {
-			// Remove existing overlay
-			const existingOverlay = document.getElementById('wordOverlay');
-			if (existingOverlay) {
-				existingOverlay.remove();
-			}
-			
-			// Clear variant elements
-			variantElements = [];
-			
-			const english = englishInput.value.trim();
-			if (english === "") {
-				return;
-			}
-			
-			// Create overlay container
-			const overlay = document.createElement('div');
-			overlay.id = 'wordOverlay';
-			overlay.style.cssText = `
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				pointer-events: none;
-				font-family: inherit;
-				font-size: 16px;
-				padding: 10px;
-				line-height: 1.4;
-				white-space: normal;
-				word-wrap: break-word;
-				overflow: hidden;
-				background: transparent;
-				border: none;
-				resize: none;
-				box-sizing: border-box;
-				z-index: 10;
-			`;
-			
-			// Parse text and create interactive elements
-			const words = english.split(/(\s+)/);
-			let overlayHTML = '';
-			let wordIndex = 0;
-			
-			for (let i = 0; i < words.length; i++) {
-				const word = words[i];
-				
-				if (word.trim() === '') {
-					// Preserve whitespace
-					overlayHTML += word;
-				} else {
-					const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
-					
-					if (wordVariants[cleanWord] && wordVariants[cleanWord].length > 1) {
-						// This word has variants
-						const currentVariantIndex = selectedVariants[`${cleanWord}_${wordIndex}`] || 0;
-						const currentVariant = wordVariants[cleanWord][currentVariantIndex];
-						
-						overlayHTML += `<span class="word-variant" data-base-word="${cleanWord}" data-word-index="${wordIndex}" style="pointer-events: auto;">
-							${word}
-							<span class="variant-tooltip">${currentVariant.variant}</span>
-						</span>`;
-						
-						wordIndex++;
-					} else {
-						// Regular word
-						overlayHTML += word;
-						if (cleanWord !== '') wordIndex++;
-					}
-				}
-			}
-			
-			overlay.innerHTML = overlayHTML;
-			
-			// Position overlay over the input
-			const inputRect = englishInput.getBoundingClientRect();
-			const containerRect = englishInput.parentElement.getBoundingClientRect();
-			
-			overlay.style.position = 'absolute';
-			overlay.style.top = '0';
-			overlay.style.left = '0';
-			
-			// Add click handlers for variant cycling
-			overlay.querySelectorAll('.word-variant').forEach(element => {
-				element.addEventListener('click', function(e) {
-					e.preventDefault();
-					e.stopPropagation();
-					
-					const baseWord = this.dataset.baseWord;
-					const wordIndex = this.dataset.wordIndex;
-					const key = `${baseWord}_${wordIndex}`;
-					
-					// Cycle to next variant
-					const variants = wordVariants[baseWord];
-					const currentIndex = selectedVariants[key] || 0;
-					const nextIndex = (currentIndex + 1) % variants.length;
-					selectedVariants[key] = nextIndex;
-					
-					// Update tooltip
-					const tooltip = this.querySelector('.variant-tooltip');
-					tooltip.textContent = variants[nextIndex].variant;
-					
-					// Retranslate
-					translateToIchrolic();
-				});
-			});
-			
-			// Add overlay to input container
-			englishInput.parentElement.style.position = 'relative';
-			englishInput.parentElement.appendChild(overlay);
 		}
 
 
 
 		// Event Listeners
-		let lastInputLength = 0;
-		englishInput.addEventListener('input', function() {
-			// Clear variants if significant change in input length (words added/removed)
-			const currentLength = englishInput.value.trim().split(/\s+/).length;
-			if (Math.abs(currentLength - lastInputLength) > 0) {
-				clearSelectedVariants();
-			}
-			lastInputLength = currentLength;
-			
-			translateToIchrolic();
-		});
+		englishInput.addEventListener('input', translateToIchrolic);
 		ignoreDiacriticsCheckbox.addEventListener('change', translateToIchrolic);
 		useContractionsCheckbox.addEventListener('change', translateToIchrolic);
 		saveDictionaryButton.addEventListener('click', saveDictionary);
@@ -1637,8 +1684,7 @@
 						} else {
 							delete dictionary[entry.english];
 						}
-						buildWordVariants(); // Rebuild variants after deletion
-						clearSelectedVariants(); // Clear any selected variants
+						buildVariantMapping();
 						updateDictionaryTable();
 						translateToIchrolic();
 					});
@@ -1661,8 +1707,7 @@
 							// Focus on the ichrolic input for editing
 							newIchrolicInput.focus();
 
-							buildWordVariants(); // Rebuild variants after removal
-							clearSelectedVariants(); // Clear any selected variants
+							buildVariantMapping();
 							updateDictionaryTable();
 						});
 						actionsCell.appendChild(editButton);
@@ -1684,7 +1729,7 @@
 							// Add as a primary entry
 							dictionary[entry.english] = translation;
 
-							buildWordVariants(); // Rebuild variants after change
+							buildVariantMapping();
 							updateDictionaryTable();
 							translateToIchrolic();
 						});
@@ -1755,8 +1800,7 @@
 						} else {
 							delete dictionary[entry.english];
 						}
-						buildWordVariants(); // Rebuild variants after deletion
-						clearSelectedVariants(); // Clear any selected variants
+						buildVariantMapping();
 						updateDictionaryTable();
 						translateToIchrolic();
 					});
@@ -1778,8 +1822,7 @@
 							// Focus on the ichrolic input for editing
 							newIchrolicInput.focus();
 
-							buildWordVariants(); // Rebuild variants after removal
-							clearSelectedVariants(); // Clear any selected variants
+							buildVariantMapping();
 							updateDictionaryTable();
 						});
 						actionsDiv.appendChild(editButton);
@@ -1800,7 +1843,7 @@
 							// Add as a primary entry
 							dictionary[entry.english] = translation;
 
-							buildWordVariants(); // Rebuild variants after change
+							buildVariantMapping();
 							updateDictionaryTable();
 							translateToIchrolic();
 						});
@@ -1882,7 +1925,7 @@
 			newIchrolicInput.value = '';
 
 			// Update the table and translation
-			buildWordVariants(); // Rebuild variants after adding entry
+			buildVariantMapping();
 			updateDictionaryTable();
 			translateToIchrolic();
 
@@ -1931,7 +1974,7 @@
 					if (data.dictionary && data.synonyms) {
 						dictionary = data.dictionary;
 						synonyms = data.synonyms;
-						buildWordVariants(); // Build variants after loading dictionary
+						buildVariantMapping();
 						updateDictionaryTable();
 						translateToIchrolic();
 						dictionaryStatus.textContent = "Default dictionary loaded successfully.";
@@ -1957,19 +2000,11 @@
 
 		// Function to translate English to Ichrolic
 		function translateToIchrolic() {
-			const english = englishInput.value.trim();
+			const english = getPlainTextFromInput().trim();
 			if (english === "") {
 				ichrolicOutput.value = "";
-				// Remove overlay when input is empty
-				const existingOverlay = document.getElementById('wordOverlay');
-				if (existingOverlay) {
-					existingOverlay.remove();
-				}
 				return;
 			}
-
-			// Build word variants mapping
-			buildWordVariants();
 
 			const ignoreDiacritics = ignoreDiacriticsCheckbox.checked;
 			const useContractions = useContractionsCheckbox.checked;
@@ -1985,8 +2020,19 @@
 				}
 			}
 
+			// Build dictionary for translation including variants
+			const translationDictionary = { ...dictionary };
+			
+			// Add selected variants to translation dictionary
+			for (const baseWord in wordVariants) {
+				const variant = getSelectedVariant(baseWord);
+				if (variant) {
+					translationDictionary[baseWord] = variant.translation;
+				}
+			}
+
 			// Sort dictionary keys by length (descending) to prioritize longer phrases
-			const sortedKeys = Object.keys(dictionary).sort((a, b) =>
+			const sortedKeys = Object.keys(translationDictionary).sort((a, b) =>
 				b.split(" ").length - a.split(" ").length
 			);
 
@@ -2022,7 +2068,6 @@
 			const result = [];
 			const resultToEnglishIndex = {};
 			let englishIndex = 0;
-			let wordIndex = 0; // Track position for variant selection
 
 			while (i < tokens.length) {
 				let foundPhrase = false;
@@ -2070,7 +2115,7 @@
 							const matchStr = phraseTokens.join(" ");
 							if (matchStr.toLowerCase() === key.toLowerCase()) {
 								foundPhrase = true;
-								result.push(dictionary[key]);
+								result.push(translationDictionary[key]);
 
 								// Map this result to the English word
 								resultToEnglishIndex[result.length - 1] = englishIndex;
@@ -2080,7 +2125,6 @@
 									if (i < tokens.length) {
 										if (tokens[i] !== " " && !punctuationChars.includes(tokens[i])) {
 											englishIndex++;
-											wordIndex++;
 										}
 										i++;
 									}
@@ -2111,11 +2155,11 @@
 					}
 
 					// Process regular word
-					const cleanWord = token.toLowerCase().replace(/[^\w]/g, '');
-					const canonicalWord = getCanonicalForm(cleanWord, wordIndex);
+					const cleanWord = token.toLowerCase();
+					const canonicalWord = getCanonicalForm(cleanWord);
 
-					if (dictionary.hasOwnProperty(canonicalWord)) {
-						result.push(dictionary[canonicalWord]);
+					if (translationDictionary.hasOwnProperty(canonicalWord)) {
+						result.push(translationDictionary[canonicalWord]);
 						resultToEnglishIndex[result.length - 1] = englishIndex;
 					} else {
 						result.push("[" + token + "]");
@@ -2123,7 +2167,6 @@
 					}
 
 					englishIndex++;
-					wordIndex++;
 					i++;
 				}
 			}
@@ -2177,21 +2220,16 @@
 			}
 
 			ichrolicOutput.value = ichrolic;
-
-			// Create interactive word overlay
-			createWordOverlay();
 		}
 
 		// Function to get canonical form from synonyms and variants
-		function getCanonicalForm(word, wordIndex = 0) {
+		function getCanonicalForm(word) {
 			const lowercaseWord = word.toLowerCase();
 
-			// Check if word has variants
-			if (wordVariants[lowercaseWord] && wordVariants[lowercaseWord].length > 0) {
-				const variantKey = `${lowercaseWord}_${wordIndex}`;
-				const selectedIndex = selectedVariants[variantKey] || 0;
-				const selectedVariant = wordVariants[lowercaseWord][selectedIndex];
-				return selectedVariant.key;
+			// First check if there's a selected variant for this word
+			if (wordVariants[lowercaseWord]) {
+				const variant = getSelectedVariant(lowercaseWord);
+				return variant ? variant.key : lowercaseWord;
 			}
 
 			// Check if word already exists in main dictionary
