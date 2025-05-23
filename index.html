@@ -318,6 +318,11 @@
 			word-wrap: break-word;
 		}
 
+		/* Reset any inherited text decoration for regular text (but not variant words) */
+		.english-input-editor {
+			text-decoration: none !important;
+		}
+
 		.english-input-editor:empty:before {
 			content: "Enter English text here...";
 			color: #999;
@@ -352,15 +357,15 @@
 		}
 
 		/* Variant word styling */
-		.variant-word {
-			text-decoration: underline;
-			text-decoration-style: dashed;
-			text-decoration-color: var(--heading-color);
+		.english-input-editor .variant-word {
+			text-decoration: underline !important;
+			text-decoration-style: dashed !important;
+			text-decoration-color: var(--heading-color) !important;
 			cursor: pointer;
 			position: relative;
 		}
 
-		.variant-word:hover {
+		.english-input-editor .variant-word:hover {
 			background-color: var(--table-hover);
 			border-radius: 2px;
 		}
@@ -1005,10 +1010,8 @@
 			const fullText = getPlainTextFromInput();
 			const text = fullText.trim();
 			if (!text) {
-				// If no text, just clear any existing markup
-				if (englishInput.innerHTML !== '' && !englishInput.textContent.trim()) {
-					englishInput.innerHTML = '';
-				}
+				// If no text, completely clear and reset
+				englishInput.innerHTML = '';
 				return;
 			}
 
@@ -1019,7 +1022,20 @@
 			});
 			
 			if (!hasVariants) {
-				// No variants to mark, don't rebuild HTML unnecessarily
+				// No variants to mark, ensure we have clean plain text
+				if (englishInput.innerHTML !== fullText) {
+					const selection = window.getSelection();
+					let cursorTextOffset = 0;
+					
+					if (selection.rangeCount > 0) {
+						const range = selection.getRangeAt(0);
+						cursorTextOffset = getAbsoluteTextOffset(englishInput, range.startContainer, range.startOffset);
+					}
+					
+					englishInput.innerHTML = '';
+					englishInput.textContent = fullText;
+					restoreCursorToTextOffset(englishInput, cursorTextOffset);
+				}
 				return;
 			}
 
@@ -1138,6 +1154,52 @@
 			range.collapse(false);
 			selection.removeAllRanges();
 			selection.addRange(range);
+		}
+
+		// Clean up any broken HTML markup that can cause style inheritance issues
+		function cleanupBrokenMarkup() {
+			const currentText = getPlainTextFromInput();
+			
+			// Check for various types of broken markup
+			const hasSpans = englishInput.innerHTML.includes('<span');
+			const hasProperVariantSpans = englishInput.querySelectorAll('.variant-word').length > 0;
+			const hasOrphanedSpans = englishInput.querySelectorAll('span:not(.variant-word)').length > 0;
+			
+			// Check if text content differs significantly from innerHTML (indicating broken markup)
+			const htmlText = englishInput.innerHTML.replace(/<[^>]*>/g, '');
+			const textMismatch = htmlText !== currentText;
+			
+			// If we have problems, clean up
+			if ((hasSpans && !hasProperVariantSpans) || hasOrphanedSpans || textMismatch) {
+				console.log('Detected broken markup, cleaning up...', {
+					hasSpans,
+					hasProperVariantSpans, 
+					hasOrphanedSpans,
+					textMismatch
+				});
+				
+				// Save cursor position
+				const selection = window.getSelection();
+				let cursorTextOffset = 0;
+				
+				if (selection.rangeCount > 0) {
+					const range = selection.getRangeAt(0);
+					cursorTextOffset = getAbsoluteTextOffset(englishInput, range.startContainer, range.startOffset);
+				}
+				
+				// Reset to plain text cleanly
+				englishInput.innerHTML = '';
+				if (currentText) {
+					englishInput.appendChild(document.createTextNode(currentText));
+				}
+				
+				// Restore cursor
+				restoreCursorToTextOffset(englishInput, cursorTextOffset);
+				
+				return true; // Indicate we cleaned up
+			}
+			
+			return false; // No cleanup needed
 		}
 
 		// Get plain text content from the contenteditable div
@@ -1341,11 +1403,13 @@
 					updateEnglishInputDisplay();
 				}, 200);
 			} else if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
-				// User deleted content - may have removed variant markup
+				// User deleted content - may have removed variant markup or left dangling HTML
 				clearTimeout(englishInput.displayTimeout);
 				englishInput.displayTimeout = setTimeout(() => {
+					// Clean up any potential HTML mess first
+					cleanupBrokenMarkup();
 					updateEnglishInputDisplay();
-				}, 300);
+				}, 100);
 			} else if (e.inputType === 'insertParagraph' || e.inputType === 'insertLineBreak') {
 				// User pressed Enter
 				clearTimeout(englishInput.displayTimeout);
@@ -1411,12 +1475,34 @@
 			document.execCommand('insertText', false, text);
 		});
 
-		// Prevent rich formatting
+		// Prevent rich formatting and catch typing after partial deletions
 		englishInput.addEventListener('keydown', function(e) {
 			// Prevent formatting shortcuts
 			if (e.ctrlKey || e.metaKey) {
 				if (['b', 'i', 'u'].includes(e.key.toLowerCase())) {
 					e.preventDefault();
+				}
+			}
+			
+			// If user is typing a letter and we detect potential style inheritance,
+			// clean it up immediately
+			if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+				// Quick check: if cursor is in a position that might inherit styles
+				const selection = window.getSelection();
+				if (selection.rangeCount > 0) {
+					const range = selection.getRangeAt(0);
+					const container = range.startContainer;
+					
+					// If we're typing in a span that's not a proper variant word, clean up
+					if (container.parentElement && 
+						container.parentElement.tagName === 'SPAN' && 
+						!container.parentElement.classList.contains('variant-word')) {
+						
+						// Schedule cleanup after the character is inserted
+						setTimeout(() => {
+							cleanupBrokenMarkup();
+						}, 0);
+					}
 				}
 			}
 		});
