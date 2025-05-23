@@ -363,6 +363,7 @@
       text-decoration-color: var(--heading-color) !important;
       cursor: pointer;
       position: relative;
+      display: inline-block;
     }
 
     .english-input-editor .variant-word:hover {
@@ -370,35 +371,44 @@
       border-radius: 2px;
     }
 
-    /* Custom tooltip styling */
-    .variant-word .tooltip {
-      position: fixed;
-      background-color: #000;
-      color: #fff;
-      font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 4px;
+    /* Custom tooltip styles */
+    .variant-word .tooltiptext {
+      visibility: hidden;
+      width: 120px;
+      background-color: var(--heading-color);
+      color: var(--button-text);
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 0;
       font-size: 12px;
-      white-space: nowrap;
-      z-index: 9999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.1s ease;
-      transform: translateX(-50%);
-    }
-
-    .variant-word .tooltip::after {
-      content: '';
+      font-weight: normal;
+      text-decoration: none !important;
+      
+      /* Position the tooltip */
       position: absolute;
+      z-index: 1000;
       top: 100%;
       left: 50%;
-      transform: translateX(-50%);
-      border: 4px solid transparent;
-      border-top-color: #000;
+      margin-left: -60px;
+      margin-top: 5px;
+      
+      /* Add a small arrow pointing up */
+      box-shadow: 0 2px 8px var(--box-shadow);
     }
 
-    .variant-word:hover .tooltip {
-      opacity: 1;
+    .variant-word .tooltiptext::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 0 5px 5px 5px;
+      border-style: solid;
+      border-color: transparent transparent var(--heading-color) transparent;
+    }
+
+    .variant-word:hover .tooltiptext {
+      visibility: visible;
     }
 
     /* Special styling for the Ichrolic output textarea */
@@ -1031,23 +1041,9 @@
       const newVariant = wordVariants[baseWord][nextIndex];
       console.log(`Cycled "${baseWord}" to variant: ${newVariant.type} (${newVariant.translation})`);
       
-      // Update tooltips immediately for this word without rebuilding entire display
-      const escapedBaseWord = escapeHtml(baseWord);
-      const variantSpans = englishInput.querySelectorAll(`[data-base-word="${escapedBaseWord}"]`);
-      variantSpans.forEach(span => {
-        const tooltip = span.querySelector('.tooltip');
-        if (tooltip) {
-          tooltip.textContent = newVariant.type;
-        }
-      });
-      
-      // Retranslate to show new variant
+      // Update display and retranslate
+      updateEnglishInputDisplay();
       translateToIchrolic();
-    }
-
-    // Validate that a string is safe for use in HTML attributes (no quotes or angle brackets)
-    function isSafeForAttribute(str) {
-      return !/[<>"']/.test(str);
     }
 
     // HTML escape function to prevent XSS
@@ -1132,13 +1128,14 @@
       for (const token of tokens) {
         if (token.type === 'word') {
           const baseWord = token.content.toLowerCase();
-          if (wordVariants[baseWord] && isSafeForAttribute(baseWord)) {
+          if (wordVariants[baseWord]) {
             const variant = getSelectedVariant(baseWord);
             const tooltipText = variant ? escapeHtml(variant.type) : 'VARIANT';
+            const escapedBaseWord = escapeHtml(baseWord);
             const escapedContent = escapeHtml(token.content);
-            html += `<span class="variant-word" data-base-word="${baseWord}">
+            html += `<span class="variant-word" data-base-word="${escapedBaseWord}">
               ${escapedContent}
-              <span class="tooltip">${tooltipText}</span>
+              <span class="tooltiptext">${tooltipText}</span>
             </span>`;
           } else {
             html += escapeHtml(token.content);
@@ -1483,12 +1480,8 @@
       if (variantWord) {
         e.preventDefault();
         e.stopPropagation();
-        const escapedBaseWord = variantWord.getAttribute('data-base-word');
-        if (escapedBaseWord) {
-          // Create a temporary div to decode the HTML entities back to text
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = escapedBaseWord;
-          const baseWord = tempDiv.textContent || tempDiv.innerText || "";
+        const baseWord = variantWord.getAttribute('data-base-word');
+        if (baseWord) {
           cycleVariant(baseWord);
         }
       }
