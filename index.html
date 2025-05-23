@@ -1221,9 +1221,9 @@
       const relativeTop = targetRect.top - inputRect.top;
       const targetWidth = targetRect.width;
       
-      // Position tooltip above the word, centered
+      // Position tooltip below the word, centered
       const tooltipLeft = relativeLeft + (targetWidth / 2);
-      const tooltipTop = relativeTop + 10;
+      const tooltipTop = relativeTop + 30;
       
       customTooltip.style.left = tooltipLeft + 'px';
       customTooltip.style.top = tooltipTop + 'px';
