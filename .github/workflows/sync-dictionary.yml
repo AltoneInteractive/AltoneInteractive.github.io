@@ -53,12 +53,6 @@ jobs:
           path: formatted_dictionary.md
           retention-days: 30
       
-      - name: Create Google Doc (if credentials available)
-        if: ${{ secrets.GOOGLE_CREDENTIALS }}
-        run: |
-          echo "Google credentials found - would update Google Doc here"
-          # We'll add this part later if you want Google Docs integration
-      
       - name: Commit processed dictionary
         run: |
           git config --local user.email "action@github.com"
