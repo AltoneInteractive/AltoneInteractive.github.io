@@ -54,7 +54,7 @@ jobs:
               # Extract base word and variant type
               base_word=$(echo "$key" | cut -d'/' -f1)
               variant_type=$(echo "$key" | cut -d'/' -f2)
-              echo "- **${base_word}** <sub style=\"color:#666;\">(${variant_type})</sub> → ${value}"
+              echo "- **${base_word}** <small style=\"color:#666;\">(${variant_type})</small> → ${value}"
             else
               echo "- **${key}** → ${value}"
             fi
@@ -72,7 +72,7 @@ jobs:
               # Look up the translation for the canonical form
               translation=$(cat temp_dict.json | jq -r --arg key "$syn_value" '.[$key] // "NOT_FOUND"')
               if [ "$translation" != "NOT_FOUND" ]; then
-                echo "- **${syn_key}** ~ <sub style=\"color:#666;\">*${syn_value}*</sub> → ${translation}"
+                echo "- **${syn_key}** ~ <small style=\"color:#666;\">*${syn_value}*</small> → ${translation}"
               fi
             done | sort >> formatted_dictionary.md
           fi
