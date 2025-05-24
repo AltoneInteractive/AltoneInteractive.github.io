@@ -53,22 +53,19 @@ jobs:
           path: formatted_dictionary.md
           retention-days: 30
       
-      - name: Create Google Doc (if credentials available)
-        if: ${{ secrets.GOOGLE_CREDENTIALS }}
-        run: |
-          echo "Google credentials found - would update Google Doc here"
-          # We'll add this part later if you want Google Docs integration
-      
       - name: Commit processed dictionary
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "Dictionary Sync Bot"
           
-          # Only commit if the file changed
-          if git diff --quiet formatted_dictionary.md; then
+          # Add the file (even if it's new)
+          git add formatted_dictionary.md
+          
+          # Check if there are any changes to commit
+          if git diff --cached --quiet; then
             echo "No changes to dictionary markdown"
           else
-            git add formatted_dictionary.md
             git commit -m "Auto-update Ichrolic dictionary markdown [skip ci]"
             git push
+            echo "Dictionary updated and pushed!"
           fi
