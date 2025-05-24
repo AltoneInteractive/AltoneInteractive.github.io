@@ -58,14 +58,11 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "Dictionary Sync Bot"
           
-          # Add the file (even if it's new)
-          git add formatted_dictionary.md
-          
-          # Check if there are any changes to commit
-          if git diff --cached --quiet; then
+          # Only commit if the file changed
+          if git diff --quiet formatted_dictionary.md; then
             echo "No changes to dictionary markdown"
           else
+            git add formatted_dictionary.md
             git commit -m "Auto-update Ichrolic dictionary markdown [skip ci]"
             git push
-            echo "Dictionary updated and pushed!"
           fi
