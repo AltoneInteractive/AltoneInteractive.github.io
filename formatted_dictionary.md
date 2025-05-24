@@ -1,6 +1,6 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
+Auto-generated from dictionary.json on Sat May 24 17:40:17 UTC 2025
 
 ## Translations (573 main entries + 1751 synonyms)
 
@@ -514,8 +514,8 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - **turn** <small style="color:#666;">(verb)</small> → exaro
 - **two** → ud
 - **understand** → aníkaí
-- **understanding** → aníkaíìh
-- **understood** → aníkaíaí
+- **understanding** <small style="color:#666;">(verb)</small> → aníkìh
+- **understood** → aníkazaíh
 - **unknowable** → nul
 - **until** → quoix
 - **up** → sepuít
@@ -592,14 +592,13 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - ****genuine** ~ <small style="color:#666;">*true*</small> → zaíh
 - ****grasp** ~ <small style="color:#666;">*take*</small> → cho
 - ****grasped** ~ <small style="color:#666;">*took*</small> → achoí
-- ****grasping** ~ <small style="color:#666;">*understanding*</small> → aníkaíìh
 - ****might** ~ <small style="color:#666;">*would*</small> → ènè
 - ****object** ~ <small style="color:#666;">*thing*</small> → shiyè
 - ****observe** ~ <small style="color:#666;">*watch*</small> → ìhlisto
 - ****observed** ~ <small style="color:#666;">*watched*</small> → ìhlistaí
 - ****observing** ~ <small style="color:#666;">*watching*</small> → ìhlistìh
 - ****perceive** ~ <small style="color:#666;">*understand*</small> → aníkaí
-- ****perceived** ~ <small style="color:#666;">*understood*</small> → aníkaíaí
+- ****perceived** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - ****present** ~ <small style="color:#666;">*show*</small> → luaho
 - ****presently** ~ <small style="color:#666;">*today*</small> → busaoix
 - ****regarding** ~ <small style="color:#666;">*watching*</small> → ìhlistìh
@@ -634,8 +633,7 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - ***clutched** ~ <small style="color:#666;">*took*</small> → achoí
 - ***complicated** ~ <small style="color:#666;">*hard*</small> → ìkèsena
 - ***comprehend** ~ <small style="color:#666;">*understand*</small> → aníkaí
-- ***comprehended** ~ <small style="color:#666;">*understood*</small> → aníkaíaí
-- ***comprehending** ~ <small style="color:#666;">*understanding*</small> → aníkaíìh
+- ***comprehended** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - ***conjecture** ~ <small style="color:#666;">*idea*</small> → uhnawè
 - ***consciousness** ~ <small style="color:#666;">*sense*</small> → evax
 - ***construct** ~ <small style="color:#666;">*make*</small> → tepo
@@ -711,7 +709,6 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - ***peculiar** ~ <small style="color:#666;">*weird*</small> → buri
 - ***perceive** ~ <small style="color:#666;">*hear*</small> → tanevax
 - ***perceived** ~ <small style="color:#666;">*heard*</small> → tanevaxaí
-- ***perceiving** ~ <small style="color:#666;">*understanding*</small> → aníkaíìh
 - ***perception** ~ <small style="color:#666;">*sense*</small> → evax
 - ***pining** ~ <small style="color:#666;">*missing*</small> → dayunoìh
 - ***pleased** ~ <small style="color:#666;">*happy*</small> → soìva
@@ -858,8 +855,7 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - **applying** ~ <small style="color:#666;">*using*</small> → wenoìh
 - **appreciate** ~ <small style="color:#666;">*like*</small> → yil
 - **apprehend** ~ <small style="color:#666;">*understand*</small> → aníkaí
-- **apprehended** ~ <small style="color:#666;">*understood*</small> → aníkaíaí
-- **apprehending** ~ <small style="color:#666;">*understanding*</small> → aníkaíìh
+- **apprehended** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - **approach** ~ <small style="color:#666;">*come*</small> → yano
 - **appropriate** ~ <small style="color:#666;">*right*</small> → oriuít
 - **aqua** ~ <small style="color:#666;">*water*</small> → nava
@@ -1004,8 +1000,7 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - **cogitated** ~ <small style="color:#666;">*thought*</small> → uqèbaí
 - **cogitating** ~ <small style="color:#666;">*thinking*</small> → uqèboìh
 - **cognize** ~ <small style="color:#666;">*understand*</small> → aníkaí
-- **cognized** ~ <small style="color:#666;">*understood*</small> → aníkaíaí
-- **cognizing** ~ <small style="color:#666;">*understanding*</small> → aníkaíìh
+- **cognized** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - **come back** ~ <small style="color:#666;">*return*</small> → atuoix
 - **command** ~ <small style="color:#666;">*rule*</small> → xièka
 - **commence** ~ <small style="color:#666;">*start*</small> → yepa
@@ -1155,8 +1150,7 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - **disallowed** ~ <small style="color:#666;">*forbidden*</small> → ruvisha
 - **disarray** ~ <small style="color:#666;">*chaos*</small> → víka
 - **discern** ~ <small style="color:#666;">*understand*</small> → aníkaí
-- **discerned** ~ <small style="color:#666;">*understood*</small> → aníkaíaí
-- **discerning** ~ <small style="color:#666;">*understanding*</small> → aníkaíìh
+- **discerned** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - **disconnection** ~ <small style="color:#666;">*separation*</small> → izèpuít
 - **discontinued** ~ <small style="color:#666;">*paused*</small> → ehswoix
 - **discover** ~ <small style="color:#666;">*find*</small> → nodo
@@ -1296,8 +1290,7 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - **fashioned** ~ <small style="color:#666;">*made*</small> → tepaí
 - **fashioning** ~ <small style="color:#666;">*making*</small> → tepoìh
 - **fathom** ~ <small style="color:#666;">*understand*</small> → aníkaí
-- **fathomed** ~ <small style="color:#666;">*understood*</small> → aníkaíaí
-- **fathoming** ~ <small style="color:#666;">*understanding*</small> → aníkaíìh
+- **fathomed** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - **fatigued** ~ <small style="color:#666;">*tired*</small> → ezhìni
 - **favor** ~ <small style="color:#666;">*like*</small> → yil
 - **favorable** ~ <small style="color:#666;">*good*</small> → viya
@@ -2199,7 +2192,7 @@ Auto-generated from dictionary.json on Sat May 24 17:29:03 UTC 2025
 - **under** ~ <small style="color:#666;">*below*</small> → asuoít
 - **underneath** ~ <small style="color:#666;">*down*</small> → suoít
 - **understand** ~ <small style="color:#666;">*know*</small> → isèyo
-- **understanding** ~ <small style="color:#666;">*knowing*</small> → isèyoìh
+- **understanding/noun** ~ <small style="color:#666;">*knowledge*</small> → anisèìh
 - **understood** ~ <small style="color:#666;">*knew*</small> → isèyaí
 - **uneven** ~ <small style="color:#666;">*rough*</small> → kachíhè
 - **unfathomable** ~ <small style="color:#666;">*unknowable*</small> → nul
