@@ -26,6 +26,7 @@
     "are": "íka",
     "aren't": "ìkanè",
     "arm": "revkuh",
+    "articulating/verb": "quozìh",
     "as": "kes",
     "ask": "qèyo",
     "asked": "qèyaí",
@@ -573,7 +574,6 @@
     "zero": "nìh"
   },
   "synonyms": {
-    "**articulating": "stating",
     "**cherished": "loved",
     "**consumed": "have eaten",
     "**craving": "wanting",
@@ -605,7 +605,6 @@
     "*appreciate": "thank you",
     "*approach": "technique",
     "*articulate": "speak",
-    "*articulating": "speaking",
     "*astonishing": "wow",
     "*at present": "right now",
     "*at this moment": "right now",
