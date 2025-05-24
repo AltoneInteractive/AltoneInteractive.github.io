@@ -29,26 +29,55 @@ jobs:
       
       - name: Extract and format dictionary
         run: |
-          # Extract just the dictionary part (no synonyms)
-          echo "Extracting dictionary from JSON..."
+          # Extract dictionary and synonyms
+          echo "Extracting dictionary and synonyms from JSON..."
           cat dictionary.json | jq '.dictionary' > temp_dict.json
+          cat dictionary.json | jq '.synonyms' > temp_synonyms.json
           
           # Count entries for logging
-          ENTRY_COUNT=$(cat temp_dict.json | jq 'length')
-          echo "Found $ENTRY_COUNT dictionary entries"
+          DICT_COUNT=$(cat temp_dict.json | jq 'length')
+          SYN_COUNT=$(cat temp_synonyms.json | jq 'length')
+          echo "Found $DICT_COUNT dictionary entries and $SYN_COUNT synonyms"
           
           # Create formatted markdown for Claude
           echo "# Ichrolic Dictionary" > formatted_dictionary.md
           echo "" >> formatted_dictionary.md
           echo "Auto-generated from dictionary.json on $(date)" >> formatted_dictionary.md
           echo "" >> formatted_dictionary.md
-          echo "## Translations ($ENTRY_COUNT entries)" >> formatted_dictionary.md
+          echo "## Translations ($DICT_COUNT main entries + $SYN_COUNT synonyms)" >> formatted_dictionary.md
           echo "" >> formatted_dictionary.md
           
-          # Convert to nice markdown format
-          cat temp_dict.json | jq -r 'to_entries[] | "- **\(.key)** → \(.value)"' | sort >> formatted_dictionary.md
+          # Process main dictionary entries with variant handling
+          echo "Processing main dictionary entries..." >&2
+          cat temp_dict.json | jq -r 'to_entries[] | "\(.key)|\(.value)"' | while IFS='|' read -r key value; do
+            if [[ "$key" == *"/"* ]]; then
+              # Extract base word and variant type
+              base_word=$(echo "$key" | cut -d'/' -f1)
+              variant_type=$(echo "$key" | cut -d'/' -f2)
+              echo "- **${base_word}** <sub style=\"color:#666;\">(${variant_type})</sub> → ${value}"
+            else
+              echo "- **${key}** → ${value}"
+            fi
+          done | sort >> formatted_dictionary.md
           
-          echo "Generated markdown file with $ENTRY_COUNT entries"
+          # Add synonyms section if there are any
+          if [ "$SYN_COUNT" -gt 0 ]; then
+            echo "" >> formatted_dictionary.md
+            echo "### Synonyms" >> formatted_dictionary.md
+            echo "" >> formatted_dictionary.md
+            
+            echo "Processing synonyms..." >&2
+            # For each synonym, find its canonical form and translation
+            cat temp_synonyms.json | jq -r 'to_entries[] | "\(.key)|\(.value)"' | while IFS='|' read -r syn_key syn_value; do
+              # Look up the translation for the canonical form
+              translation=$(cat temp_dict.json | jq -r --arg key "$syn_value" '.[$key] // "NOT_FOUND"')
+              if [ "$translation" != "NOT_FOUND" ]; then
+                echo "- **${syn_key}** ~ <sub style=\"color:#666;\">*${syn_value}*</sub> → ${translation}"
+              fi
+            done | sort >> formatted_dictionary.md
+          fi
+          
+          echo "Generated markdown file with $DICT_COUNT main entries and $SYN_COUNT synonyms"
       
       - name: Upload dictionary as artifact
         uses: actions/upload-artifact@v4
