@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sat May 24 17:40:17 UTC 2025
+Auto-generated from dictionary.json on Sat May 24 18:09:13 UTC 2025
 
-## Translations (573 main entries + 1751 synonyms)
+## Translations (576 main entries + 1751 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -371,11 +371,13 @@ Auto-generated from dictionary.json on Sat May 24 17:40:17 UTC 2025
 - **part** → akesu
 - **past** → teí
 - **paused** → ehswoix
+- **pecìa** → smart
 - **people** → chìvaíah
 - **person** → chìvaí
 - **place** → odal
 - **player** → iftí
 - **please** → símai
+- **poem** → azaurí
 - **possibility** → rezi
 - **possible** → serez
 - **powerful** → sepuít
@@ -435,6 +437,7 @@ Auto-generated from dictionary.json on Sat May 24 17:40:17 UTC 2025
 - **sleeping** → luloìh
 - **slept** → alulaí
 - **slow** → tenotefi
+- **smart** → pecía
 - **so much** → lisíya
 - **so** → lís
 - **some** → niyè
