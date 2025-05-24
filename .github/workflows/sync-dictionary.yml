@@ -1,0 +1,74 @@
+# Put this file in: .github/workflows/sync-dictionary.yml
+
+name: Sync Ichrolic Dictionary
+
+on:
+	# Trigger when dictionary.json changes
+	push:
+		paths: 
+			- 'dictionary.json'
+	
+	# Also run twice daily to catch any manual changes
+	schedule:
+		- cron: '0 6,18 * * *'  # 6 AM and 6 PM UTC
+	
+	# Allow manual triggering
+	workflow_dispatch:
+
+jobs:
+	sync-dictionary:
+		runs-on: ubuntu-latest
+		
+		steps:
+			- name: Checkout repository
+			  uses: actions/checkout@v4
+			
+			- name: Extract and format dictionary
+			  run: |
+			  	# Extract just the dictionary part (no synonyms)
+			  	echo "Extracting dictionary from JSON..."
+			  	cat dictionary.json | jq '.dictionary' > temp_dict.json
+			  	
+			  	# Count entries for logging
+			  	ENTRY_COUNT=$(cat temp_dict.json | jq 'length')
+			  	echo "Found $ENTRY_COUNT dictionary entries"
+			  	
+			  	# Create formatted markdown for Claude
+			  	echo "# Ichrolic Dictionary" > formatted_dictionary.md
+			  	echo "" >> formatted_dictionary.md
+			  	echo "Auto-generated from dictionary.json on $(date)" >> formatted_dictionary.md
+			  	echo "" >> formatted_dictionary.md
+			  	echo "## Translations ($ENTRY_COUNT entries)" >> formatted_dictionary.md
+			  	echo "" >> formatted_dictionary.md
+			  	
+			  	# Convert to nice markdown format
+			  	cat temp_dict.json | jq -r 'to_entries[] | "- **\(.key)** → \(.value)"' | sort >> formatted_dictionary.md
+			  	
+			  	echo "Generated markdown file with $ENTRY_COUNT entries"
+			
+			- name: Upload dictionary as artifact
+			  uses: actions/upload-artifact@v4
+			  with:
+			  	name: ichrolic-dictionary
+			  	path: formatted_dictionary.md
+			  	retention-days: 30
+			
+			- name: Create Google Doc (if credentials available)
+			  if: ${{ secrets.GOOGLE_CREDENTIALS }}
+			  run: |
+			  	echo "Google credentials found - would update Google Doc here"
+			  	# We'll add this part later if you want Google Docs integration
+			
+			- name: Commit processed dictionary
+			  run: |
+			  	git config --local user.email "action@github.com"
+			  	git config --local user.name "Dictionary Sync Bot"
+			  	
+			  	# Only commit if the file changed
+			  	if git diff --quiet formatted_dictionary.md; then
+			  		echo "No changes to dictionary markdown"
+			  	else
+			  		git add formatted_dictionary.md
+			  		git commit -m "Auto-update Ichrolic dictionary markdown [skip ci]"
+			  		git push
+			  	fi
