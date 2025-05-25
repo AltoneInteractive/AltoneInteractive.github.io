@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun May 25 07:07:31 UTC 2025
+Auto-generated from dictionary.json on Sun May 25 07:13:00 UTC 2025
 
-## Translations (579 main entries + 1751 synonyms)
+## Translations (581 main entries + 1751 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -558,11 +558,13 @@ Auto-generated from dictionary.json on Sun May 25 07:07:31 UTC 2025
 - **why** → kavaí
 - **will sleep** → ekoyè lulo
 - **will** → ekoyè
+- **win** → yawo
 - **wish** → azio
 - **with** → kivì
 - **without** → kivìnìh
 - **won't go** → ekoyìkè ano
 - **won't** → ekoyìkè
+- **won** → ayawaí
 - **word** → lod
 - **words** → lodah
 - **work** → ekìhdo
