@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun May 25 06:18:14 UTC 2025
+Auto-generated from dictionary.json on Sun May 25 07:07:31 UTC 2025
 
-## Translations (576 main entries + 1751 synonyms)
+## Translations (579 main entries + 1751 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -170,6 +170,7 @@ Auto-generated from dictionary.json on Sun May 25 06:18:14 UTC 2025
 - **feeling** → evìh
 - **fell** → asuovaí
 - **felt** → evaí
+- **fighting** → kechoìh
 - **find** → nodo
 - **finding** → nodìh
 - **first** → eui
@@ -187,6 +188,7 @@ Auto-generated from dictionary.json on Sun May 25 06:18:14 UTC 2025
 - **forgive** → shishirè
 - **forgiving** → shishirèìh
 - **forgot** → masuaí
+- **fought** → akechaí
 - **found** → anodí
 - **friend** → kyudi
 - **from** → ía
@@ -276,6 +278,7 @@ Auto-generated from dictionary.json on Sun May 25 06:18:14 UTC 2025
 - **jumped** → takèvaí
 - **jumping** → takèvoìh
 - **just** → avalí
+- **kecho** → fight
 - **kid** → dolu
 - **kill** → exuoít
 - **killed** → exuoítaí
