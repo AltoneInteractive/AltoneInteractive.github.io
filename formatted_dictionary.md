@@ -1,6 +1,6 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Nov 23 18:19:00 UTC 2025
+Auto-generated from dictionary.json on Mon Nov 24 06:23:14 UTC 2025
 
 ## Translations (581 main entries + 1751 synonyms)
 
