@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
+Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 
-## Translations (587 main entries + 1750 synonyms)
+## Translations (581 main entries + 1751 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -41,7 +41,6 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **aware** → kazaí
 - **away** → edíva
 - **baby** → lilu
-- **back** → mavu
 - **based on** → oyoìsua
 - **based** → oyoix
 - **basis** → oyodin
@@ -72,7 +71,6 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **boring** → èhìlu
 - **bring** → revo
 - **bringing** → revoìh
-- **bro** → esu
 - **brought** → revaí
 - **bunny** → budo-budo
 - **but** → mìle
@@ -198,8 +196,8 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **fuck** <small style="color:#666;">(curse)</small> → kucha
 - **fuck** <small style="color:#666;">(verb)</small> → basíkè
 - **fucked** <small style="color:#666;">(verb)</small> → abasíkí
+- **fucking** <small style="color:#666;">(curse)</small> → kuchaìh
 - **fucking** <small style="color:#666;">(verb)</small> → basíkìh
-- **fucking** → kuchaìh/curse
 - **further** → ukeva
 - **game** → wasi
 - **gave** → akudaí
@@ -386,7 +384,6 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **possibility** → rezi
 - **possible** → serez
 - **powerful** → sepuít
-- **problem** → mashizé
 - **proselytization** → víkashèniyèvaía
 - **pure** → oriuít
 - **quickly** → advikefi
@@ -418,7 +415,6 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **said** → quolaí
 - **say** → quolo
 - **saying** → quolìh
-- **says** → chuqolo
 - **scare** → kochayluh
 - **scared** → akochaylaí
 - **scaring** → kochaylìh
@@ -440,7 +436,6 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **sibling** → esunia
 - **side** → akí
 - **significant** → boquia
-- **sis** → esu
 - **sleep** → lulo
 - **sleeping** → luloìh
 - **slept** → alulaí
@@ -577,7 +572,6 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **working** → ekìhdoìh
 - **would go** → ènè ano
 - **would** → ènè
-- **wouldn't** → enikè
 - **wow** → uh-tuh
 - **write** → eshoix
 - **writing** → eshoixìh
@@ -915,6 +909,7 @@ Auto-generated from dictionary.json on Mon Jan 19 13:45:27 UTC 2026
 - **avenue** ~ <small style="color:#666;">*road*</small> → bamaí
 - **aware of** ~ <small style="color:#666;">*know*</small> → isèyo
 - **awareness** ~ <small style="color:#666;">*sense*</small> → evax
+- **back** ~ <small style="color:#666;">*behind*</small> → shona
 - **balanced** ~ <small style="color:#666;">*even*</small> → owè
 - **banned** ~ <small style="color:#666;">*forbidden*</small> → ruvisha
 - **barely** ~ <small style="color:#666;">*just*</small> → avalí
