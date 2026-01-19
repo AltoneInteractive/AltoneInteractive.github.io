@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Jan 19 13:49:52 UTC 2026
+Auto-generated from dictionary.json on Mon Jan 19 13:54:37 UTC 2026
 
-## Translations (582 main entries + 1751 synonyms)
+## Translations (584 main entries + 1751 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -384,6 +384,7 @@ Auto-generated from dictionary.json on Mon Jan 19 13:49:52 UTC 2026
 - **possibility** → rezi
 - **possible** → serez
 - **powerful** → sepuít
+- **problem** → mashizé
 - **proselytization** → víkashèniyèvaía
 - **pure** → oriuít
 - **quickly** → advikefi
@@ -573,6 +574,7 @@ Auto-generated from dictionary.json on Mon Jan 19 13:49:52 UTC 2026
 - **working** → ekìhdoìh
 - **would go** → ènè ano
 - **would** → ènè
+- **wouldn't** → enikè
 - **wow** → uh-tuh
 - **write** → eshoix
 - **writing** → eshoixìh
@@ -1639,6 +1641,7 @@ Auto-generated from dictionary.json on Mon Jan 19 13:49:52 UTC 2026
 - **mom** ~ <small style="color:#666;">*mother*</small> → esoihva
 - **moment** ~ <small style="color:#666;">*minute*</small> → mida
 - **mommy** ~ <small style="color:#666;">*mother*</small> → esoihva
+- **moron** ~ <small style="color:#666;">*stupid*</small> → tenoka
 - **moronic** ~ <small style="color:#666;">*stupid*</small> → tenoka
 - **motive** ~ <small style="color:#666;">*why*</small> → kavaí
 - **move** ~ <small style="color:#666;">*go*</small> → ano
@@ -2307,7 +2310,6 @@ Auto-generated from dictionary.json on Mon Jan 19 13:49:52 UTC 2026
 - **would not** ~ <small style="color:#666;">*shouldn't*</small> → avìkè
 - **would sleep** ~ <small style="color:#666;">*will sleep*</small> → ekoyè lulo
 - **would you** ~ <small style="color:#666;">*please*</small> → símai
-- **would** ~ <small style="color:#666;">*should*</small> → avé
 - **wraith** ~ <small style="color:#666;">*ghost*</small> → nuhli
 - **wrath** ~ <small style="color:#666;">*anger*</small> → kashova
 - **wrong** ~ <small style="color:#666;">*incorrect*</small> → ìkèzaíh
