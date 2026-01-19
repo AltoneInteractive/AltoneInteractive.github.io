@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Jan 19 14:13:06 UTC 2026
+Auto-generated from dictionary.json on Mon Jan 19 14:17:50 UTC 2026
 
-## Translations (588 main entries + 1751 synonyms)
+## Translations (590 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -225,6 +225,8 @@ Auto-generated from dictionary.json on Mon Jan 19 14:13:06 UTC 2026
 - **guessing** → quisoìh
 - **had** → akuzí
 - **hand** → haurí
+- **happen** → maítè
+- **happens** → ìmaítè
 - **happy** → soìva
 - **hard** → ìkèsena
 - **has** → uzì
@@ -1395,8 +1397,6 @@ Auto-generated from dictionary.json on Mon Jan 19 14:13:06 UTC 2026
 - **gulp** ~ <small style="color:#666;">*drink*</small> → navuo
 - **h2o** ~ <small style="color:#666;">*water*</small> → nava
 - **halted** ~ <small style="color:#666;">*paused*</small> → ehswoix
-- **happened to be** ~ <small style="color:#666;">*was*</small> → ìshu
-- **happens to be** ~ <small style="color:#666;">*is*</small> → íka
 - **happiness** ~ <small style="color:#666;">*joy*</small> → soìva
 - **happy** ~ <small style="color:#666;">*glad*</small> → soìva
 - **hard** ~ <small style="color:#666;">*difficult*</small> → ìkèsena
