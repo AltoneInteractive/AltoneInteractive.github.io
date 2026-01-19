@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
+Auto-generated from dictionary.json on Mon Jan 19 13:49:52 UTC 2026
 
-## Translations (581 main entries + 1751 synonyms)
+## Translations (582 main entries + 1751 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -413,8 +413,9 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **sadness** → miova
 - **safe** → marwoix
 - **said** → quolaí
-- **say** → quolo
-- **saying** → quolìh
+- **say** → volo
+- **saying** → vololìh
+- **says** → chuvolo
 - **scare** → kochayluh
 - **scared** → akochaylaí
 - **scaring** → kochaylìh
@@ -876,9 +877,9 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **arrive** ~ <small style="color:#666;">*come*</small> → yano
 - **arrived** ~ <small style="color:#666;">*came*</small> → yanaí
 - **article** ~ <small style="color:#666;">*thing*</small> → shiyè
-- **articulate** ~ <small style="color:#666;">*say*</small> → quolo
+- **articulate** ~ <small style="color:#666;">*say*</small> → volo
 - **articulated** ~ <small style="color:#666;">*said*</small> → quolaí
-- **articulating** ~ <small style="color:#666;">*saying*</small> → quolìh
+- **articulating** ~ <small style="color:#666;">*saying*</small> → vololìh
 - **artifact** ~ <small style="color:#666;">*thing*</small> → shiyè
 - **aspire** ~ <small style="color:#666;">*want*</small> → yuí
 - **aspired** ~ <small style="color:#666;">*wanted*</small> → ayuaí
@@ -1275,9 +1276,9 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **explaining** ~ <small style="color:#666;">*telling*</small> → vìsoìh
 - **explicit** ~ <small style="color:#666;">*specific*</small> → moka
 - **explicitly** ~ <small style="color:#666;">*specifically*</small> → mokefi
-- **express** ~ <small style="color:#666;">*say*</small> → quolo
+- **express** ~ <small style="color:#666;">*say*</small> → volo
 - **expressed** ~ <small style="color:#666;">*said*</small> → quolaí
-- **expressing** ~ <small style="color:#666;">*saying*</small> → quolìh
+- **expressing** ~ <small style="color:#666;">*saying*</small> → vololìh
 - **expression** ~ <small style="color:#666;">*word*</small> → lod
 - **exterior** ~ <small style="color:#666;">*out*</small> → afa
 - **external** ~ <small style="color:#666;">*out*</small> → afa
@@ -1846,9 +1847,9 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **producing** ~ <small style="color:#666;">*making*</small> → tepoìh
 - **profound** ~ <small style="color:#666;">*deep*</small> → kuzuía
 - **prohibited** ~ <small style="color:#666;">*forbidden*</small> → ruvisha
-- **pronounce** ~ <small style="color:#666;">*say*</small> → quolo
+- **pronounce** ~ <small style="color:#666;">*say*</small> → volo
 - **pronounced** ~ <small style="color:#666;">*said*</small> → quolaí
-- **pronouncing** ~ <small style="color:#666;">*saying*</small> → quolìh
+- **pronouncing** ~ <small style="color:#666;">*saying*</small> → vololìh
 - **proper** ~ <small style="color:#666;">*right*</small> → oriuít
 - **proscribed** ~ <small style="color:#666;">*forbidden*</small> → ruvisha
 - **protected** ~ <small style="color:#666;">*safe*</small> → marwoix
@@ -2040,8 +2041,8 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **southern** ~ <small style="color:#666;">*south*</small> → suoít
 - **southward** ~ <small style="color:#666;">*south*</small> → suoít
 - **span** ~ <small style="color:#666;">*time*</small> → toix
-- **speak** ~ <small style="color:#666;">*say*</small> → quolo
-- **speaking** ~ <small style="color:#666;">*saying*</small> → quolìh
+- **speak** ~ <small style="color:#666;">*say*</small> → volo
+- **speaking** ~ <small style="color:#666;">*saying*</small> → vololìh
 - **specter** ~ <small style="color:#666;">*ghost*</small> → nuhli
 - **speculate** ~ <small style="color:#666;">*guess*</small> → quiso
 - **speculated** ~ <small style="color:#666;">*guessed*</small> → quisaí
@@ -2068,9 +2069,9 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **startled** ~ <small style="color:#666;">*scared*</small> → akochaylaí
 - **startling** ~ <small style="color:#666;">*scaring*</small> → kochaylìh
 - **starving** ~ <small style="color:#666;">*hungry*</small> → chovìh
-- **state** ~ <small style="color:#666;">*say*</small> → quolo
+- **state** ~ <small style="color:#666;">*say*</small> → volo
 - **stated** ~ <small style="color:#666;">*said*</small> → quolaí
-- **stating** ~ <small style="color:#666;">*saying*</small> → quolìh
+- **stating** ~ <small style="color:#666;">*saying*</small> → vololìh
 - **status** ~ <small style="color:#666;">*state*</small> → shèshua
 - **steady** ~ <small style="color:#666;">*stable*</small> → oyo
 - **stopped** ~ <small style="color:#666;">*paused*</small> → ehswoix
@@ -2223,10 +2224,10 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **utilize** ~ <small style="color:#666;">*use*</small> → weno
 - **utilized** ~ <small style="color:#666;">*used*</small> → wenaí
 - **utilizing** ~ <small style="color:#666;">*using*</small> → wenoìh
-- **utter** ~ <small style="color:#666;">*say*</small> → quolo
+- **utter** ~ <small style="color:#666;">*say*</small> → volo
 - **utterance** ~ <small style="color:#666;">*word*</small> → lod
 - **uttered** ~ <small style="color:#666;">*said*</small> → quolaí
-- **uttering** ~ <small style="color:#666;">*saying*</small> → quolìh
+- **uttering** ~ <small style="color:#666;">*saying*</small> → vololìh
 - **vacant** ~ <small style="color:#666;">*nothing*</small> → nìh
 - **valid** ~ <small style="color:#666;">*correct*</small> → zaíh
 - **variation** ~ <small style="color:#666;">*change*</small> → ex
@@ -2251,12 +2252,12 @@ Auto-generated from dictionary.json on Mon Jan 19 13:46:57 UTC 2026
 - **vocable** ~ <small style="color:#666;">*word*</small> → lod
 - **vocabulary** ~ <small style="color:#666;">*words*</small> → lodah
 - **vocabule** ~ <small style="color:#666;">*word*</small> → lod
-- **vocalize** ~ <small style="color:#666;">*say*</small> → quolo
+- **vocalize** ~ <small style="color:#666;">*say*</small> → volo
 - **vocalized** ~ <small style="color:#666;">*said*</small> → quolaí
-- **vocalizing** ~ <small style="color:#666;">*saying*</small> → quolìh
-- **voice** ~ <small style="color:#666;">*say*</small> → quolo
+- **vocalizing** ~ <small style="color:#666;">*saying*</small> → vololìh
+- **voice** ~ <small style="color:#666;">*say*</small> → volo
 - **voiced** ~ <small style="color:#666;">*said*</small> → quolaí
-- **voicing** ~ <small style="color:#666;">*saying*</small> → quolìh
+- **voicing** ~ <small style="color:#666;">*saying*</small> → vololìh
 - **void** ~ <small style="color:#666;">*nothing*</small> → nìh
 - **was aware of** ~ <small style="color:#666;">*knew*</small> → isèyaí
 - **was familiar with** ~ <small style="color:#666;">*knew*</small> → isèyaí
