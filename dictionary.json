@@ -153,6 +153,7 @@
     "even": "owè",
     "ever": "oshía",
     "every": "ileo",
+    "everyone": "ileoma",
     "example": "suri",
     "exclusively": "ivar",
     "excuse me": "shìreziré",
@@ -364,6 +365,7 @@
     "only": "síaow",
     "option": "rihìn",
     "or": "uw",
+    "ostensible": "èdiaki",
     "other": "ìvonèh",
     "our": "yana",
     "out": "afa",
@@ -585,7 +587,8 @@
     "your": "yuhna",
     "your side": "yuhnakí",
     "yourself": "yuhnazen",
-    "zero": "nìh"
+    "zero": "nìh",
+    "èdiakima": "ostensibly"
   },
   "synonyms": {
     "**cherished": "loved",
