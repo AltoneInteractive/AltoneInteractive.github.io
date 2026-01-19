@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Jan 19 14:10:50 UTC 2026
+Auto-generated from dictionary.json on Mon Jan 19 14:13:06 UTC 2026
 
-## Translations (589 main entries + 1751 synonyms)
+## Translations (588 main entries + 1751 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -157,7 +157,6 @@ Auto-generated from dictionary.json on Mon Jan 19 14:10:50 UTC 2026
 - **even** → owè
 - **ever** → oshía
 - **every** → ileo
-- **everyone** → ileoma
 - **example** → suri
 - **exclusively** → ivar
 - **excuse me** → shìreziré
@@ -370,6 +369,7 @@ Auto-generated from dictionary.json on Mon Jan 19 14:10:50 UTC 2026
 - **option** → rihìn
 - **or** → uw
 - **ostensible** → èdiaki
+- **ostensibly** → èdiakima
 - **other** → ìvonèh
 - **our** → yana
 - **out of nothing** → afanìh
@@ -592,7 +592,6 @@ Auto-generated from dictionary.json on Mon Jan 19 14:10:50 UTC 2026
 - **your** → yuhna
 - **yourself** → yuhnazen
 - **zero** → nìh
-- **èdiakima** → ostensibly
 
 ### Synonyms
 
