@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 13 18:13:29 UTC 2026
 
-## Translations (593 main entries + 1749 synonyms)
+## Translations (594 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -119,7 +119,8 @@ Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 - **cut** → kezeko
 - **cute** → kimè
 - **cutie** → kimèya
-- **dark** → ìkorineh
+- **dark** → occoix
+- **darkness** → enèoku
 - **day** → saoix
 - **dear** → síeua
 - **death** → exuis
@@ -1115,7 +1116,6 @@ Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 - **cyclone** ~ <small style="color:#666;">*storm*</small> → riaí
 - **dad** ~ <small style="color:#666;">*father*</small> → esoihcha
 - **daddy** ~ <small style="color:#666;">*father*</small> → esoihcha
-- **darkness** ~ <small style="color:#666;">*night*</small> → occoix
 - **dash** ~ <small style="color:#666;">*run*</small> → tavano
 - **dashed** ~ <small style="color:#666;">*ran*</small> → tavanaí
 - **dashing** ~ <small style="color:#666;">*running*</small> → tavanoìh
@@ -1165,7 +1165,7 @@ Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 - **different** ~ <small style="color:#666;">*other*</small> → ìvonèh
 - **difficult** ~ <small style="color:#666;">*hard*</small> → ìkèsena
 - **digit** ~ <small style="color:#666;">*number*</small> → tot
-- **dim** ~ <small style="color:#666;">*dark*</small> → ìkorineh
+- **dim** ~ <small style="color:#666;">*dark*</small> → occoix
 - **dine** ~ <small style="color:#666;">*eat*</small> → chovo
 - **disallowed** ~ <small style="color:#666;">*forbidden*</small> → ruvisha
 - **disarray** ~ <small style="color:#666;">*chaos*</small> → víka
@@ -1369,7 +1369,7 @@ Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 - **glancing** ~ <small style="color:#666;">*looking*</small> → asìtìh
 - **glee** ~ <small style="color:#666;">*joy*</small> → soìva
 - **gloom** ~ <small style="color:#666;">*sadness*</small> → miova
-- **gloomy** ~ <small style="color:#666;">*dark*</small> → ìkorineh
+- **gloomy** ~ <small style="color:#666;">*dark*</small> → occoix
 - **glow** ~ <small style="color:#666;">*light*</small> → orineh
 - **go back** ~ <small style="color:#666;">*return*</small> → atuoix
 - **goddess** ~ <small style="color:#666;">*god*</small> → yrèh
@@ -1657,7 +1657,7 @@ Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 - **murder** ~ <small style="color:#666;">*kill*</small> → exuoít
 - **murdered** ~ <small style="color:#666;">*killed*</small> → exuoítaí
 - **murdering** ~ <small style="color:#666;">*killing*</small> → exuoítìh
-- **murky** ~ <small style="color:#666;">*dark*</small> → ìkorineh
+- **murky** ~ <small style="color:#666;">*dark*</small> → occoix
 - **muse** ~ <small style="color:#666;">*think*</small> → uqèbo
 - **mused** ~ <small style="color:#666;">*thought*</small> → uqèbaí
 - **musing** ~ <small style="color:#666;">*thinking*</small> → uqèboìh
@@ -1997,7 +1997,7 @@ Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 - **several** ~ <small style="color:#666;">*many*</small> → niya
 - **severing** ~ <small style="color:#666;">*separation*</small> → izèpuít
 - **shade** ~ <small style="color:#666;">*shadow*</small> → sokayla
-- **shadowy** ~ <small style="color:#666;">*dark*</small> → ìkorineh
+- **shadowy** ~ <small style="color:#666;">*dark*</small> → occoix
 - **shall not go** ~ <small style="color:#666;">*won't go*</small> → ekoyìkè ano
 - **shall not** ~ <small style="color:#666;">*won't*</small> → ekoyìkè
 - **shall sleep** ~ <small style="color:#666;">*will sleep*</small> → ekoyè lulo
@@ -2219,7 +2219,7 @@ Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 - **unharmed** ~ <small style="color:#666;">*safe*</small> → marwoix
 - **uniform** ~ <small style="color:#666;">*even*</small> → owè
 - **uninteresting** ~ <small style="color:#666;">*boring*</small> → èhìlu
-- **unlit** ~ <small style="color:#666;">*dark*</small> → ìkorineh
+- **unlit** ~ <small style="color:#666;">*dark*</small> → occoix
 - **untainted** ~ <small style="color:#666;">*pure*</small> → oriuít
 - **until the time** ~ <small style="color:#666;">*until*</small> → quoix
 - **until** ~ <small style="color:#666;">*to*</small> → ìh
