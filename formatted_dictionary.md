@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 13 10:54:59 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 13 15:52:07 UTC 2026
 
-## Translations (590 main entries + 1749 synonyms)
+## Translations (593 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -537,6 +537,9 @@ Auto-generated from dictionary.json on Sun Sep 13 10:54:59 UTC 2026
 - **use** → weno
 - **used** → wenaí
 - **using** → wenoìh
+- **vanish** → kaytao
+- **vanished** → kaytaí
+- **vanishing** → kaytaìh
 - **very** → vìnè
 - **wanna** → yuzìh
 - **want** → yuí
