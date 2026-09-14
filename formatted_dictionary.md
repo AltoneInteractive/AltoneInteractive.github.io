@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 13 20:07:10 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 14 03:12:05 UTC 2026
 
-## Translations (594 main entries + 1748 synonyms)
+## Translations (596 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -163,6 +163,8 @@ Auto-generated from dictionary.json on Sun Sep 13 20:07:10 UTC 2026
 - **excuse me** → shìreziré
 - **existence** → sèconisè
 - **eye** → olu
+- **ezora** → ash
+- **ezorah** → ashes
 - **fall** → suovo
 - **falling** → suovoìh
 - **far** → èqí
