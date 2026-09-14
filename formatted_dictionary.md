@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 14 03:14:27 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 14 04:00:14 UTC 2026
 
-## Translations (597 main entries + 1748 synonyms)
+## Translations (598 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -280,6 +280,7 @@ Auto-generated from dictionary.json on Mon Sep 14 03:14:27 UTC 2026
 - **it's** → ishíka
 - **it** → ish
 - **its** → síka
+- **journey** → via
 - **joy** → soìva
 - **jump** → takèvo
 - **jumped** → takèvaí
