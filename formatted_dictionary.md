@@ -1,12 +1,13 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 14 14:57:59 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 14 17:46:56 UTC 2026
 
-## Translations (600 main entries + 1748 synonyms)
+## Translations (603 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
 - **absolutely** → ìzaìa
+- **ada** → though
 - **after** → eí
 - **agent** → post
 - **agony** → akadi
@@ -66,6 +67,7 @@ Auto-generated from dictionary.json on Mon Sep 14 14:57:59 UTC 2026
 - **better** → urivah
 - **big** → eyuba
 - **bird** → íkoko
+- **birth** → anaka
 - **bitch** → zuka
 - **blood** → nakaíne
 - **body** → kuva
@@ -548,6 +550,7 @@ Auto-generated from dictionary.json on Mon Sep 14 14:57:59 UTC 2026
 - **vanished** → kaytaí
 - **vanishing** → kaytaìh
 - **very** → vìnè
+- **voni** → outlier
 - **wanna** → yuzìh
 - **want** → yuí
 - **wanted** → ayuaí
