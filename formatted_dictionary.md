@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 14 11:28:13 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 14 13:15:01 UTC 2026
 
-## Translations (598 main entries + 1748 synonyms)
+## Translations (599 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -259,6 +259,7 @@ Auto-generated from dictionary.json on Mon Sep 14 11:28:13 UTC 2026
 - **honestly** → èfaihefi
 - **how** → kon
 - **hungry** → chovìh
+- **hunter** → caru
 - **i don't** → alikè
 - **i'm not** → alìkè
 - **i'm** → alíka
