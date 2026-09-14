@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 14 13:15:01 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 14 14:57:59 UTC 2026
 
-## Translations (599 main entries + 1748 synonyms)
+## Translations (600 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -449,6 +449,7 @@ Auto-generated from dictionary.json on Mon Sep 14 13:15:01 UTC 2026
 - **sibling** → esunia
 - **side** → akí
 - **significant** → boquia
+- **skin** → takuh
 - **sleep** → lulo
 - **sleeping** → luloìh
 - **slept** → alulaí
