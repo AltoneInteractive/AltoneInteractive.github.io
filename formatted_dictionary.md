@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 14 03:12:05 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 14 03:14:27 UTC 2026
 
-## Translations (596 main entries + 1748 synonyms)
+## Translations (597 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -514,6 +514,7 @@ Auto-generated from dictionary.json on Mon Sep 14 03:12:05 UTC 2026
 - **those** → busut
 - **thought** → uqèbaí
 - **through** → kivoy
+- **throughout** → hara
 - **time** → toix
 - **tired** → ezhìni
 - **to** → ìh
