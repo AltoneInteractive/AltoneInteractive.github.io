@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 14 21:17:07 UTC 2026
+Auto-generated from dictionary.json on Tue Sep 15 02:53:30 UTC 2026
 
-## Translations (603 main entries + 1748 synonyms)
+## Translations (604 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -38,6 +38,7 @@ Auto-generated from dictionary.json on Mon Sep 14 21:17:07 UTC 2026
 - **asking** → qèyoìh
 - **asleep** → ìhlul
 - **ass** → saku
+- **assassin** → shikízu
 - **at** → inì
 - **ate** → achovaí
 - **aware** → kazaí
