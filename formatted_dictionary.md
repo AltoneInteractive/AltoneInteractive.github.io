@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Tue Sep 15 02:53:30 UTC 2026
+Auto-generated from dictionary.json on Tue Sep 15 02:58:49 UTC 2026
 
-## Translations (604 main entries + 1748 synonyms)
+## Translations (605 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -178,6 +178,7 @@ Auto-generated from dictionary.json on Tue Sep 15 02:53:30 UTC 2026
 - **feeling** → evìh
 - **fell** → asuovaí
 - **felt** → evaí
+- **fighter** → shèlauri
 - **fighting** → kechoìh
 - **find** → nodo
 - **finding** → nodìh
