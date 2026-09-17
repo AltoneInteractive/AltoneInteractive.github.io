@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Thu Sep 17 20:50:06 UTC 2026
+Auto-generated from dictionary.json on Thu Sep 17 23:01:53 UTC 2026
 
-## Translations (605 main entries + 1748 synonyms)
+## Translations (606 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -214,6 +214,7 @@ Auto-generated from dictionary.json on Thu Sep 17 20:50:06 UTC 2026
 - **gazed** → asìtaí
 - **gazing** → asìta
 - **get** → kudì
+- **getting** → akunadìh
 - **ghost** → nuhli
 - **ghosts** → nuhliah
 - **give** → kudo
