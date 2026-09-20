@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 22:45:43 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 22:50:51 UTC 2026
 
-## Translations (623 main entries + 1749 synonyms)
+## Translations (624 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -40,7 +40,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:45:43 UTC 2026
 - **asking** → qèyoìh
 - **asleep** → ìhlul
 - **ass** → saku
-- **assassin** → shikízu
+- **assassinate** → shikízo
 - **at** → inì
 - **ate** → achovaí
 - **aurora** → léne
@@ -50,6 +50,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:45:43 UTC 2026
 - **based on** → oyoìsua
 - **based** → oyoix
 - **basis** → oyodin
+- **bastard** → ìkedeza
 - **be** → shuo
 - **beat** → akach
 - **beaten** → akachaí
@@ -240,7 +241,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:45:43 UTC 2026
 - **had** → akuzí
 - **hand** → haurí
 - **happen** → maítè
-- **happened** → ìmitaí
+- **happened** → ìmataí
 - **happens** → ìmaítè
 - **happy** → soìva
 - **hard** → ìkèsena
