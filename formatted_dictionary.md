@@ -1,6 +1,6 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 21:05:36 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 21:07:36 UTC 2026
 
 ## Translations (606 main entries + 1748 synonyms)
 
@@ -545,7 +545,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:05:36 UTC 2026
 - **unknowable** → nul
 - **until** → quoix
 - **up** → sepuít
-- **us** → yana
+- **us** → yan
 - **use** → weno
 - **used** → wenaí
 - **using** → wenoìh
@@ -1756,11 +1756,11 @@ Auto-generated from dictionary.json on Sun Sep 20 21:05:36 UTC 2026
 - **ought not make** ~ <small style="color:#666;">*shouldn't make*</small> → avìkè tepo
 - **ought not** ~ <small style="color:#666;">*shouldn't*</small> → avìkè
 - **ought to** ~ <small style="color:#666;">*should*</small> → avé
-- **our group** ~ <small style="color:#666;">*us*</small> → yana
+- **our group** ~ <small style="color:#666;">*us*</small> → yan
 - **our own** ~ <small style="color:#666;">*our*</small> → yani
-- **our team** ~ <small style="color:#666;">*us*</small> → yana
+- **our team** ~ <small style="color:#666;">*us*</small> → yan
 - **ours** ~ <small style="color:#666;">*our*</small> → yani
-- **ourselves** ~ <small style="color:#666;">*us*</small> → yana
+- **ourselves** ~ <small style="color:#666;">*us*</small> → yan
 - **outlawed** ~ <small style="color:#666;">*forbidden*</small> → ruvisha
 - **outside** ~ <small style="color:#666;">*out*</small> → afa
 - **over** ~ <small style="color:#666;">*on*</small> → ìsua
@@ -2289,7 +2289,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:05:36 UTC 2026
 - **watercourse** ~ <small style="color:#666;">*river*</small> → navaí
 - **waterway** ~ <small style="color:#666;">*river*</small> → navaí
 - **way** ~ <small style="color:#666;">*how*</small> → kon
-- **we** ~ <small style="color:#666;">*us*</small> → yana
+- **we** ~ <small style="color:#666;">*us*</small> → yan
 - **weary** ~ <small style="color:#666;">*tired*</small> → ezhìni
 - **weird** ~ <small style="color:#666;">*strange*</small> → buri
 - **western** ~ <small style="color:#666;">*west*</small> → occluít
