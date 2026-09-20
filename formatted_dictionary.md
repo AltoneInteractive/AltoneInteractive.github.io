@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 21:58:03 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 22:25:49 UTC 2026
 
-## Translations (616 main entries + 1749 synonyms)
+## Translations (620 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -81,6 +81,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:58:03 UTC 2026
 - **bringing** → revoìh
 - **brought** → revaí
 - **bunny** → budo-budo
+- **burned** → ìleaí
 - **but** → mìle
 - **by** → kweh
 - **bye** → ihdo
@@ -164,7 +165,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:58:03 UTC 2026
 - **end** → omé
 - **even** → owè
 - **ever** → oshía
-- **every** → ileo
+- **every** → ile
 - **example** → suri
 - **exclusively** → ivar
 - **excuse me** → shìreziré
@@ -184,6 +185,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:58:03 UTC 2026
 - **fighting** → kechoìh
 - **find** → nodo
 - **finding** → nodìh
+- **fire** → liah
 - **first** → eui
 - **flawed** → ìkèpuìh
 - **focus** → oluzi
@@ -313,6 +315,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:58:03 UTC 2026
 - **let** → weh
 - **life** → soronisè
 - **light** → orineh
+- **like the** → selo
 - **like** → sel
 - **limbo** → radimeta
 - **line** → sèc
@@ -405,6 +408,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:58:03 UTC 2026
 - **problem** → mashizé
 - **proselytization** → víkashèniyèvaía
 - **pure** → oriuít
+- **put** → li
 - **quickly** → advikefi
 - **quite** → niya
 - **ran** → tavanaí
