@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 21:07:36 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 21:08:42 UTC 2026
 
-## Translations (606 main entries + 1748 synonyms)
+## Translations (607 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -475,6 +475,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:07:36 UTC 2026
 - **speaking** → quolìh
 - **specific** → moka
 - **specifically** → mokefi
+- **spoke** → quoloìh
 - **stable** → oyo
 - **stand** → takèho
 - **standing** → takèhoìh
