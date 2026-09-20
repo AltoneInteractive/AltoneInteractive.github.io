@@ -329,6 +329,47 @@
       pointer-events: none;
     }
 
+    .english-input-editor.swapped-input:empty:before {
+      content: "Enter Ichrolic text here...";
+    }
+
+    .swap-button {
+      align-self: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .swap-button:hover {
+      transform: scale(1.1);
+    }
+
+    .swap-button:active {
+      transform: scale(0.95);
+    }
+
+    @media (max-width: 768px) {
+      .swap-button {
+        transform: rotate(90deg);
+      }
+
+      .swap-button:hover {
+        transform: rotate(90deg) scale(1.1);
+      }
+
+      .swap-button:active {
+        transform: rotate(90deg) scale(0.95);
+      }
+    }
+
     textarea:focus, .english-input-editor:focus {
       background-color: var(--container-bg) !important; /* Force override */
       color: var(--text-color) !important; /* Force override */
@@ -857,7 +898,7 @@
     <div class="translator">
       <div class="text-areas">
         <div class="text-column">
-          <div class="header">English</div>
+          <div class="header"><span id="sourceLangLabel">English</span></div>
           <div style="position: relative;">
             <div id="englishInput" class="english-input-editor" contenteditable="true"></div>
             <!-- Tooltip overlay positioned above the text area -->
@@ -868,8 +909,9 @@
             </div>
           </div>
         </div>
+        <button type="button" class="swap-button" id="swapButton" title="Swap languages" aria-label="Swap languages">⇄</button>
         <div class="text-column" style="position: relative;">
-          <div class="header">Ichrolic <span class="copy-header">(Click to Copy)</span></div>
+          <div class="header"><span id="targetLangLabel">Ichrolic</span> <span class="copy-header">(Click to Copy)</span></div>
           <textarea id="ichrolicOutput" placeholder="Ichrolic translation will appear here..." readonly title="Click to copy to clipboard"></textarea>
           <div class="copy-feedback" id="copyFeedback">Copied! ✓</div>
         </div>
@@ -966,6 +1008,9 @@
     const ichrolicOutput = document.getElementById('ichrolicOutput');
     const ignoreDiacriticsCheckbox = document.getElementById('ignoreDiacritics');
     const useContractionsCheckbox = document.getElementById('useContractions');
+    const swapButton = document.getElementById('swapButton');
+    const sourceLangLabel = document.getElementById('sourceLangLabel');
+    const targetLangLabel = document.getElementById('targetLangLabel');
     const forceSyncCheckbox = document.getElementById('forceSync');
     const saveDictionaryButton = document.getElementById('saveDictionary');
     const showDictionaryButton = document.getElementById('showDictionary');
@@ -997,6 +1042,7 @@
     const cancelSignIn = document.getElementById('cancelSignIn');
 
     let isSynonymMode = false; // Track the current mode
+    let isSwapped = false; // Track translation direction (false = English -> Ichrolic)
     let isDeveloperMode = false; // Track developer mode
     let githubToken = localStorage.getItem('github_token'); // GitHub token
     let currentUser = null; // Store user info
@@ -1058,7 +1104,7 @@
       
       // Update display and retranslate
       updateEnglishInputDisplay();
-      translateToIchrolic();
+      translate();
     }
 
     // HTML escape function to prevent XSS
@@ -1536,7 +1582,7 @@
       // Always translate on input changes
       clearTimeout(englishInput.translateTimeout);
       englishInput.translateTimeout = setTimeout(() => {
-        translateToIchrolic();
+        translate();
       }, 50);
       
       // Only rebuild display in specific cases to avoid cursor issues
@@ -1644,8 +1690,8 @@
 
 
     // Event Listeners (translation is handled in the input event above)
-    ignoreDiacriticsCheckbox.addEventListener('change', translateToIchrolic);
-    useContractionsCheckbox.addEventListener('change', translateToIchrolic);
+    ignoreDiacriticsCheckbox.addEventListener('change', translate);
+    useContractionsCheckbox.addEventListener('change', translate);
     saveDictionaryButton.addEventListener('click', saveDictionary);
     showDictionaryButton.addEventListener('click', toggleDictionaryTable);
     addEntryButton.addEventListener('click', addDictionaryEntry);
@@ -1966,7 +2012,7 @@
             }
             buildVariantMapping();
             updateDictionaryTable();
-            translateToIchrolic();
+            translate();
           });
 
           actionsCell.appendChild(deleteButton);
@@ -2011,7 +2057,7 @@
 
               buildVariantMapping();
               updateDictionaryTable();
-              translateToIchrolic();
+              translate();
             });
 
             actionsCell.appendChild(makePrimaryButton);
@@ -2082,7 +2128,7 @@
             }
             buildVariantMapping();
             updateDictionaryTable();
-            translateToIchrolic();
+            translate();
           });
           
           actionsDiv.appendChild(deleteButton);
@@ -2125,7 +2171,7 @@
 
               buildVariantMapping();
               updateDictionaryTable();
-              translateToIchrolic();
+              translate();
             });
 
             actionsDiv.appendChild(makePrimaryButton);
@@ -2207,7 +2253,7 @@
       // Update the table and translation
       buildVariantMapping();
       updateDictionaryTable();
-      translateToIchrolic();
+      translate();
 
       // Clear status message after 3 seconds
       setTimeout(() => {
@@ -2263,7 +2309,7 @@
             }
             
             updateDictionaryTable();
-            translateToIchrolic();
+            translate();
             dictionaryStatus.textContent = "Default dictionary loaded successfully.";
             
             // Clear status message after 3 seconds
@@ -2284,6 +2330,42 @@
           updateDictionaryTable();
         });
     }
+
+    // Runs translation in whichever direction is currently active
+    function translate() {
+      if (isSwapped) {
+        translateToEnglish();
+      } else {
+        translateToIchrolic();
+      }
+    }
+
+    // Swap the source/target languages, like the Google Translate switch button
+    function performSwap() {
+      const currentSourceText = getPlainTextFromInput();
+      const currentTargetText = ichrolicOutput.value;
+
+      isSwapped = !isSwapped;
+
+      englishInput.textContent = currentTargetText;
+      englishInput.classList.toggle('swapped-input', isSwapped);
+
+      if (isSwapped) {
+        sourceLangLabel.textContent = 'Ichrolic';
+        targetLangLabel.textContent = 'English';
+        ichrolicOutput.placeholder = 'English translation will appear here...';
+      } else {
+        sourceLangLabel.textContent = 'English';
+        targetLangLabel.textContent = 'Ichrolic';
+        ichrolicOutput.placeholder = 'Ichrolic translation will appear here...';
+      }
+
+      updateEnglishInputDisplay();
+      translate();
+      englishInput.focus();
+    }
+
+    swapButton.addEventListener('click', performSwap);
 
     // Function to translate English to Ichrolic
     function translateToIchrolic() {
@@ -2507,6 +2589,204 @@
       }
 
       ichrolicOutput.value = ichrolic;
+    }
+
+    // Builds lookup tables mapping Ichrolic words/phrases back to an English dictionary key.
+    // reverseMap uses exact (case-insensitive) Ichrolic text; reverseMapNoDiacritics strips
+    // diacritics from both sides so e.g. typing "nih" can still match the entry for "nìh".
+    function buildReverseDictionary() {
+      const translationDictionary = { ...dictionary };
+
+      for (const baseWord in wordVariants) {
+        const variant = getSelectedVariant(baseWord);
+        if (variant) {
+          translationDictionary[baseWord] = variant.translation;
+        }
+      }
+
+      const reverseMap = {};
+      const reverseMapNoDiacritics = {};
+
+      // Sort so the mapping is picked deterministically when multiple English
+      // words share the same Ichrolic translation (first alphabetical wins).
+      const englishKeys = Object.keys(translationDictionary).sort();
+
+      for (const englishKey of englishKeys) {
+        // Raw variant keys like "them/plural" aren't real words a user would type;
+        // their base word ("them") is already covered via the wordVariants loop above.
+        if (englishKey.includes('/')) continue;
+
+        const ichrolicValue = translationDictionary[englishKey];
+        if (!ichrolicValue) continue;
+
+        const lower = ichrolicValue.toLowerCase();
+        if (!reverseMap.hasOwnProperty(lower)) {
+          reverseMap[lower] = englishKey;
+        }
+
+        const stripped = removeDiacritics(lower);
+        if (!reverseMapNoDiacritics.hasOwnProperty(stripped)) {
+          reverseMapNoDiacritics[stripped] = englishKey;
+        }
+      }
+
+      return { reverseMap, reverseMapNoDiacritics };
+    }
+
+    // Function to translate Ichrolic to English
+    function translateToEnglish() {
+      const ichrolicText = getPlainTextFromInput().trim();
+      if (ichrolicText === "") {
+        ichrolicOutput.value = "";
+        return;
+      }
+
+      const ignoreDiacritics = ignoreDiacriticsCheckbox.checked;
+      const { reverseMap, reverseMapNoDiacritics } = buildReverseDictionary();
+
+      // Longest phrases first, so multi-word Ichrolic translations match greedily
+      const phraseKeys = Object.keys(reverseMap)
+        .filter(key => key.includes(" "))
+        .sort((a, b) => b.split(" ").length - a.split(" ").length);
+
+      const punctuationChars = [",", ".", "!", "?", ";", ":"];
+
+      // Tokenize the Ichrolic text, preserving punctuation (same scheme as translateToIchrolic)
+      const tokens = [];
+      let currentWord = "";
+
+      for (const c of ichrolicText) {
+        if (c === " ") {
+          if (currentWord !== "") {
+            tokens.push(currentWord);
+            currentWord = "";
+          }
+          tokens.push(" ");
+        } else if (punctuationChars.includes(c)) {
+          if (currentWord !== "") {
+            tokens.push(currentWord);
+            currentWord = "";
+          }
+          tokens.push(c);
+        } else {
+          currentWord += c;
+        }
+      }
+
+      if (currentWord !== "") {
+        tokens.push(currentWord);
+      }
+
+      // Looks up a single Ichrolic word, falling back to a diacritic-insensitive
+      // match (treating e.g. "nih" as if it had been typed "nìh") when enabled.
+      function lookupWord(word) {
+        const lower = word.toLowerCase();
+        if (reverseMap.hasOwnProperty(lower)) {
+          return reverseMap[lower];
+        }
+        if (ignoreDiacritics) {
+          const stripped = removeDiacritics(lower);
+          if (reverseMapNoDiacritics.hasOwnProperty(stripped)) {
+            return reverseMapNoDiacritics[stripped];
+          }
+        }
+        return null;
+      }
+
+      function capitalizeLike(sourceWord, targetWord) {
+        if (sourceWord.length > 0 && sourceWord[0] !== sourceWord[0].toLowerCase()) {
+          return targetWord.charAt(0).toUpperCase() + targetWord.slice(1);
+        }
+        return targetWord;
+      }
+
+      let i = 0;
+      const result = [];
+
+      while (i < tokens.length) {
+        if (tokens[i] === " ") {
+          result.push(" ");
+          i++;
+          continue;
+        }
+
+        if (tokens[i].length === 1 && punctuationChars.includes(tokens[i])) {
+          result.push(tokens[i]);
+          i++;
+          continue;
+        }
+
+        let matchedPhrase = false;
+
+        // Try to match multi-word Ichrolic phrases
+        for (const phraseKey of phraseKeys) {
+          const phraseWords = phraseKey.split(" ");
+          const collected = [];
+          let j = i;
+          let ok = true;
+
+          for (const _ of phraseWords) {
+            while (j < tokens.length && tokens[j] === " ") j++;
+            if (j >= tokens.length || (tokens[j].length === 1 && punctuationChars.includes(tokens[j]))) {
+              ok = false;
+              break;
+            }
+            collected.push(tokens[j]);
+            j++;
+          }
+
+          if (!ok || collected.length !== phraseWords.length) continue;
+
+          const matchLower = collected.map(w => w.toLowerCase()).join(" ");
+          let candidateKey = null;
+
+          if (matchLower === phraseKey) {
+            candidateKey = reverseMap[phraseKey];
+          } else if (ignoreDiacritics && removeDiacritics(matchLower) === removeDiacritics(phraseKey)) {
+            candidateKey = reverseMap[phraseKey];
+          }
+
+          if (candidateKey) {
+            result.push(capitalizeLike(collected[0], candidateKey));
+            i = j;
+            matchedPhrase = true;
+            break;
+          }
+        }
+
+        if (matchedPhrase) continue;
+
+        // Process a single word
+        const token = tokens[i];
+        const englishKey = lookupWord(token);
+
+        if (englishKey !== null) {
+          result.push(capitalizeLike(token, englishKey));
+        } else {
+          result.push("[" + token + "]");
+        }
+
+        i++;
+      }
+
+      // Join the result, properly handling spaces and punctuation
+      let finalResult = "";
+      for (let j = 0; j < result.length; j++) {
+        const token = result[j];
+
+        if (token === " ") {
+          finalResult += " ";
+        } else if (token.length === 1 && punctuationChars.includes(token)) {
+          finalResult += token;
+        } else {
+          if (j > 0 && result[j-1] !== " " && !(result[j-1].length === 1 && punctuationChars.includes(result[j-1]))) {
+            finalResult += " ";
+          }
+          finalResult += token;
+        }
+      }
+
+      ichrolicOutput.value = finalResult.trim();
     }
 
     // Function to get canonical form from synonyms and variants
