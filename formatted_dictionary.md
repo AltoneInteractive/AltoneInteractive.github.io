@@ -1,6 +1,6 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 20:33:24 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 21:05:36 UTC 2026
 
 ## Translations (606 main entries + 1748 synonyms)
 
@@ -383,7 +383,7 @@ Auto-generated from dictionary.json on Sun Sep 20 20:33:24 UTC 2026
 - **ostensible** → èdiaki
 - **ostensibly** → èdiakima
 - **other** → ìvonèh
-- **our** → yana
+- **our** → yani
 - **out of nothing** → afanìh
 - **out** → afa
 - **outcome** → ìpoza
@@ -948,7 +948,7 @@ Auto-generated from dictionary.json on Sun Sep 20 20:33:24 UTC 2026
 - **believing** ~ <small style="color:#666;">*thinking*</small> → uqèboìh
 - **belonging to it** ~ <small style="color:#666;">*its*</small> → síka
 - **belonging to me** ~ <small style="color:#666;">*my*</small> → al-
-- **belonging to us** ~ <small style="color:#666;">*our*</small> → yana
+- **belonging to us** ~ <small style="color:#666;">*our*</small> → yani
 - **belonging to you** ~ <small style="color:#666;">*your*</small> → yuhna
 - **beloved** ~ <small style="color:#666;">*dear*</small> → síeua
 - **beneath** ~ <small style="color:#666;">*down*</small> → suoít
@@ -1757,9 +1757,9 @@ Auto-generated from dictionary.json on Sun Sep 20 20:33:24 UTC 2026
 - **ought not** ~ <small style="color:#666;">*shouldn't*</small> → avìkè
 - **ought to** ~ <small style="color:#666;">*should*</small> → avé
 - **our group** ~ <small style="color:#666;">*us*</small> → yana
-- **our own** ~ <small style="color:#666;">*our*</small> → yana
+- **our own** ~ <small style="color:#666;">*our*</small> → yani
 - **our team** ~ <small style="color:#666;">*us*</small> → yana
-- **ours** ~ <small style="color:#666;">*our*</small> → yana
+- **ours** ~ <small style="color:#666;">*our*</small> → yani
 - **ourselves** ~ <small style="color:#666;">*us*</small> → yana
 - **outlawed** ~ <small style="color:#666;">*forbidden*</small> → ruvisha
 - **outside** ~ <small style="color:#666;">*out*</small> → afa
