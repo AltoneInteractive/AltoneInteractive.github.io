@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 21:58:03 UTC 2026
 
-## Translations (615 main entries + 1749 synonyms)
+## Translations (616 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -43,6 +43,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 - **assassin** → shikízu
 - **at** → inì
 - **ate** → achovaí
+- **aurora** → léne
 - **aware** → kazaí
 - **away** → edíva
 - **baby** → lilu
@@ -312,7 +313,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 - **let** → weh
 - **life** → soronisè
 - **light** → orineh
-- **like** → yil
+- **like** → sel
 - **limbo** → radimeta
 - **line** → sèc
 - **literally** → padamìtè
@@ -895,7 +896,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 - **applied** ~ <small style="color:#666;">*used*</small> → wenaí
 - **apply** ~ <small style="color:#666;">*use*</small> → weno
 - **applying** ~ <small style="color:#666;">*using*</small> → wenoìh
-- **appreciate** ~ <small style="color:#666;">*like*</small> → yil
+- **appreciate** ~ <small style="color:#666;">*like*</small> → sel
 - **apprehend** ~ <small style="color:#666;">*understand*</small> → aníkaí
 - **apprehended** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - **approach** ~ <small style="color:#666;">*come*</small> → yano
@@ -1260,7 +1261,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 - **enabling** ~ <small style="color:#666;">*helping*</small> → ahuoìh
 - **end** ~ <small style="color:#666;">*death*</small> → exuis
 - **enigmatic** ~ <small style="color:#666;">*unknowable*</small> → nul
-- **enjoy** ~ <small style="color:#666;">*like*</small> → yil
+- **enjoy** ~ <small style="color:#666;">*like*</small> → sel
 - **enormous** ~ <small style="color:#666;">*big*</small> → eyuba
 - **enter** ~ <small style="color:#666;">*come*</small> → yano
 - **entity** ~ <small style="color:#666;">*something*</small> → nìshiyè
@@ -1324,7 +1325,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 - **familiar with** ~ <small style="color:#666;">*know*</small> → isèyo
 - **familiar** ~ <small style="color:#666;">*known*</small> → anía
 - **famished** ~ <small style="color:#666;">*hungry*</small> → chovìh
-- **fancy** ~ <small style="color:#666;">*like*</small> → yil
+- **fancy** ~ <small style="color:#666;">*like*</small> → sel
 - **faraway** ~ <small style="color:#666;">*far*</small> → èqí
 - **farewell** ~ <small style="color:#666;">*goodbye*</small> → viyado
 - **fashion** ~ <small style="color:#666;">*make*</small> → tepo
@@ -1333,7 +1334,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 - **fathom** ~ <small style="color:#666;">*understand*</small> → aníkaí
 - **fathomed** ~ <small style="color:#666;">*understood*</small> → aníkazaíh
 - **fatigued** ~ <small style="color:#666;">*tired*</small> → ezhìni
-- **favor** ~ <small style="color:#666;">*like*</small> → yil
+- **favor** ~ <small style="color:#666;">*like*</small> → sel
 - **favorable** ~ <small style="color:#666;">*good*</small> → viya
 - **feast** ~ <small style="color:#666;">*eat*</small> → chovo
 - **feces** ~ <small style="color:#666;">*shit*</small> → kavar
@@ -1856,7 +1857,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 - **precious** ~ <small style="color:#666;">*dear*</small> → síeua
 - **precise** ~ <small style="color:#666;">*correct*</small> → zaíh
 - **precisely** ~ <small style="color:#666;">*literally*</small> → padamìtè
-- **prefer** ~ <small style="color:#666;">*like*</small> → yil
+- **prefer** ~ <small style="color:#666;">*like*</small> → sel
 - **present** ~ <small style="color:#666;">*give*</small> → kudo
 - **presented** ~ <small style="color:#666;">*showed*</small> → luahaí
 - **presenting** ~ <small style="color:#666;">*giving*</small> → kudoìh
