@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 22:25:49 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 22:31:48 UTC 2026
 
-## Translations (620 main entries + 1749 synonyms)
+## Translations (621 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -81,6 +81,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:25:49 UTC 2026
 - **bringing** → revoìh
 - **brought** → revaí
 - **bunny** → budo-budo
+- **burn** → leo
 - **burned** → ìleaí
 - **but** → mìle
 - **by** → kweh
