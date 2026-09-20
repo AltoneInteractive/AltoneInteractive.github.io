@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 22:31:48 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 22:41:47 UTC 2026
 
-## Translations (621 main entries + 1749 synonyms)
+## Translations (622 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -81,7 +81,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:31:48 UTC 2026
 - **bringing** → revoìh
 - **brought** → revaí
 - **bunny** → budo-budo
-- **burn** → leo
+- **burn** → ileo
 - **burned** → ìleaí
 - **but** → mìle
 - **by** → kweh
@@ -93,6 +93,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:31:48 UTC 2026
 - **can't find** → koìkè nodo
 - **can't** → koìkè
 - **can** → ko
+- **candle** → lilu-leo
 - **care** → hittì
 - **cared** → hittaí
 - **caring** → hittìh
@@ -186,7 +187,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:31:48 UTC 2026
 - **fighting** → kechoìh
 - **find** → nodo
 - **finding** → nodìh
-- **fire** → liah
+- **fire** → líah
 - **first** → eui
 - **flawed** → ìkèpuìh
 - **focus** → oluzi
