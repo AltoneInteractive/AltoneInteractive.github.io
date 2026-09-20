@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 21:23:28 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 21:40:47 UTC 2026
 
-## Translations (610 main entries + 1748 synonyms)
+## Translations (615 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -159,6 +159,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:23:28 UTC 2026
 - **eat** → chovo
 - **eating** → chovoìh
 - **else** → ífa
+- **embrace** → rí
 - **end** → omé
 - **even** → owè
 - **ever** → oshía
@@ -477,7 +478,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:23:28 UTC 2026
 - **speaking** → quolìh
 - **specific** → moka
 - **specifically** → mokefi
-- **spoke** → quoloìh
+- **spoke** → quolaí
 - **stable** → oyo
 - **stand** → takèho
 - **standing** → takèhoìh
@@ -538,7 +539,11 @@ Auto-generated from dictionary.json on Sun Sep 20 21:23:28 UTC 2026
 - **transform** → ex
 - **transformed** → exaí
 - **transforming** → exìh
+- **tried** → ekaí
 - **true** → zaíh
+- **try** → eka
+- **trying to** → ekoìh
+- **trying** → eko
 - **turn** <small style="color:#666;">(noun)</small> → asèqoix
 - **turn** <small style="color:#666;">(verb)</small> → exaro
 - **two** → ud
@@ -1447,6 +1452,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:23:28 UTC 2026
 - **hot** ~ <small style="color:#666;">*sexy*</small> → sommaí
 - **howdy** ~ <small style="color:#666;">*hello*</small> → kulí
 - **however** ~ <small style="color:#666;">*still*</small> → siés
+- **hug** ~ <small style="color:#666;">*embrace*</small> → rí
 - **huge** ~ <small style="color:#666;">*big*</small> → eyuba
 - **human** ~ <small style="color:#666;">*person*</small> → chìvaí
 - **humanity** ~ <small style="color:#666;">*people*</small> → chìvaíah
