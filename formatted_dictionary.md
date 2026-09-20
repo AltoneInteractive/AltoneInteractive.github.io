@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 21:08:42 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 21:23:28 UTC 2026
 
-## Translations (607 main entries + 1748 synonyms)
+## Translations (610 main entries + 1748 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -14,7 +14,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:08:42 UTC 2026
 - **ahead** → eseí
 - **alignment** → udaxi
 - **all the time** → siluítoix
-- **all** → siluí
+- **all** → sil
 - **alone** → ivar
 - **already** → inuoix
 - **also** → ato
@@ -444,6 +444,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:08:42 UTC 2026
 - **shackled** → casoix
 - **shadow** → sokayla
 - **shadowgazing** → sokayla-asìta
+- **shadows** → sokaylah
 - **shit** → kavar
 - **should** → avé
 - **shouldn't make** → avìkè tepo
@@ -466,6 +467,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:08:42 UTC 2026
 - **someone** → niyèva
 - **something** → nìshiyè
 - **sometime** → niyètoix
+- **sometimes** → aniyètoix
 - **somewhere** → niquién
 - **soon** → lutoix
 - **sorry** → arémaí
@@ -585,6 +587,7 @@ Auto-generated from dictionary.json on Sun Sep 20 21:08:42 UTC 2026
 - **will** → ekoyè
 - **win** → yawo
 - **wish** → azio
+- **with me** → kivali
 - **with** → kivì
 - **without** → kivìnìh
 - **won't go** → ekoyìkè ano
