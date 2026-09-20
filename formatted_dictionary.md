@@ -1,6 +1,6 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 20:08:23 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 20:32:37 UTC 2026
 
 ## Translations (606 main entries + 1748 synonyms)
 
@@ -33,6 +33,7 @@ Auto-generated from dictionary.json on Sun Sep 20 20:08:23 UTC 2026
 - **arm** → revkuh
 - **articulating** <small style="color:#666;">(verb)</small> → quozìh
 - **as** → kes
+- **ash** → ezora
 - **ask** → qèyo
 - **asked** → qèyaí
 - **asking** → qèyoìh
@@ -166,7 +167,6 @@ Auto-generated from dictionary.json on Sun Sep 20 20:08:23 UTC 2026
 - **excuse me** → shìreziré
 - **existence** → sèconisè
 - **eye** → olu
-- **ezora** → ash
 - **ezorah** → ashes
 - **fall** → suovo
 - **falling** → suovoìh
