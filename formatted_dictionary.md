@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sun Sep 20 22:57:46 UTC 2026
+Auto-generated from dictionary.json on Sun Sep 20 22:59:26 UTC 2026
 
-## Translations (627 main entries + 1749 synonyms)
+## Translations (628 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -404,6 +404,7 @@ Auto-generated from dictionary.json on Sun Sep 20 22:57:46 UTC 2026
 - **pecìa** → smart
 - **people** → chìvaíah
 - **person** → chìvaí
+- **piece of** → luashè
 - **piece** → lua
 - **place** → odal
 - **player** → iftí
