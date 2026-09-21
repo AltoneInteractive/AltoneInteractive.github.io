@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 21 15:41:00 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 21 17:36:01 UTC 2026
 
-## Translations (629 main entries + 1749 synonyms)
+## Translations (630 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -45,6 +45,7 @@ Auto-generated from dictionary.json on Mon Sep 21 15:41:00 UTC 2026
 - **at** → inì
 - **ate** → achovaí
 - **aurora** → léne
+- **awake** → oluehteh
 - **aware** → kazaí
 - **away** → edíva
 - **baby** → lilu
