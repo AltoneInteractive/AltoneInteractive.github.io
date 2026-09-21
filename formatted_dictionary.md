@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Mon Sep 21 17:36:01 UTC 2026
+Auto-generated from dictionary.json on Mon Sep 21 17:49:45 UTC 2026
 
-## Translations (630 main entries + 1749 synonyms)
+## Translations (631 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -236,6 +236,7 @@ Auto-generated from dictionary.json on Mon Sep 21 17:36:01 UTC 2026
 - **going to** → kianí
 - **going** → anoih
 - **gonna** → kianí
+- **good morning** → vioríoix
 - **good** → viya
 - **goodbye** → viyado
 - **got** → akunadaí
