@@ -1,0 +1,1777 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PRIME Heuristic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Onest:wght@400;500;600;700&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+<style>
+/* Layout: a roster rail beside one working sheet per character. Each sheet opens on the PRIME equation; its sections follow the formula's term order. Computed values wear the notes app's blue, totals the doc's red. */
+:root {
+  --bg: #edf0f4;
+  --grid: rgba(38, 72, 128, 0.06);
+  --panel: #fbfcfd;
+  --sunk: #eef1f5;
+  --line: #d6dce5;
+  --line-2: #bfc7d3;
+  --ink: #151a24;
+  --ink-2: #455064;
+  --muted: #6c7587;
+  --solver: #1b58b3;
+  --total: #c22436;
+  --total-bg: #fbe6e8;
+  --warn: #8a5600;
+  --warn-bg: #fff3d6;
+  --warn-line: #e5bd5c;
+  --ok: #187a47;
+  --err: #b42318;
+  --focus: #1b58b3;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  --tC: #5f6878;
+  --tB: #a96a00;
+  --tA: #16864a;
+  --tS: #c81f53;
+  --tG: #7b3acb;
+  --shadow: 0 1px 0 rgba(20, 30, 50, 0.04), 0 8px 24px -16px rgba(20, 30, 50, 0.35);
+  --f-display: "STIX Two Text", "Cambria Math", Cambria, Georgia, serif;
+  --f-ui: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --r: 12px;
+  --r-s: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1016;
+    --grid: rgba(140, 170, 230, 0.045);
+    --panel: #161a22;
+    --sunk: #1c212b;
+    --line: #2a303c;
+    --line-2: #3a4252;
+    --ink: #e8ebf1;
+    --ink-2: #b2b9c6;
+    --muted: #828b9d;
+    --solver: #7cb0f7;
+    --total: #ff707c;
+    --total-bg: #3a1c22;
+    --warn: #f2bb4f;
+    --warn-bg: #2e2411;
+    --warn-line: #7a5a17;
+    --ok: #4fc285;
+    --err: #ff8a80;
+    --focus: #7cb0f7;
+    --s1: #3987e5;
+    --s2: #d95926;
+    --s3: #199e70;
+    --s4: #c98500;
+    --s5: #d55181;
+    --tC: #9aa3b4;
+    --tB: #f0b035;
+    --tA: #45c47f;
+    --tS: #ff6b98;
+    --tG: #b58cff;
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 10px 28px -18px rgba(0, 0, 0, 0.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1016;
+  --grid: rgba(140, 170, 230, 0.045);
+  --panel: #161a22;
+  --sunk: #1c212b;
+  --line: #2a303c;
+  --line-2: #3a4252;
+  --ink: #e8ebf1;
+  --ink-2: #b2b9c6;
+  --muted: #828b9d;
+  --solver: #7cb0f7;
+  --total: #ff707c;
+  --total-bg: #3a1c22;
+  --warn: #f2bb4f;
+  --warn-bg: #2e2411;
+  --warn-line: #7a5a17;
+  --ok: #4fc285;
+  --err: #ff8a80;
+  --focus: #7cb0f7;
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --s4: #c98500;
+  --s5: #d55181;
+  --tC: #9aa3b4;
+  --tB: #f0b035;
+  --tA: #45c47f;
+  --tS: #ff6b98;
+  --tG: #b58cff;
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 10px 28px -18px rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+@media (max-width: 700px) { .brand-gloss { display: none; } }
+html, body { min-height: 100%; }
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-size: 14px;
+  line-height: 1.45;
+  padding-inline: 16px;
+  padding-block: 0 48px;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline-offset: 0; }
+.num, output, .tabnum { font-variant-numeric: tabular-nums; }
+
+.wrap { max-width: 1320px; margin-inline: auto; }
+
+/* ---------- top bar ---------- */
+.top {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding-block: 12px;
+  background: linear-gradient(var(--bg) 80%, transparent);
+}
+.brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; margin-right: auto; }
+.brand-mark {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: 0.14em;
+}
+.brand-mark i { font-weight: 400; letter-spacing: 0.04em; }
+.brand-gloss { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tabs {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.tab {
+  border: 0;
+  background: transparent;
+  padding: 6px 14px;
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.tab[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line-2);
+}
+.status[data-kind="ok"]::before { background: var(--ok); }
+.status[data-kind="busy"]::before { background: var(--solver); }
+.status[data-kind="local"]::before { background: var(--warn); }
+.status[data-kind="err"]::before { background: var(--err); }
+.status[data-kind="err"] { color: var(--err); }
+
+/* ---------- shared bits ---------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line-2);
+  background: var(--panel);
+  border-radius: var(--r-s);
+  padding: 6px 11px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink-2); }
+.btn.primary { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.btn.danger { color: var(--err); }
+.btn.danger.armed { background: var(--err); color: var(--panel); border-color: var(--err); }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--ink-2); }
+.btn.ghost:hover { background: var(--sunk); border-color: transparent; }
+.btn svg { width: 14px; height: 14px; flex: none; }
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+}
+.icon-btn:hover { background: var(--sunk); color: var(--ink); }
+.icon-btn:disabled { opacity: 0.35; pointer-events: none; }
+.icon-btn svg { width: 15px; height: 15px; }
+.field {
+  border: 1px solid var(--line);
+  background: var(--sunk);
+  border-radius: 7px;
+  padding: 5px 8px;
+  min-width: 0;
+  width: 100%;
+  transition: border-color 0.12s, background 0.12s;
+}
+.field:hover { border-color: var(--line-2); }
+.field:focus { background: var(--panel); border-color: var(--focus); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 20%, transparent); }
+.field.n { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--f-mono); font-size: 13px; }
+.field::placeholder { color: var(--muted); opacity: 0.8; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+select.field { appearance: none; padding-right: 26px; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 13px) 55%, calc(100% - 9px) 55%; background-size: 4px 4px; background-repeat: no-repeat; }
+.lbl { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.code { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.solver { color: var(--solver); font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 500; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+fieldset:disabled .field { opacity: 0.75; }
+fieldset:disabled .icon-btn, fieldset:disabled .add-row, fieldset:disabled .step-btn { display: none; }
+
+/* ---------- characters layout ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: 15.5rem minmax(0, 1fr); gap: 20px; }
+  .rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); }
+}
+.rail { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.rail-list { display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 899px) {
+  .rail-list { flex-direction: row; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
+  .rail-item { flex: 0 0 11rem; scroll-snap-align: start; }
+  .rail-head { display: none; }
+}
+.rail-head { display: flex; justify-content: space-between; align-items: center; }
+.rail-item {
+  text-align: left;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+.rail-item:hover { border-color: var(--line-2); }
+.rail-item[aria-current="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.ri-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ri-total { font-family: var(--f-display); font-size: 16px; color: var(--total); font-variant-numeric: tabular-nums lining-nums; }
+.ri-meta { grid-column: 1 / -1; font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.ri-flag { color: var(--warn); display: inline-flex; align-items: center; gap: 3px; }
+.ri-flag svg { width: 12px; height: 12px; }
+.mini { grid-column: 1 / -1; display: flex; gap: 2px; height: 5px; }
+.mini span { border-radius: 3px; min-width: 0; }
+.rail-new { justify-content: center; border-style: dashed; color: var(--ink-2); }
+@media (max-width: 899px) { .rail-new { align-self: flex-start; } }
+
+/* ---------- sheet ---------- */
+.sheet { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.sheet-head { padding: 18px 20px 16px; display: flex; flex-direction: column; gap: 14px; }
+.head-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.name-input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  font-family: var(--f-display);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  padding: 2px 6px;
+  margin-left: -7px;
+}
+.name-input:hover { border-color: var(--line); }
+.name-input:focus { border-color: var(--focus); background: var(--sunk); outline: none; }
+.head-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: end; }
+.fact { display: flex; flex-direction: column; gap: 4px; }
+.fact .field { width: 6.2rem; }
+.fact.note { flex: 1 1 12rem; }
+.fact.note .field { width: 100%; }
+.fact-static { font-family: var(--f-mono); font-size: 13px; padding: 6px 0; }
+
+.equation {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+@media (min-width: 640px) { .equation-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: end; } }
+.terms { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+.term { position: relative; display: flex; flex-direction: column; gap: 2px; padding-left: 14px; min-width: 0; }
+.term:first-child { padding-left: 0; }
+.term + .term::before {
+  content: "+";
+  position: absolute;
+  left: -3px;
+  top: 2px;
+  font-family: var(--f-display);
+  font-size: 20px;
+  color: var(--muted);
+}
+.term-sym { display: flex; align-items: center; gap: 7px; }
+.term-sym i { font-family: var(--f-display); font-size: 28px; line-height: 1; }
+.term-sym .sw { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+.term-val { font-family: var(--f-mono); font-size: 14px; color: var(--solver); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; }
+.term-name { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eq-total { display: flex; align-items: baseline; gap: 10px; justify-content: flex-start; }
+.eq-total .eq { font-family: var(--f-display); font-size: 28px; color: var(--muted); }
+.eq-total .big { font-family: var(--f-display); font-size: 46px; line-height: 1; color: var(--total); font-variant-numeric: lining-nums tabular-nums; letter-spacing: -0.01em; }
+.eq-note {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--total);
+  background: var(--total-bg);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.stack { display: flex; gap: 2px; height: 14px; }
+.stack span { border-radius: 4px; min-width: 0; transition: flex-grow 0.25s ease; }
+.eq-foot { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--ink-2); font-size: 13px; }
+.eq-foot b { font-family: var(--f-mono); font-weight: 500; color: var(--solver); }
+@media (max-width: 520px) {
+  .term-sym i { font-size: 22px; }
+  .term-val { font-size: 12px; }
+  .term { padding-left: 10px; }
+  .term + .term::before { font-size: 16px; left: -2px; }
+  .term-name { display: none; }
+  .eq-total .big { font-size: 38px; }
+}
+
+.sec { container-type: inline-size; }
+.sec-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.sec-h .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.sec-h i { font-family: var(--f-display); font-size: 24px; line-height: 1; min-width: 1ch; padding-right: 2px; }
+.sec-h h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.sec-h .hint { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.sec-h .sub { margin-left: auto; font-family: var(--f-mono); font-size: 15px; color: var(--solver); font-weight: 500; white-space: nowrap; }
+.sec-b { padding: 14px 20px 18px; display: flex; flex-direction: column; gap: 12px; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.badge svg { width: 11px; height: 11px; }
+
+@container (max-width: 520px) {
+  .sec-h .hint { display: none; }
+  .sec-h, .sec-b { padding-inline: 16px; }
+  .pret-row { grid-template-columns: minmax(0, 1fr) 5.2rem 3.8rem; gap: 8px; }
+  .strats { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .strat { grid-template-columns: 2.2rem 3.2rem minmax(0, 1fr) 4.4rem; padding: 6px 10px; }
+  .strat .stepper { grid-column: 3; }
+  .strat output { grid-column: 4 !important; }
+  .strat-v { justify-self: start; }
+}
+/* P */
+.pret-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px 28px; }
+@container (min-width: 600px) { .pret-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pret-row { display: grid; grid-template-columns: minmax(0, 1fr) 6.4rem 4.6rem; gap: 10px; align-items: center; padding: 3px 0; }
+.pret-row label { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.pret-row label span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pret-row.zero label span:first-child { color: var(--muted); }
+.pret-row output { text-align: right; }
+.pct { position: relative; }
+.pct .field { padding-right: 22px; }
+.pct::after { content: "%"; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 12px; pointer-events: none; }
+.formula-line { font-family: var(--f-mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+
+/* R */
+.issues { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.issue { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; padding: 8px 10px; border-radius: 8px; }
+.issue svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+.issue.warn { background: var(--warn-bg); color: var(--warn); }
+.issue.info { color: var(--ink-2); background: var(--sunk); }
+.era-head, .era {
+  display: grid;
+  gap: 6px 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-areas:
+    "name name name score"
+    "from to yrs mult"
+    "stress stress stress act";
+  align-items: center;
+}
+.era-head { display: none; }
+.era { padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); position: relative; }
+.era.flagged { border-color: var(--warn-line); box-shadow: inset 3px 0 0 var(--warn-line); }
+.era .f { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.era .fl { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.e-name { grid-area: name; }
+.e-from { grid-area: from; }
+.e-to { grid-area: to; }
+.e-yrs { grid-area: yrs; }
+.e-stress { grid-area: stress; }
+.e-mult { grid-area: mult; }
+.e-score { grid-area: score; text-align: right; }
+.e-act { grid-area: act; display: flex; justify-content: flex-end; gap: 2px; }
+.e-name .field { font-weight: 600; }
+.stress-w { display: flex; gap: 6px; }
+.stress-w select { flex: 1 1 auto; }
+.stress-w .custom { width: 4.6rem; flex: none; }
+.e-score output { font-size: 15px; }
+.yrs-hint { font-size: 10px; color: var(--warn); white-space: nowrap; }
+@container (min-width: 780px) {
+  .era-head, .era {
+    grid-template-columns: minmax(7rem, 1.5fr) 4.9rem 4.9rem 4.6rem minmax(10rem, 1.5fr) 3.9rem 5.2rem 5.4rem;
+    grid-template-areas: "name from to yrs stress mult score act";
+  }
+  .era-head { display: grid; padding: 0 11px; }
+  .era-head span { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .era-head .r { text-align: right; }
+  .era { padding: 6px 10px; border-radius: 9px; }
+  .era .fl { display: none; }
+}
+.era-list { display: flex; flex-direction: column; gap: 6px; }
+.add-row {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px dashed var(--line-2);
+  background: transparent;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+.add-row:hover { border-color: var(--ink-2); color: var(--ink); }
+.add-row svg { width: 14px; height: 14px; }
+.ring-sum { display: flex; flex-wrap: wrap; gap: 4px 18px; justify-content: space-between; align-items: baseline; border-top: 1px dashed var(--line); padding-top: 10px; font-size: 13px; color: var(--ink-2); }
+
+/* I */
+.strats { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.2rem, 1fr)); gap: 8px; }
+.strat { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: grid; grid-template-columns: auto 1fr; gap: 6px 8px; align-items: center; }
+.strat-l { font-family: var(--f-display); font-weight: 600; font-size: 22px; line-height: 1; color: var(--tier); }
+.strat-v { justify-self: end; }
+.stepper { grid-column: 1 / -1; display: grid; grid-template-columns: 30px minmax(0, 1fr) 30px; gap: 4px; }
+.step-btn { border: 1px solid var(--line); background: var(--sunk); border-radius: 7px; height: 30px; font-size: 16px; line-height: 1; color: var(--ink-2); }
+.step-btn:hover { border-color: var(--line-2); color: var(--ink); }
+.stepper .field { text-align: center; font-family: var(--f-mono); }
+.chips { display: flex; flex-wrap: wrap; gap: 3px 6px; padding: 9px 12px; background: var(--sunk); border-radius: 8px; min-height: 36px; align-items: center; }
+.chip { font-family: var(--f-ui); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; }
+.chips .none { color: var(--muted); font-size: 13px; }
+
+/* M */
+.seg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 4px; border: 1px solid var(--line); border-radius: 9px; background: var(--sunk); }
+.seg span b { font-family: var(--f-display); font-size: 20px; font-weight: 600; line-height: 1.1; }
+.seg span small { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.seg input:checked + span { background: var(--panel); border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.seg input:checked + span small { color: var(--solver); }
+.seg input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* E */
+.exp-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 14px; align-items: end; }
+@container (min-width: 620px) { .exp-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 9rem; } }
+.exp-grid .f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.exp-line { font-size: 13px; color: var(--ink-2); }
+.extras { display: flex; flex-direction: column; gap: 6px; }
+.extra { display: grid; grid-template-columns: minmax(0, 1fr) 6rem 28px; gap: 6px; align-items: center; }
+.sub-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; border-top: 1px dashed var(--line); padding-top: 12px; }
+.sub-h p { margin: 0; font-size: 12px; color: var(--muted); }
+
+/* ---------- empty / loading ---------- */
+.empty { padding: 40px 24px; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.empty h2 { margin: 0; font-family: var(--f-display); font-size: 26px; font-weight: 600; }
+.empty p { margin: 0; color: var(--ink-2); max-width: 46ch; }
+.empty .eqn { font-family: var(--f-display); font-style: italic; font-size: 30px; color: var(--muted); letter-spacing: 0.06em; }
+.skeleton { height: 58px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); opacity: 0.6; }
+
+/* ---------- compare ---------- */
+.cmp { display: flex; flex-direction: column; gap: 14px; }
+.cmp-head { padding: 18px 20px 6px; display: flex; flex-wrap: wrap; gap: 10px 20px; justify-content: space-between; align-items: end; }
+.cmp-head h2 { margin: 0; font-family: var(--f-display); font-size: 26px; font-weight: 600; text-wrap: balance; }
+.cmp-head p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; max-width: 60ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { font-family: var(--f-display); font-size: 15px; color: var(--ink); }
+.legend .sw { width: 9px; height: 9px; border-radius: 2px; }
+.board { padding: 8px 12px 16px; display: flex; flex-direction: column; gap: 2px; }
+.board-row {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(6rem, 10rem) minmax(0, 1fr) 5.4rem;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 8px;
+  border-radius: 9px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+}
+.board-row:hover { background: var(--sunk); }
+.b-rank { font-family: var(--f-display); font-style: italic; color: var(--muted); font-size: 16px; }
+.b-name { min-width: 0; display: flex; flex-direction: column; }
+.b-name b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.b-name small { color: var(--muted); font-size: 12px; }
+.b-bar { display: flex; gap: 2px; height: 16px; min-width: 0; }
+.b-bar span { border-radius: 4px; min-width: 0; }
+.b-total { text-align: right; font-family: var(--f-display); font-size: 20px; color: var(--total); font-variant-numeric: lining-nums tabular-nums; }
+@media (max-width: 560px) {
+  .board-row { grid-template-columns: 1.2rem minmax(0, 1fr) auto; grid-template-areas: "rank name total" "rank bar bar"; gap: 4px 10px; }
+  .b-rank { grid-area: rank; align-self: start; }
+  .b-name { grid-area: name; }
+  .b-bar { grid-area: bar; height: 12px; }
+  .b-total { grid-area: total; }
+}
+.table-wrap { overflow-x: auto; padding: 0 4px 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 13px; }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+th { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+th:first-child, td:first-child { text-align: left; }
+td { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+td:first-child { font-family: var(--f-ui); font-weight: 600; }
+td.t { color: var(--total); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+.th-i { font-family: var(--f-display); font-style: italic; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.cmp-note { padding: 14px 20px; font-size: 13px; color: var(--ink-2); display: flex; gap: 10px; align-items: flex-start; }
+.cmp-note p { margin: 0; max-width: 72ch; }
+
+/* ---------- formula ---------- */
+.fx { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+@media (min-width: 900px) { .fx { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } .fx .wide { grid-column: 1 / -1; } }
+.fx-eq { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.fx-eq .big-eq { font-family: var(--f-display); font-size: clamp(20px, 3.4vw, 30px); line-height: 1.3; text-wrap: balance; }
+.fx-eq .big-eq i { font-style: italic; }
+.fx-eq .big-eq .op { color: var(--muted); margin-inline: 0.2em; }
+.fx-eq p { margin: 0; color: var(--ink-2); font-size: 13px; max-width: 75ch; }
+.kgrid { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem; gap: 6px 12px; align-items: center; }
+.kgrid label { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.kgrid label span:last-child { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.data-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.check { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- overlays ---------- */
+.tip {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  background: var(--ink);
+  color: var(--panel);
+  font-size: 12px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.toast {
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink);
+  color: var(--panel);
+  padding: 9px 10px 9px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.45);
+}
+.toast button { border: 0; background: transparent; color: var(--panel); font-weight: 700; text-decoration: underline; padding: 2px 4px; }
+.copybox {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+.copybox .panel { width: min(640px, 100%); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.copybox textarea { width: 100%; height: min(60vh, 420px); font-family: var(--f-mono); font-size: 12px; resize: vertical; }
+.copybox .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark">PRIME</span>
+      <span class="brand-gloss" id="gloss">Preternaturalism · Rings · Implemented strats · Mythicality · Expertise</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="tab-characters" data-tab="characters" aria-selected="true">Characters</button>
+      <button class="tab" role="tab" id="tab-compare" data-tab="compare" aria-selected="false">Compare</button>
+      <button class="tab" role="tab" id="tab-formula" data-tab="formula" aria-selected="false">Formula</button>
+    </nav>
+    <span class="status" id="status" data-kind="idle">Loading roster…</span>
+  </header>
+  <main id="main">
+    <div class="layout">
+      <aside class="rail"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></aside>
+      <section class="sheet"><div class="panel empty"><span class="eqn">P + R + I + M + E</span><h2>Loading your roster</h2><p>Your characters and formula values load from this page's saved data.</p></div></section>
+    </div>
+  </main>
+</div>
+<div id="tip" class="tip" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<div id="copybox" class="copybox" hidden>
+  <div class="panel">
+    <div class="row"><strong>Copy this text</strong><button class="btn" id="copybox-close">Done</button></div>
+    <p class="code" style="margin:0">Your browser blocked the clipboard here. The text is selected, so long-press or press Ctrl+C to copy it.</p>
+    <textarea class="field" id="copybox-text" readonly></textarea>
+  </div>
+</div>
+
+<script>
+// PRIME core: constants, seed roster, and the scoring math.
+// Shared between the page and the node audit script.
+
+const DEFAULT_CONSTANTS = {
+  pret: [
+    { key: "af", label: "Aformic", factor: 200 },
+    { key: "ra", label: "Radiant", factor: 200 },
+    { key: "po", label: "Polyformic", factor: 200 },
+    { key: "ne", label: "Necrometic", factor: 400 },
+    { key: "ho", label: "Hollow", factor: 400 },
+    { key: "pa", label: "Paraformic", factor: 400 },
+    { key: "cc", label: "Catacosmic", factor: 666 }
+  ],
+  stress: [
+    { key: "N", code: "—", label: "Low to no stress", value: 0 },
+    { key: "TSA", code: "TSA", label: "Average-low stress", value: 10 },
+    { key: "TSM", code: "TSM", label: "Moderate stress", value: 20 },
+    { key: "TSH", code: "TSH", label: "High stress & trauma", value: 30 },
+    { key: "TSX", code: "TSX", label: "Extreme trauma / crippling stress", value: 40 },
+    { key: "TSU", code: "TSU", label: "Unspeakable trauma / unbearable stress", value: 50 }
+  ],
+  meta: [
+    { key: "C", label: "C", value: 50 },
+    { key: "B", label: "B", value: 100 },
+    { key: "A", label: "A", value: 150 },
+    { key: "S", label: "S", value: 200 },
+    { key: "G", label: "SS", value: 250 }
+  ],
+  myth: [0, 400, 500, 550],
+  expertise: [
+    { value: 0, label: "Minimal unique casts/equipment" },
+    { value: 100, label: "Variety of tools" },
+    { value: 200, label: "Well above average kit" },
+    { value: 300, label: "Exceptional specialization" },
+    { value: 400, label: "Consummate" }
+  ]
+};
+
+function num(v) {
+  const n = parseFloat(v);
+  return isFinite(n) ? n : 0;
+}
+
+function eraSpan(e) { return num(e.end) - num(e.start); }
+function eraYears(e) { return e.years === null || e.years === "" || e.years === undefined ? eraSpan(e) : num(e.years); }
+function stressValue(e, K) {
+  if (e.stress === "custom") return num(e.custom);
+  const s = K.stress.find(function (x) { return x.key === e.stress; });
+  return s ? s.value : 0;
+}
+function eraScore(e, K) { return eraYears(e) * stressValue(e, K) * num(e.mult === "" ? 1 : e.mult); }
+
+function score(c, K) {
+  let pSum = 0;
+  K.pret.forEach(function (p) { pSum += p.factor * num(c.pret[p.key]); });
+  const P = pSum / 100 + num(c.akyric);
+
+  let R = 0;
+  c.eras.forEach(function (e) { R += eraScore(e, K); });
+
+  let I = 0;
+  K.meta.forEach(function (m) { I += m.value * num(c.meta[m.key]); });
+
+  const mi = Math.min(Math.max(Math.round(num(c.myth)), 0), K.myth.length - 1);
+  const M = K.myth[mi];
+
+  let extras = 0;
+  c.extras.forEach(function (x) { extras += num(x.value); });
+  const lv = K.expertise[Math.min(Math.max(Math.round(num(c.exp.level)), 0), K.expertise.length - 1)];
+  const E = lv.value * num(c.exp.affinities) + extras;
+
+  const age = num(c.year) - num(c.birth);
+  const total = P + R + I + M + E;
+  return { P: P, R: R, I: I, M: M, E: E, total: total, age: age, rate: age > 0 ? R / age : 0 };
+}
+
+// Timeline checks: overlaps, gaps of 2+ years, years counted that differ from the span.
+function timelineIssues(c) {
+  const out = [];
+  const eras = c.eras.map(function (e, i) { return { e: e, i: i, s: num(e.start), t: num(e.end) }; });
+  eras.forEach(function (x) {
+    if (x.t < x.s) out.push({ level: "warn", era: x.i, text: x.e.name + " ends before it starts (" + x.s + "–" + x.t + ")." });
+  });
+  for (let a = 0; a < eras.length; a++) {
+    for (let b = a + 1; b < eras.length; b++) {
+      const ov = Math.min(eras[a].t, eras[b].t) - Math.max(eras[a].s, eras[b].s);
+      if (ov > 0) {
+        out.push({ level: "warn", era: eras[b].i, text: eras[a].e.name + " and " + eras[b].e.name + " overlap by " + fmt(ov) + (ov === 1 ? " year" : " years") + ", so " + (ov === 1 ? "that year is" : "those years are") + " scored twice." });
+      }
+    }
+  }
+  const sorted = eras.slice().sort(function (x, y) { return x.s - y.s; });
+  if (sorted.length) {
+    const lead = sorted[0].s - num(c.birth);
+    if (lead >= 2) out.push({ level: "warn", era: sorted[0].i, text: "Timeline starts at " + sorted[0].s + ", " + fmt(lead) + " years after birth (" + num(c.birth) + "). Those years aren't scored, but they still count toward age and the ring rate." });
+    if (lead < 0) out.push({ level: "warn", era: sorted[0].i, text: "Timeline starts at " + sorted[0].s + ", before the birth year (" + num(c.birth) + ")." });
+    let reach = sorted[0].t;
+    for (let k = 1; k < sorted.length; k++) {
+      const gap = sorted[k].s - reach;
+      if (gap >= 2) out.push({ level: "warn", era: sorted[k].i, text: fmt(gap) + "-year gap before " + sorted[k].e.name + " (" + reach + "–" + sorted[k].s + ") isn't scored." });
+      reach = Math.max(reach, sorted[k].t);
+    }
+    const tail = num(c.year) - reach;
+    if (tail >= 2) out.push({ level: "warn", era: null, text: "Timeline ends at " + reach + ", " + fmt(tail) + " years before the snapshot year (" + num(c.year) + ")." });
+    if (tail < 0) out.push({ level: "warn", era: null, text: "Timeline runs to " + reach + ", past the snapshot year (" + num(c.year) + ")." });
+  }
+  eras.forEach(function (x) {
+    const y = x.e.years;
+    if (y !== null && y !== "" && y !== undefined && num(y) !== eraSpan(x.e)) {
+      const sp = eraSpan(x.e);
+      const yrs = function (n) { return fmt(n) + (n === 1 ? " year" : " years"); };
+      out.push({
+        level: "info", era: x.i,
+        text: num(y) > sp
+          ? x.e.name + " counts " + yrs(num(y)) + " but only spans " + yrs(sp) + "."
+          : x.e.name + " counts " + fmt(num(y)) + " of its " + yrs(sp) + "."
+      });
+    }
+  });
+  return out;
+}
+
+function fmt(n) {
+  if (!isFinite(n)) return "0";
+  const r = Math.round(n * 100) / 100;
+  return r.toLocaleString("en-US", { maximumFractionDigits: 2 });
+}
+
+
+</script>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- icons ---------------- */
+  const IC = {
+    up: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10l4-4 4 4"/></svg>',
+    down: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>',
+    x: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg>',
+    plus: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 3.5v9M3.5 8h9"/></svg>',
+    warn: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8 2.2l6.3 11H1.7z"/><path d="M8 6.5v3.2" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".5" fill="currentColor"/></svg>',
+    info: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.2v4" stroke-linecap="round"/><circle cx="8" cy="4.9" r=".5" fill="currentColor"/></svg>',
+    copy: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="5" y="5" width="8.5" height="8.5" rx="1.6"/><path d="M10.8 5V3.6c0-.9-.7-1.6-1.6-1.6H3.6C2.7 2 2 2.7 2 3.6v5.6c0 .9.7 1.6 1.6 1.6H5"/></svg>',
+    dup: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="8" height="8" rx="1.6"/><path d="M13.5 6v6c0 .8-.7 1.5-1.5 1.5H6"/></svg>'
+  };
+
+  const TERMS = [
+    { k: "P", name: "Preternaturalism", short: "Preternatural", color: "var(--s1)" },
+    { k: "R", name: "Rings", short: "Rings", color: "var(--s2)" },
+    { k: "I", name: "Implemented meta strats", short: "Meta strats", color: "var(--s3)" },
+    { k: "M", name: "Mythicality", short: "Mythicality", color: "var(--s4)" },
+    { k: "E", name: "Expertise", short: "Expertise", color: "var(--s5)" }
+  ];
+  const TIER_COLOR = { C: "var(--tC)", B: "var(--tB)", A: "var(--tA)", S: "var(--tS)", G: "var(--tG)" };
+  const MYTH_LABEL = ["None", "1", "2", "3+"];
+  const SEG_OK = /^[A-Za-z0-9_\-.~:@+]{1,120}$/;
+
+  /* ---------------- state ---------------- */
+  const S = {
+    mode: "loading",           // loading | db | local
+    K: clone(DEFAULT_CONSTANTS),
+    chars: {},
+    selected: null,
+    tab: "characters",
+    readOnly: false,
+    dirty: new Set(),
+    writing: new Set(),
+    deleted: new Set(),
+    timers: {},
+    kDirty: false,
+    kWriting: false,
+    kTimer: null,
+    error: null
+  };
+  let db = null;
+  let downloads = null;
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+  function fid(path) { return "f-" + path.replace(/\./g, "-"); }
+  function getPath(o, path) { return path.split(".").reduce(function (a, k) { return a == null ? a : a[k]; }, o); }
+  function setPath(o, path, v) {
+    const ks = path.split(".");
+    let t = o;
+    for (let i = 0; i < ks.length - 1; i++) t = t[ks[i]];
+    t[ks[ks.length - 1]] = v;
+  }
+  function newId(name) {
+    const base = String(name || "c").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || "c";
+    return base + "-" + Math.random().toString(36).slice(2, 7);
+  }
+  function list() {
+    return Object.values(S.chars).sort(function (a, b) { return (num(a.order) - num(b.order)) || String(a.name).localeCompare(String(b.name)); });
+  }
+  function cur() { return S.selected ? S.chars[S.selected] : null; }
+  function fmtv(n) { return fmt(n); }
+  function yr(n) { return String(Math.round(num(n) * 100) / 100); }
+  function pct(part, whole) { return whole > 0 ? Math.round(part / whole * 100) : 0; }
+
+  function normalizeK(k) {
+    const d = clone(DEFAULT_CONSTANTS);
+    if (!k || typeof k !== "object") return d;
+    ["pret", "stress", "meta", "expertise"].forEach(function (grp) {
+      if (Array.isArray(k[grp])) {
+        d[grp].forEach(function (row, i) {
+          const src = grp === "expertise" ? k[grp][i] : k[grp].find(function (x) { return x && x.key === row.key; });
+          if (src) {
+            if (grp === "pret") row.factor = num(src.factor);
+            else row.value = num(src.value);
+          }
+        });
+      }
+    });
+    if (Array.isArray(k.myth)) d.myth = d.myth.map(function (v, i) { return i === 0 ? 0 : (k.myth[i] === undefined ? v : num(k.myth[i])); });
+    return d;
+  }
+  function normalizeChar(id, d) {
+    d = d || {};
+    const pret = {};
+    DEFAULT_CONSTANTS.pret.forEach(function (p) { pret[p.key] = d.pret && d.pret[p.key] !== undefined ? d.pret[p.key] : 0; });
+    const meta = {};
+    DEFAULT_CONSTANTS.meta.forEach(function (m) { meta[m.key] = d.meta && d.meta[m.key] !== undefined ? d.meta[m.key] : 0; });
+    return {
+      id: id,
+      name: typeof d.name === "string" ? d.name : "Unnamed",
+      year: d.year !== undefined ? d.year : 2015,
+      birth: d.birth !== undefined ? d.birth : 1990,
+      note: typeof d.note === "string" ? d.note : "",
+      pret: pret,
+      akyric: d.akyric !== undefined ? d.akyric : 0,
+      eras: Array.isArray(d.eras) ? d.eras.map(function (e) {
+        return {
+          name: typeof e.name === "string" ? e.name : "",
+          start: e.start !== undefined ? e.start : "",
+          end: e.end !== undefined ? e.end : "",
+          years: e.years === undefined ? null : e.years,
+          stress: typeof e.stress === "string" ? e.stress : "N",
+          custom: e.custom !== undefined ? e.custom : 0,
+          mult: e.mult !== undefined ? e.mult : 1
+        };
+      }) : [],
+      meta: meta,
+      myth: d.myth !== undefined ? d.myth : 0,
+      exp: {
+        level: d.exp && d.exp.level !== undefined ? d.exp.level : 0,
+        name: d.exp && typeof d.exp.name === "string" ? d.exp.name : "",
+        affinities: d.exp && d.exp.affinities !== undefined ? d.exp.affinities : 1
+      },
+      extras: Array.isArray(d.extras) ? d.extras.map(function (x) { return { label: x.label || "", value: x.value !== undefined ? x.value : 0 }; }) : [],
+      order: d.order !== undefined ? d.order : 0
+    };
+  }
+  function toDoc(c) {
+    const o = clone(c);
+    delete o.id;
+    return o;
+  }
+  function blankChar() {
+    const year = 2015;
+    const all = list();
+    return normalizeChar(null, {
+      name: "New character",
+      year: year,
+      birth: 1990,
+      eras: [{ name: "Childhood", start: 1990, end: 2000, years: null, stress: "N", custom: 0, mult: 1 }],
+      myth: 0,
+      exp: { level: 0, name: "", affinities: 1 },
+      order: all.length ? Math.max.apply(null, all.map(function (c) { return num(c.order); })) + 1 : 0
+    });
+  }
+
+  /* ---------------- persistence ---------------- */
+  const LS_DATA = "prime-heuristic-roster-v1";
+  const LS_UI = "prime-heuristic-ui-v1";
+  function lsGet(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function saveUI() { lsSet(LS_UI, { tab: S.tab, selected: S.selected }); }
+
+  let localTimer = null;
+  function saveLocalSoon() {
+    clearTimeout(localTimer);
+    localTimer = setTimeout(function () {
+      const ok = lsSet(LS_DATA, { constants: S.K, characters: list().map(function (c) { return c; }) });
+      setStatus(ok ? "local" : "err", ok ? "Saved in this browser only" : "Couldn't save in this browser");
+    }, 400);
+  }
+
+  function touch(id) {
+    if (S.readOnly) return;
+    if (S.mode === "local") { saveLocalSoon(); return; }
+    if (S.mode !== "db") return;
+    S.dirty.add(id);
+    updateStatus();
+    clearTimeout(S.timers[id]);
+    S.timers[id] = setTimeout(function () { flush(id); }, 650);
+  }
+  async function flush(id) {
+    if (S.writing.has(id)) { S.timers[id] = setTimeout(function () { flush(id); }, 300); return; }
+    delete S.timers[id];
+    const c = S.chars[id];
+    S.dirty.delete(id);
+    if (!c) { updateStatus(); return; }
+    S.writing.add(id);
+    updateStatus();
+    try {
+      await db.collection("characters").doc(id).set(toDoc(c));
+      S.error = null;
+    } catch (e) {
+      writeFailed(e);
+    } finally {
+      S.writing.delete(id);
+      updateStatus();
+    }
+  }
+  function touchK() {
+    if (S.readOnly) return;
+    if (S.mode === "local") { saveLocalSoon(); return; }
+    if (S.mode !== "db") return;
+    S.kDirty = true;
+    updateStatus();
+    clearTimeout(S.kTimer);
+    S.kTimer = setTimeout(flushK, 650);
+  }
+  async function flushK() {
+    if (S.kWriting) { S.kTimer = setTimeout(flushK, 300); return; }
+    S.kDirty = false;
+    S.kWriting = true;
+    updateStatus();
+    try {
+      await db.doc("settings/formula").set(clone(S.K));
+      S.error = null;
+    } catch (e) {
+      writeFailed(e);
+    } finally {
+      S.kWriting = false;
+      updateStatus();
+    }
+  }
+  function writeFailed(e) {
+    const code = e && e.code;
+    if (code === "invalid_argument" || code === "not_granted" || code === "revoked") {
+      S.readOnly = true;
+      S.error = "View only. Changes on this page aren't saved for you.";
+      render();
+    } else if (code === "quota_exceeded") {
+      S.error = "Storage is full. Delete a character, then try again.";
+    } else {
+      S.error = "Couldn't save the last change. It will retry on your next edit.";
+    }
+    updateStatus();
+  }
+  async function removeChar(id) {
+    const c = S.chars[id];
+    if (!c) return;
+    clearTimeout(S.timers[id]);
+    delete S.timers[id];
+    S.dirty.delete(id);
+    delete S.chars[id];
+    if (S.selected === id) { const l = list(); S.selected = l.length ? l[0].id : null; }
+    render();
+    if (S.mode === "local") { saveLocalSoon(); return; }
+    if (S.mode !== "db") return;
+    S.deleted.add(id);
+    try { await db.collection("characters").doc(id).delete(); } catch (e) { writeFailed(e); }
+  }
+
+  function setStatus(kind, text) {
+    const el = document.getElementById("status");
+    el.dataset.kind = kind;
+    el.textContent = text;
+  }
+  function updateStatus() {
+    if (S.mode === "loading") return setStatus("idle", "Loading roster…");
+    if (S.mode === "local") return setStatus("local", "Saved in this browser only");
+    if (S.readOnly) return setStatus("idle", "View only");
+    if (S.error) return setStatus("err", S.error);
+    const busy = S.dirty.size || S.writing.size || S.kDirty || S.kWriting;
+    setStatus(busy ? "busy" : "ok", busy ? "Saving…" : "Saved");
+  }
+
+  /* ---------------- boot ---------------- */
+  async function boot() {
+    const ui = lsGet(LS_UI);
+    if (ui) {
+      if (ui.tab === "characters" || ui.tab === "compare" || ui.tab === "formula") S.tab = ui.tab;
+      if (typeof ui.selected === "string") S.selected = ui.selected;
+    }
+    syncTabs();
+    const host = window.claude;
+    let dbNs = null;
+    if (host && typeof host.use === "function") {
+      try { dbNs = await host.use("db"); } catch (e) { dbNs = null; }
+      try { downloads = await host.use("downloads"); } catch (e) { downloads = null; }
+      try {
+        const u = await host.use("user");
+        if (u && typeof u.can === "function") {
+          const w = await u.can("data.write");
+          if (w === false) S.readOnly = true;
+        }
+      } catch (e) { /* keep inputs; a refused write decides */ }
+    }
+    if (dbNs) startDb(dbNs); else startLocal();
+  }
+
+  function startLocal() {
+    S.mode = "local";
+    S.readOnly = false;
+    const saved = lsGet(LS_DATA);
+    if (saved) {
+      S.K = normalizeK(saved.constants);
+      (saved.characters || []).forEach(function (c) {
+        const id = c.id && SEG_OK.test(c.id) ? c.id : newId(c.name);
+        S.chars[id] = normalizeChar(id, c);
+      });
+    }
+    pickSelected();
+    updateStatus();
+    render();
+  }
+
+  function startDb(ns) {
+    db = ns;
+    let first = true;
+    db.collection("characters").onSnapshot(function (snap) {
+      let changed = false;
+      const seen = new Set();
+      snap.docs.forEach(function (d) {
+        seen.add(d.id);
+        if (S.deleted.has(d.id) || S.dirty.has(d.id) || S.writing.has(d.id)) return;
+        const inc = normalizeChar(d.id, d.data());
+        const prev = S.chars[d.id];
+        if (!prev || JSON.stringify(toDoc(prev)) !== JSON.stringify(toDoc(inc))) {
+          S.chars[d.id] = inc;
+          changed = true;
+        }
+      });
+      Object.keys(S.chars).forEach(function (id) {
+        if (!seen.has(id) && !S.dirty.has(id) && !S.writing.has(id)) { delete S.chars[id]; changed = true; }
+      });
+      S.deleted.forEach(function (id) { if (!seen.has(id)) S.deleted.delete(id); });
+      if (first) {
+        first = false;
+        S.mode = "db";
+        pickSelected();
+        updateStatus();
+        render();
+      } else if (changed) {
+        pickSelected();
+        render(true);
+      }
+    }, function () {
+      S.error = "Lost the connection to saved data. Reload the page to reconnect.";
+      updateStatus();
+    });
+    db.doc("settings/formula").onSnapshot(function (snap) {
+      if (S.kDirty || S.kWriting) return;
+      const next = snap.exists ? normalizeK(snap.data()) : clone(DEFAULT_CONSTANTS);
+      if (JSON.stringify(next) !== JSON.stringify(S.K)) {
+        S.K = next;
+        if (S.mode === "db") render(true);
+      }
+    }, function () {});
+  }
+
+  function pickSelected() {
+    if (S.selected && S.chars[S.selected]) return;
+    const l = list();
+    S.selected = l.length ? l[0].id : null;
+  }
+
+  /* ---------------- rendering ---------------- */
+  const main = document.getElementById("main");
+
+  function syncTabs() {
+    document.querySelectorAll(".tab").forEach(function (t) {
+      t.setAttribute("aria-selected", t.dataset.tab === S.tab ? "true" : "false");
+    });
+  }
+
+  function render(keepFocus) {
+    let focusId = null, selStart = null, selEnd = null;
+    if (keepFocus && document.activeElement && document.activeElement.id && main.contains(document.activeElement)) {
+      focusId = document.activeElement.id;
+      try { selStart = document.activeElement.selectionStart; selEnd = document.activeElement.selectionEnd; } catch (e) { /* not a text field */ }
+    }
+    syncTabs();
+    if (S.mode === "loading") return;
+    if (S.tab === "compare") main.innerHTML = compareHTML();
+    else if (S.tab === "formula") main.innerHTML = formulaHTML();
+    else main.innerHTML = charactersHTML();
+    if (S.tab === "characters") refresh();
+    if (focusId) {
+      const el = document.getElementById(focusId);
+      if (el) {
+        el.focus({ preventScroll: true });
+        try { if (selStart != null) el.setSelectionRange(selStart, selEnd); } catch (e) { /* ignore */ }
+      }
+    }
+    saveUI();
+  }
+
+  function stackHTML(s, cls) {
+    const parts = TERMS.map(function (t) {
+      const v = Math.max(0, s[t.k]);
+      return '<span data-tip="' + esc(t.k + " · " + t.name + ": " + fmtv(s[t.k]) + " (" + pct(v, s.total) + "%)") + '" style="flex:' + v + ' 1 0;background:' + t.color + '"></span>';
+    }).join("");
+    return '<div class="' + cls + '" aria-hidden="true">' + parts + "</div>";
+  }
+
+  function railHTML() {
+    const items = list().map(function (c) {
+      const s = score(c, S.K);
+      const warns = timelineIssues(c).filter(function (i) { return i.level === "warn"; }).length;
+      return '<button class="rail-item" data-open="' + esc(c.id) + '" aria-current="' + (c.id === S.selected) + '">' +
+        '<span class="ri-name">' + esc(c.name || "Unnamed") + "</span>" +
+        '<span class="ri-total">' + fmtv(s.total) + "</span>" +
+        stackHTML(s, "mini") +
+        '<span class="ri-meta"><span>' + esc(yr(c.year)) + " · age " + esc(fmt(s.age)) + "</span>" +
+        (warns ? '<span class="ri-flag" title="Timeline flags">' + IC.warn + warns + "</span>" : "") + "</span>" +
+        "</button>";
+    }).join("");
+    const canAdd = !S.readOnly;
+    return '<div class="rail-head"><span class="lbl">Roster · ' + list().length + "</span></div>" +
+      '<div class="rail-list" id="rail-list">' + items +
+      (canAdd ? '<button class="btn rail-new" data-act="new-char">' + IC.plus + "New character</button>" : "") +
+      "</div>";
+  }
+
+  function charactersHTML() {
+    const c = cur();
+    if (!c) {
+      return '<div class="layout"><aside class="rail">' + railHTML() + '</aside><section class="sheet"><div class="panel empty">' +
+        '<span class="eqn">P + R + I + M + E</span><h2>No characters yet</h2>' +
+        "<p>Add a character to start scoring, or restore a backup file from the Formula tab.</p>" +
+        (S.readOnly ? "" : '<button class="btn primary" data-act="new-char">' + IC.plus + "New character</button>") +
+        "</div></section></div>";
+    }
+    return '<div class="layout"><aside class="rail" id="rail">' + railHTML() + "</aside>" +
+      '<fieldset class="sheet" id="sheet"' + (S.readOnly ? " disabled" : "") + ">" +
+      headHTML(c) + pretHTML(c) + ringsHTML(c) + metaHTML(c) + mythHTML(c) + expHTML(c) +
+      "</fieldset></div>";
+  }
+
+  function inp(path, value, kind, cls, extra) {
+    return '<input class="field ' + (cls || "") + '" id="' + fid(path) + '" data-bind="' + path + '" data-kind="' + kind + '"' +
+      (kind === "str" ? ' type="text"' : ' type="number" step="any" inputmode="decimal"') +
+      ' value="' + esc(value === null || value === undefined ? "" : value) + '"' + (extra || "") + ">";
+  }
+
+  function headHTML(c) {
+    return '<section class="panel sheet-head">' +
+      '<div class="head-row">' +
+      '<input class="name-input" id="f-name" data-bind="name" data-kind="str" type="text" aria-label="Character name" value="' + esc(c.name) + '">' +
+      '<div class="head-actions">' +
+      '<button type="button" class="btn" data-act="copy-one">' + IC.copy + "Copy breakdown</button>" +
+      '<button type="button" class="btn" data-act="dup">' + IC.dup + "Duplicate</button>" +
+      '<button type="button" class="btn danger" data-act="del-char">Delete</button>' +
+      "</div></div>" +
+      '<div class="facts">' +
+      '<label class="fact"><span class="lbl">Snapshot year</span>' + inp("year", c.year, "num", "n") + "</label>" +
+      '<label class="fact"><span class="lbl">Born</span>' + inp("birth", c.birth, "num", "n") + "</label>" +
+      '<div class="fact"><span class="lbl">Age</span><span class="fact-static solver" data-out="age"></span></div>' +
+      '<label class="fact note"><span class="lbl">Note</span>' + inp("note", c.note, "str", "", ' placeholder="e.g. Absolute minimum"') + "</label>" +
+      "</div>" +
+      '<div class="equation">' +
+      '<div class="equation-top">' +
+      '<div class="terms">' + TERMS.map(function (t) {
+        return '<div class="term"><span class="term-sym"><i>' + t.k + '</i><span class="sw" style="background:' + t.color + '"></span></span>' +
+          '<span class="term-val" data-out="' + t.k + '"></span><span class="term-name">' + t.short + "</span></div>";
+      }).join("") + "</div>" +
+      '<div><div class="eq-total"><span class="eq">=</span><span class="big" data-out="total"></span></div>' +
+      '<span class="eq-note" data-out="note" hidden></span></div>' +
+      "</div>" +
+      '<div data-out="stack"></div>' +
+      '<div class="eq-foot"><span>Ring rate ≈ <b data-out="rate"></b> per year</span><span>R is <b data-out="rshare"></b> of the total</span></div>' +
+      "</div></section>";
+  }
+
+  function secHead(t, hint, extra) {
+    return '<header class="sec-h"><span class="sw" style="background:' + t.color + '"></span><i>' + t.k + "</i><h2>" + t.name + "</h2>" +
+      '<span class="hint">' + hint + "</span>" + (extra || "") + '<span class="sub" data-out="' + t.k + '-sub"></span></header>';
+  }
+
+  function pretHTML(c) {
+    const rows = S.K.pret.map(function (p) {
+      const path = "pret." + p.key;
+      return '<div class="pret-row" data-pret="' + p.key + '"><label for="' + fid(path) + '"><span>' + esc(p.label) + '</span><span class="code">×' + esc(fmt(p.factor)) + "</span></label>" +
+        '<div class="pct">' + inp(path, c.pret[p.key], "num", "n", ' min="0" max="100"') + "</div>" +
+        '<output class="solver" data-out="' + path + '"></output></div>';
+    }).join("");
+    return '<section class="panel sec">' + secHead(TERMS[0], "Percent preternatural, scaled by type") +
+      '<div class="sec-b"><div class="pret-grid">' + rows +
+      '<div class="pret-row"><label for="' + fid("akyric") + '"><span>Akyric</span><span class="code">flat</span></label>' +
+      inp("akyric", c.akyric, "num", "n") + '<output class="solver" data-out="akyric"></output></div>' +
+      "</div><div class=\"formula-line\" data-out=\"pret-line\"></div></div></section>";
+  }
+
+  function stressOptions(sel) {
+    return S.K.stress.map(function (s) {
+      return '<option value="' + s.key + '"' + (sel === s.key ? " selected" : "") + ">" + (s.key === "N" ? "None" : s.code) + " · " + fmt(s.value) + "</option>";
+    }).join("") + '<option value="custom"' + (sel === "custom" ? " selected" : "") + ">Custom…</option>";
+  }
+
+  function eraHTML(e, i, n) {
+    const p = "eras." + i + ".";
+    return '<div class="era" data-era="' + i + '">' +
+      '<label class="f e-name"><span class="fl">Era</span>' + inp(p + "name", e.name, "str", "", ' aria-label="Era name"') + "</label>" +
+      '<label class="f e-from"><span class="fl">From</span>' + inp(p + "start", e.start, "num", "n", ' aria-label="From year"') + "</label>" +
+      '<label class="f e-to"><span class="fl">To</span>' + inp(p + "end", e.end, "num", "n", ' aria-label="To year"') + "</label>" +
+      '<label class="f e-yrs"><span class="fl">Years</span>' + inp(p + "years", e.years, "auto", "n", ' aria-label="Years counted (blank = full span)" title="Leave blank to count the full span"') + "</label>" +
+      '<label class="f e-stress"><span class="fl">Stress</span><span class="stress-w"><select class="field" id="' + fid(p + "stress") + '" data-bind="' + p + 'stress" data-kind="str" aria-label="Stress tier">' + stressOptions(e.stress) + "</select>" +
+      inp(p + "custom", e.custom, "num", "n custom", ' aria-label="Custom stress value"' + (e.stress === "custom" ? "" : " hidden")) + "</span></label>" +
+      '<label class="f e-mult"><span class="fl">× Mult</span>' + inp(p + "mult", e.mult, "num", "n", ' aria-label="Multiplier, such as time dilation"') + "</label>" +
+      '<div class="f e-score"><span class="fl">Score</span><output class="solver" data-out="era.' + i + '"></output></div>' +
+      '<div class="e-act">' +
+      '<button type="button" class="icon-btn" data-act="era-up" data-i="' + i + '" aria-label="Move era up"' + (i === 0 ? " disabled" : "") + ">" + IC.up + "</button>" +
+      '<button type="button" class="icon-btn" data-act="era-down" data-i="' + i + '" aria-label="Move era down"' + (i === n - 1 ? " disabled" : "") + ">" + IC.down + "</button>" +
+      '<button type="button" class="icon-btn" data-act="era-del" data-i="' + i + '" aria-label="Remove era">' + IC.x + "</button>" +
+      "</div></div>";
+  }
+
+  function ringsHTML(c) {
+    return '<section class="panel sec">' + secHead(TERMS[1], "Years × stress tier × multiplier", '<span data-out="R-badge"></span>') +
+      '<div class="sec-b"><ul class="issues" data-out="issues"></ul>' +
+      '<div class="era-head"><span>Era</span><span>From</span><span>To</span><span>Years</span><span>Stress</span><span>× Mult</span><span class="r">Score</span><span></span></div>' +
+      '<div class="era-list">' + c.eras.map(function (e, i) { return eraHTML(e, i, c.eras.length); }).join("") + "</div>" +
+      '<button type="button" class="add-row" data-act="era-add">' + IC.plus + "Add era</button>" +
+      '<div class="ring-sum"><span>Blank years count the full span. Use a multiplier for time dilation.</span><span>Rings <b class="solver" data-out="R-sum"></b></span></div>' +
+      "</div></section>";
+  }
+
+  function metaHTML(c) {
+    const cards = S.K.meta.map(function (m) {
+      const path = "meta." + m.key;
+      return '<div class="strat" style="--tier:' + TIER_COLOR[m.key] + '"><span class="strat-l">' + m.label + '</span><span class="code strat-v">×' + fmt(m.value) + "</span>" +
+        '<div class="stepper"><button type="button" class="step-btn" data-step="' + path + '" data-d="-1" aria-label="Fewer ' + m.label + ' strats">−</button>' +
+        inp(path, c.meta[m.key], "int", "", ' min="0" aria-label="' + m.label + ' strats"') +
+        '<button type="button" class="step-btn" data-step="' + path + '" data-d="1" aria-label="More ' + m.label + ' strats">+</button></div>' +
+        '<output class="solver" data-out="' + path + '" style="grid-column:1/-1;text-align:right"></output></div>';
+    }).join("");
+    return '<section class="panel sec">' + secHead(TERMS[2], "Count of strats per tier (G is SS)") +
+      '<div class="sec-b"><div class="chips" data-out="chips" aria-label="Strats as listed"></div><div class="strats">' + cards + "</div>" +
+      '<div class="formula-line" data-out="meta-line"></div></div></section>';
+  }
+
+  function mythHTML(c) {
+    const opts = S.K.myth.map(function (v, i) {
+      return '<label><input type="radio" name="myth" id="f-myth-' + i + '" value="' + i + '" data-bind="myth" data-kind="int"' + (num(c.myth) === i ? " checked" : "") + ">" +
+        "<span><b>" + MYTH_LABEL[i] + "</b><small>" + fmt(v) + "</small></span></label>";
+    }).join("");
+    return '<section class="panel sec">' + secHead(TERMS[3], "Number of mythical ancestries") +
+      '<div class="sec-b"><div class="seg" role="radiogroup" aria-label="Mythicalities">' + opts + "</div></div></section>";
+  }
+
+  function expHTML(c) {
+    const lvOpts = S.K.expertise.map(function (t, i) {
+      return '<option value="' + i + '"' + (num(c.exp.level) === i ? " selected" : "") + ">" + esc(t.label) + " · " + fmt(t.value) + "</option>";
+    }).join("");
+    const extras = c.extras.map(function (x, i) {
+      const p = "extras." + i + ".";
+      return '<div class="extra">' + inp(p + "label", x.label, "str", "", ' placeholder="e.g. Firearm use" aria-label="Bonus name"') +
+        inp(p + "value", x.value, "num", "n", ' aria-label="Bonus value"') +
+        '<button type="button" class="icon-btn" data-act="extra-del" data-i="' + i + '" aria-label="Remove bonus">' + IC.x + "</button></div>";
+    }).join("");
+    return '<section class="panel sec">' + secHead(TERMS[4], "Proficiency with their mark × affinities") +
+      '<div class="sec-b"><div class="exp-grid">' +
+      '<label class="f"><span class="lbl">Tier</span><select class="field" id="f-exp-level" data-bind="exp.level" data-kind="int">' + lvOpts + "</select></label>" +
+      '<label class="f"><span class="lbl">Specialty</span>' + inp("exp.name", c.exp.name, "str", "", ' placeholder="e.g. Bagua"') + "</label>" +
+      '<div class="f"><span class="lbl">Affinities</span><div class="stepper" style="grid-template-columns:30px minmax(0,1fr) 30px">' +
+      '<button type="button" class="step-btn" data-step="exp.affinities" data-d="-1" aria-label="Fewer affinities">−</button>' +
+      inp("exp.affinities", c.exp.affinities, "int", "", ' min="0" aria-label="Affinity count"') +
+      '<button type="button" class="step-btn" data-step="exp.affinities" data-d="1" aria-label="More affinities">+</button></div></div>' +
+      "</div>" +
+      '<div class="exp-line" data-out="exp-line"></div>' +
+      '<div class="sub-h"><span class="lbl">Extra bonuses</span><p>Flat. Not multiplied by affinities.</p></div>' +
+      '<div class="extras">' + extras + "</div>" +
+      '<button type="button" class="add-row" data-act="extra-add">' + IC.plus + "Add bonus</button>" +
+      "</div></section>";
+  }
+
+  function out(key) { return main.querySelectorAll('[data-out="' + key + '"]'); }
+  function setOut(key, text) { out(key).forEach(function (el) { el.textContent = text; }); }
+
+  function refresh() {
+    const c = cur();
+    if (!c || S.tab !== "characters") return;
+    const K = S.K;
+    const s = score(c, K);
+    TERMS.forEach(function (t) { setOut(t.k, fmtv(s[t.k])); setOut(t.k + "-sub", fmtv(s[t.k])); });
+    setOut("total", fmtv(s.total));
+    setOut("age", fmt(s.age));
+    setOut("rate", s.rate.toFixed(1));
+    setOut("rshare", pct(s.R, s.total) + "%");
+    out("note").forEach(function (el) { el.textContent = c.note; el.hidden = !c.note.trim(); });
+    out("stack").forEach(function (el) { el.innerHTML = stackHTML(s, "stack"); });
+
+    K.pret.forEach(function (p) {
+      const v = p.factor * num(c.pret[p.key]) / 100;
+      setOut("pret." + p.key, fmtv(v));
+      const row = main.querySelector('[data-pret="' + p.key + '"]');
+      if (row) row.classList.toggle("zero", !num(c.pret[p.key]));
+    });
+    setOut("akyric", fmtv(num(c.akyric)));
+    setOut("pret-line", "(" + K.pret.map(function (p) { return "p" + p.key.charAt(0).toUpperCase() + p.key.slice(1) + "·" + fmt(num(c.pret[p.key])); }).join(" + ") + ") / 100" + (num(c.akyric) ? " + " + fmt(num(c.akyric)) : "") + " = " + fmtv(s.P));
+
+    c.eras.forEach(function (e, i) {
+      setOut("era." + i, fmtv(eraScore(e, K)));
+      const yi = document.getElementById(fid("eras." + i + ".years"));
+      if (yi) yi.placeholder = fmt(eraSpan(e));
+    });
+    setOut("R-sum", fmtv(s.R));
+    const issues = timelineIssues(c);
+    const flagged = new Set(issues.filter(function (x) { return x.level === "warn" && x.era !== null; }).map(function (x) { return x.era; }));
+    main.querySelectorAll(".era").forEach(function (el) { el.classList.toggle("flagged", flagged.has(num(el.dataset.era))); });
+    out("issues").forEach(function (el) {
+      el.innerHTML = issues.map(function (x) { return '<li class="issue ' + x.level + '">' + (x.level === "warn" ? IC.warn : IC.info) + "<span>" + esc(x.text) + "</span></li>"; }).join("");
+      el.hidden = !issues.length;
+    });
+    const nw = issues.filter(function (x) { return x.level === "warn"; }).length;
+    out("R-badge").forEach(function (el) { el.innerHTML = nw ? '<span class="badge">' + IC.warn + nw + (nw === 1 ? " flag" : " flags") + "</span>" : ""; });
+
+    K.meta.forEach(function (m) { setOut("meta." + m.key, fmtv(m.value * num(c.meta[m.key]))); });
+    out("chips").forEach(function (el) { el.innerHTML = chipsHTML(c); });
+    setOut("meta-line", K.meta.map(function (m) { return (m.key === "G" ? "G" : m.key) + "·" + fmt(num(c.meta[m.key])); }).join(" + ") + " = " + fmtv(s.I));
+
+    const lv = K.expertise[clampLevel(c.exp.level)];
+    const extraSum = c.extras.reduce(function (a, x) { return a + num(x.value); }, 0);
+    setOut("exp-line", fmt(lv.value) + " × " + fmt(num(c.exp.affinities)) + (num(c.exp.affinities) === 1 ? " affinity" : " affinities") + " = " + fmtv(lv.value * num(c.exp.affinities)) + (c.extras.length ? "   + extras " + fmtv(extraSum) : "") + "   →   E = " + fmtv(s.E));
+
+    const rail = document.getElementById("rail");
+    if (rail) {
+      const sc = document.getElementById("rail-list") ? document.getElementById("rail-list").scrollLeft : 0;
+      rail.innerHTML = railHTML();
+      const rl = document.getElementById("rail-list");
+      if (rl) rl.scrollLeft = sc;
+    }
+  }
+  function clampLevel(l) { return Math.min(Math.max(Math.round(num(l)), 0), S.K.expertise.length - 1); }
+
+  function chipsHTML(c) {
+    let html = "";
+    let count = 0;
+    S.K.meta.forEach(function (m) {
+      const n = Math.max(0, Math.round(num(c.meta[m.key])));
+      for (let i = 0; i < n; i++) {
+        if (count < 60) html += '<span class="chip" style="color:' + TIER_COLOR[m.key] + '">' + m.label + "</span>";
+        count++;
+      }
+    });
+    if (count > 60) html += '<span class="none">+' + (count - 60) + " more</span>";
+    return html || '<span class="none">No strats yet</span>';
+  }
+
+  /* ---------------- compare ---------------- */
+  function compareHTML() {
+    const rows = list().map(function (c) { return { c: c, s: score(c, S.K) }; }).sort(function (a, b) { return b.s.total - a.s.total; });
+    if (!rows.length) {
+      return '<div class="panel empty"><span class="eqn">P + R + I + M + E</span><h2>Nothing to compare yet</h2><p>Add characters on the Characters tab and they will rank here.</p></div>';
+    }
+    const max = Math.max.apply(null, rows.map(function (r) { return r.s.total; })) || 1;
+    const legend = '<div class="legend">' + TERMS.map(function (t) { return '<span><span class="sw" style="background:' + t.color + '"></span><i>' + t.k + "</i>" + t.name + "</span>"; }).join("") + "</div>";
+    const board = rows.map(function (r, i) {
+      const segs = TERMS.map(function (t) {
+        const v = Math.max(0, r.s[t.k]);
+        return '<span data-tip="' + esc(r.c.name + " · " + t.k + " " + t.name + ": " + fmtv(r.s[t.k]) + " (" + pct(v, r.s.total) + "%)") + '" style="width:' + (v / max * 100) + "%;background:" + t.color + '"></span>';
+      }).join("");
+      return '<button class="board-row" data-open-cmp="' + esc(r.c.id) + '">' +
+        '<span class="b-rank">' + (i + 1) + "</span>" +
+        '<span class="b-name"><b>' + esc(r.c.name || "Unnamed") + "</b><small>" + esc(yr(r.c.year)) + " · age " + fmt(r.s.age) + (r.c.note ? " · " + esc(r.c.note) : "") + "</small></span>" +
+        '<span class="b-bar">' + segs + "</span>" +
+        '<span class="b-total">' + fmtv(r.s.total) + "</span></button>";
+    }).join("");
+    const table = '<table><thead><tr><th>Character</th><th>Year</th><th>Age</th>' +
+      TERMS.map(function (t) { return '<th><span class="th-i">' + t.k + "</span></th>"; }).join("") +
+      "<th>Total</th><th>Ring rate</th><th>R share</th></tr></thead><tbody>" +
+      rows.map(function (r) {
+        return "<tr><td>" + esc(r.c.name || "Unnamed") + "</td><td>" + esc(yr(r.c.year)) + "</td><td>" + fmt(r.s.age) + "</td>" +
+          TERMS.map(function (t) { return "<td>" + fmtv(r.s[t.k]) + "</td>"; }).join("") +
+          '<td class="t">' + fmtv(r.s.total) + "</td><td>" + r.s.rate.toFixed(1) + "</td><td>" + pct(r.s.R, r.s.total) + "%</td></tr>";
+      }).join("") + "</tbody></table>";
+    const rTop = rows.slice().sort(function (a, b) { return pct(b.s.R, b.s.total) - pct(a.s.R, a.s.total); })[0];
+    return '<div class="cmp">' +
+      '<section class="panel"><div class="cmp-head"><div><h2>Ranked at their prime</h2><p>Bars share one scale, so length compares totals directly. Hover a segment for its value, or open a character to edit.</p></div>' + legend + "</div>" +
+      '<div class="board">' + board + "</div></section>" +
+      '<section class="panel"><div class="table-wrap">' + table + "</div></section>" +
+      '<section class="panel cmp-note">' + IC.info + "<p>Rings grow with every year lived while the other four terms have ceilings, so R takes a bigger share as characters age. " +
+      esc(rTop.c.name) + " is the most ring-weighted here, at " + pct(rTop.s.R, rTop.s.total) + "% of their total.</p></section>" +
+      "</div>";
+  }
+
+  /* ---------------- formula ---------------- */
+  function kin(path, value) {
+    return '<input class="field n" type="number" step="any" inputmode="decimal" id="k-' + path.replace(/\./g, "-") + '" data-kbind="' + path + '" value="' + esc(value) + '"' + (S.readOnly ? " disabled" : "") + ">";
+  }
+  function formulaHTML() {
+    const K = S.K;
+    const pret = K.pret.map(function (p, i) { return '<label for="k-pret-' + i + '-factor"><span>' + esc(p.label) + '</span><span class="code">p' + p.key.charAt(0).toUpperCase() + p.key.slice(1) + "</span></label>" + kin("pret." + i + ".factor", p.factor); }).join("");
+    const stress = K.stress.map(function (s, i) { return '<label for="k-stress-' + i + '-value"><span class="code" style="color:var(--ink);min-width:2.6em">' + (s.key === "N" ? "0" : s.code) + "</span><span>" + esc(s.label) + "</span></label>" + kin("stress." + i + ".value", s.value); }).join("");
+    const meta = K.meta.map(function (m, i) { return '<label for="k-meta-' + i + '-value"><span style="font-weight:700;color:' + TIER_COLOR[m.key] + '">' + m.label + "</span><span>" + (m.key === "G" ? "G, written SS" : "Tier " + m.label) + "</span></label>" + kin("meta." + i + ".value", m.value); }).join("");
+    const myth = [1, 2, 3].map(function (i) { return '<label for="k-myth-' + i + '"><span>' + MYTH_LABEL[i] + (i === 1 ? " mythicality" : " mythicalities") + "</span><span>" + (i === 3 ? "diminishing returns past 3" : "") + "</span></label>" + kin("myth." + i, K.myth[i]); }).join("");
+    const exp = K.expertise.map(function (t, i) { return '<label for="k-expertise-' + i + '-value"><span>' + esc(t.label) + "</span><span></span></label>" + kin("expertise." + i + ".value", t.value); }).join("");
+    const box = function (title, hint, body, wide) {
+      return '<section class="panel sec' + (wide ? " wide" : "") + '"><header class="sec-h"><h2>' + title + '</h2><span class="hint">' + hint + '</span></header><div class="sec-b">' + body + "</div></section>";
+    };
+    return '<div class="fx">' +
+      '<section class="panel fx-eq wide"><span class="lbl">Calculation</span>' +
+      '<div class="big-eq"><i>P</i><span class="op">+</span><i>R</i><span class="op">+</span>(strats · values)<span class="op">+</span><i>M</i><span class="op">+</span>(expertise · affinities)<span class="op">+</span>extras</div>' +
+      "<p>Change a value here and every character rescores. Ring scores use the stress tiers below; custom stress values and multipliers stay as entered on each era. The heuristic leaves out Akyric preternaturalism (add it as a flat bonus), aging and thykiasis, and mental, physical, spiritual or emotional wellbeing.</p></section>" +
+      box("Preternaturalism factors", "Percent × factor ÷ 100", '<div class="kgrid">' + pret + "</div>") +
+      box("Stress tiers", "Ring score per year", '<div class="kgrid">' + stress + "</div>") +
+      box("Meta strat values", "Flat bonus per strat", '<div class="kgrid">' + meta + "</div>") +
+      box("Mythicality bonus", "By number of ancestries", '<div class="kgrid">' + myth + "</div>") +
+      box("Expertise tiers", "Multiplied by affinities", '<div class="kgrid">' + exp + "</div>") +
+      box("Reset", "Back to the doc's values", '<div class="data-actions"><button type="button" class="btn danger" data-act="reset-k"' + (S.readOnly ? " disabled" : "") + ">Reset formula values</button></div>") +
+      box("Back up and restore", "A JSON file of every character and these formula values",
+        '<div class="data-actions">' +
+        '<button type="button" class="btn" data-act="export">Export backup</button>' +
+        '<button type="button" class="btn" data-act="copy-all">' + IC.copy + "Copy all breakdowns</button>" +
+        (S.readOnly ? "" : '<label class="btn" for="import-file">Import backup</label><input type="file" id="import-file" accept=".json,application/json" class="visually-hidden">' +
+          '<label class="check"><input type="checkbox" id="import-k"> Also load formula values from the file</label>') +
+        "</div><p class=\"code\" style=\"margin:0\">Importing adds characters from the file and replaces any with the same ID.</p>", true) +
+      "</div>";
+  }
+
+  /* ---------------- breakdown text ---------------- */
+  function cap(k) { return k.charAt(0).toUpperCase() + k.slice(1); }
+  function breakdownText(c) {
+    const K = S.K;
+    const s = score(c, K);
+    const L = [];
+    L.push(c.name + " - " + yr(c.year) + " | (age: " + fmt(s.age) + ")");
+    L.push("Preternaturalism");
+    L.push("  PretBonus = (" + K.pret.map(function (p) { return "p" + cap(p.key) + "*" + fmt(num(c.pret[p.key])); }).join(" + ") + ")/100" + (num(c.akyric) ? " + Akyric " + fmt(num(c.akyric)) : "") + " = " + fmt(s.P));
+    L.push("Ring count: [rate ~" + s.rate.toFixed(1) + "]");
+    c.eras.forEach(function (e) {
+      const st = e.stress === "custom" ? fmt(num(e.custom)) : (e.stress === "N" ? "0" : e.stress);
+      const m = num(e.mult === "" ? 1 : e.mult);
+      L.push("  " + e.name + " (" + yr(e.start) + " - " + yr(e.end) + ") = " + fmt(eraYears(e)) + "*" + st + (m !== 1 ? "*" + fmt(m) : "") + " = " + fmt(eraScore(e, K)));
+    });
+    L.push("  Rings = " + fmt(s.R));
+    const chips = [];
+    K.meta.forEach(function (m) { for (let i = 0; i < Math.max(0, Math.round(num(c.meta[m.key]))); i++) chips.push(m.label); });
+    L.push("Imp-Meta: " + (chips.join(" ") || "none"));
+    L.push("  " + K.meta.map(function (m) { return m.key + "*" + fmt(num(c.meta[m.key])); }).join(" + ") + " = " + fmt(s.I));
+    L.push("Mythicality: " + MYTH_LABEL[Math.min(Math.max(Math.round(num(c.myth)), 0), 3)] + " = " + fmt(s.M));
+    const lv = K.expertise[clampLevel(c.exp.level)];
+    L.push("Expertise: " + lv.label + (c.exp.name ? " (" + c.exp.name + ")" : ""));
+    L.push("  " + fmt(num(c.exp.affinities)) + "*" + fmt(lv.value) + " = " + fmt(lv.value * num(c.exp.affinities)));
+    c.extras.forEach(function (x) { L.push("  + " + (x.label || "Bonus") + " " + fmt(num(x.value))); });
+    L.push("--- Overall ---" + (c.note ? " (" + c.note.toUpperCase() + ")" : ""));
+    L.push("P=" + fmt(s.P) + ", R=" + fmt(s.R) + ", I=" + fmt(s.I) + ", M=" + fmt(s.M) + ", E=" + fmt(s.E));
+    L.push("P+R+I+M+E=" + fmt(s.total));
+    return L.join("\n");
+  }
+
+  /* ---------------- overlays ---------------- */
+  let toastTimer = null;
+  function toast(msg, action) {
+    const el = document.getElementById("toast");
+    el.innerHTML = "<span>" + esc(msg) + "</span>" + (action ? '<button type="button" id="toast-act">' + esc(action.label) + "</button>" : "");
+    el.hidden = false;
+    if (action) document.getElementById("toast-act").onclick = function () { el.hidden = true; action.run(); };
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.hidden = true; }, action ? 6000 : 2600);
+  }
+  function copyText(text, okMsg) {
+    const fallback = function () {
+      const box = document.getElementById("copybox");
+      const ta = document.getElementById("copybox-text");
+      ta.value = text;
+      box.hidden = false;
+      ta.focus();
+      ta.select();
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { toast(okMsg); }, fallback);
+      } else fallback();
+    } catch (e) { fallback(); }
+  }
+  document.getElementById("copybox-close").addEventListener("click", function () { document.getElementById("copybox").hidden = true; });
+
+  const tip = document.getElementById("tip");
+  document.addEventListener("pointermove", function (ev) {
+    const t = ev.target.closest ? ev.target.closest("[data-tip]") : null;
+    if (!t || ev.pointerType === "touch") { tip.hidden = true; return; }
+    tip.textContent = t.dataset.tip;
+    tip.hidden = false;
+    const w = tip.offsetWidth;
+    const x = Math.min(window.innerWidth - w - 8, Math.max(8, ev.clientX - w / 2));
+    tip.style.left = x + "px";
+    tip.style.top = Math.max(8, ev.clientY - 38) + "px";
+  });
+  document.addEventListener("scroll", function () { tip.hidden = true; }, { passive: true });
+
+  /* ---------------- events ---------------- */
+  function parseVal(el) {
+    const k = el.dataset.kind;
+    const v = el.value;
+    if (k === "str") return v;
+    if (k === "auto") return v === "" ? null : parseFloat(v);
+    if (k === "int") { const n = parseInt(v, 10); return isFinite(n) ? Math.max(0, n) : 0; }
+    if (v === "") return "";
+    const n = parseFloat(v);
+    return isFinite(n) ? n : "";
+  }
+
+  main.addEventListener("input", function (ev) {
+    const el = ev.target;
+    if (el.dataset.bind) {
+      const c = cur();
+      if (!c || S.readOnly) return;
+      setPath(c, el.dataset.bind, parseVal(el));
+      if (/^eras\.\d+\.stress$/.test(el.dataset.bind)) {
+        const ci = document.getElementById(fid(el.dataset.bind.replace(/stress$/, "custom")));
+        if (ci) ci.hidden = el.value !== "custom";
+      }
+      refresh();
+      touch(c.id);
+    } else if (el.dataset.kbind) {
+      if (S.readOnly) return;
+      const v = el.value === "" ? 0 : parseFloat(el.value);
+      setPath(S.K, el.dataset.kbind, isFinite(v) ? v : 0);
+      touchK();
+    }
+  });
+  main.addEventListener("change", function (ev) {
+    const el = ev.target;
+    if (el.id === "import-file" && el.files && el.files[0]) { importFile(el.files[0]); el.value = ""; return; }
+    if (el.dataset.bind && (el.type === "radio" || el.tagName === "SELECT")) {
+      // input already handled most browsers; keep select/radio robust
+      const c = cur();
+      if (!c || S.readOnly) return;
+      setPath(c, el.dataset.bind, parseVal(el));
+      refresh();
+      touch(c.id);
+    }
+  });
+  main.addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter" && ev.target.id === "f-name") ev.target.blur();
+  });
+
+  let armedTimer = null;
+  function arm(btn, label, run) {
+    if (btn.classList.contains("armed")) { clearTimeout(armedTimer); btn.classList.remove("armed"); run(); return; }
+    const orig = btn.textContent;
+    btn.classList.add("armed");
+    btn.textContent = label;
+    clearTimeout(armedTimer);
+    armedTimer = setTimeout(function () { btn.classList.remove("armed"); btn.textContent = orig; }, 4000);
+  }
+
+  document.querySelector(".tabs").addEventListener("click", function (ev) {
+    const b = ev.target.closest("[data-tab]");
+    if (!b) return;
+    S.tab = b.dataset.tab;
+    tip.hidden = true;
+    render();
+    window.scrollTo({ top: 0 });
+  });
+
+  main.addEventListener("click", function (ev) {
+    const open = ev.target.closest("[data-open]");
+    if (open) { S.selected = open.dataset.open; render(); return; }
+    const openCmp = ev.target.closest("[data-open-cmp]");
+    if (openCmp) { S.selected = openCmp.dataset.openCmp; S.tab = "characters"; tip.hidden = true; render(); window.scrollTo({ top: 0 }); return; }
+
+    const step = ev.target.closest("[data-step]");
+    if (step) {
+      const c = cur();
+      if (!c || S.readOnly) return;
+      const v = Math.max(0, Math.round(num(getPath(c, step.dataset.step))) + num(step.dataset.d));
+      setPath(c, step.dataset.step, v);
+      const f = document.getElementById(fid(step.dataset.step));
+      if (f) f.value = v;
+      refresh();
+      touch(c.id);
+      return;
+    }
+
+    const a = ev.target.closest("[data-act]");
+    if (!a) return;
+    const act = a.dataset.act;
+    const c = cur();
+    if (act === "new-char") {
+      const n = blankChar();
+      n.id = newId(n.name);
+      S.chars[n.id] = n;
+      S.selected = n.id;
+      S.tab = "characters";
+      render();
+      touch(n.id);
+      const f = document.getElementById("f-name");
+      if (f) { f.focus(); f.select(); }
+      return;
+    }
+    if (act === "export") { exportData(); return; }
+    if (act === "copy-all") { copyText(list().map(breakdownText).join("\n\n"), "All breakdowns copied"); return; }
+    if (act === "reset-k") {
+      arm(a, "Confirm reset", function () { S.K = clone(DEFAULT_CONSTANTS); render(); touchK(); toast("Formula values reset"); });
+      return;
+    }
+    if (!c) return;
+    if (act === "copy-one") { copyText(breakdownText(c), "Breakdown copied"); return; }
+    if (act === "dup") {
+      const d = clone(c);
+      d.name = c.name + " (copy)";
+      d.id = newId(d.name);
+      d.order = num(c.order) + 0.5;
+      S.chars[d.id] = d;
+      S.selected = d.id;
+      render();
+      touch(d.id);
+      toast("Duplicated " + c.name);
+      return;
+    }
+    if (act === "del-char") { arm(a, "Confirm delete", function () { const name = c.name; removeChar(c.id); toast("Deleted " + name); }); return; }
+    if (act === "era-add") {
+      const last = c.eras[c.eras.length - 1];
+      const start = last ? num(last.end) : num(c.birth);
+      c.eras.push({ name: "", start: start, end: Math.max(start, num(c.year)), years: null, stress: "N", custom: 0, mult: 1 });
+      render();
+      touch(c.id);
+      const f = document.getElementById(fid("eras." + (c.eras.length - 1) + ".name"));
+      if (f) f.focus();
+      return;
+    }
+    const i = num(a.dataset.i);
+    if (act === "era-up" && i > 0) { const t = c.eras[i - 1]; c.eras[i - 1] = c.eras[i]; c.eras[i] = t; render(); touch(c.id); return; }
+    if (act === "era-down" && i < c.eras.length - 1) { const t = c.eras[i + 1]; c.eras[i + 1] = c.eras[i]; c.eras[i] = t; render(); touch(c.id); return; }
+    if (act === "era-del") {
+      const removed = c.eras.splice(i, 1)[0];
+      const id = c.id;
+      render();
+      touch(id);
+      toast("Removed " + (removed.name || "era"), { label: "Undo", run: function () { const cc = S.chars[id]; if (!cc) return; cc.eras.splice(Math.min(i, cc.eras.length), 0, removed); render(); touch(id); } });
+      return;
+    }
+    if (act === "extra-add") { c.extras.push({ label: "", value: 0 }); render(); touch(c.id); return; }
+    if (act === "extra-del") { c.extras.splice(i, 1); render(); touch(c.id); return; }
+  });
+
+  /* ---------------- import / export ---------------- */
+  function backupJSON() {
+    return JSON.stringify({
+      app: "PRIME Heuristic",
+      version: 1,
+      exported: new Date().toISOString(),
+      constants: S.K,
+      characters: list().map(function (c) { const d = toDoc(c); d.id = c.id; return d; })
+    }, null, 2);
+  }
+  async function exportData() {
+    const data = backupJSON();
+    if (downloads) {
+      try {
+        await downloads.save({ filename: "prime-heuristic-backup.json", data: data });
+        toast("Backup saved");
+        return;
+      } catch (e) {
+        if (e && e.code === "declined") return;
+        if (e && e.code === "rate_limited") { toast("A save prompt is already open"); return; }
+      }
+    }
+    copyText(data, "Backup copied as text. Paste it into a .json file to keep it.");
+  }
+  function importFile(file) {
+    const rd = new FileReader();
+    rd.onload = function () {
+      let parsed;
+      try { parsed = JSON.parse(String(rd.result)); } catch (e) { toast("That file isn't valid JSON."); return; }
+      const arr = Array.isArray(parsed) ? parsed : parsed && Array.isArray(parsed.characters) ? parsed.characters : null;
+      if (!arr) { toast("No characters found in that file."); return; }
+      let n = 0;
+      let maxOrder = list().reduce(function (m, c) { return Math.max(m, num(c.order)); }, -1);
+      arr.forEach(function (raw) {
+        if (!raw || typeof raw !== "object") return;
+        const id = typeof raw.id === "string" && SEG_OK.test(raw.id) && raw.id !== "." && raw.id !== ".." ? raw.id : newId(raw.name);
+        const ch = normalizeChar(id, raw);
+        if (raw.order === undefined && !S.chars[id]) ch.order = ++maxOrder;
+        S.chars[id] = ch;
+        S.deleted.delete(id);
+        touch(id);
+        n++;
+      });
+      const useK = document.getElementById("import-k");
+      if (useK && useK.checked && parsed.constants) { S.K = normalizeK(parsed.constants); touchK(); }
+      pickSelected();
+      render();
+      toast("Imported " + n + (n === 1 ? " character" : " characters"));
+    };
+    rd.onerror = function () { toast("Couldn't read that file."); };
+    rd.readAsText(file);
+  }
+
+  boot();
+})();
+</script>
+
+</body></html>
