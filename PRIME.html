@@ -34,6 +34,11 @@
   --tA: #16864a;
   --tS: #c81f53;
   --tG: #7b3acb;
+  --aU: #88b7f7;
+  --aI: #e0abc2;
+  --aA: #f79496;
+  --aT: #ffbf83;
+  --aff-ink: #1c1720;
   --shadow: 0 1px 0 rgba(20, 30, 50, 0.04), 0 8px 24px -16px rgba(20, 30, 50, 0.35);
   --f-display: "STIX Two Text", "Cambria Math", Cambria, Georgia, serif;
   --f-ui: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -513,8 +518,35 @@ fieldset:disabled .icon-btn, fieldset:disabled .add-row, fieldset:disabled .step
 .seg input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 /* E */
-.exp-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 14px; align-items: end; }
-@container (min-width: 620px) { .exp-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 9rem; } }
+.exp-grid { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "tier" "spec" "aff"; gap: 12px 22px; align-items: start; }
+.g-tier { grid-area: tier; }
+.g-spec { grid-area: spec; }
+.g-aff { grid-area: aff; }
+@container (min-width: 620px) { .exp-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "tier aff" "spec aff"; } }
+.aff-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.affs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.aff {
+  height: 40px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, var(--aff) 80%, var(--line));
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.aff:hover { background: color-mix(in srgb, var(--aff) 16%, transparent); color: var(--ink); }
+.aff-d { width: 8px; height: 8px; flex: none; transform: rotate(45deg); border: 1.5px solid var(--aff); border-radius: 1px; }
+.aff[aria-pressed="true"] { background: var(--aff); border-color: var(--aff); color: var(--aff-ink); }
+.aff[aria-pressed="true"] .aff-d { background: var(--aff-ink); border-color: var(--aff-ink); }
+.aff-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .exp-grid .f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .exp-line { font-size: 13px; color: var(--ink-2); }
 .extras { display: flex; flex-direction: column; gap: 6px; }
@@ -709,6 +741,12 @@ const DEFAULT_CONSTANTS = {
   ]
 };
 
+const AFF_KEYS = ["U", "I", "A", "T"];
+function affCount(exp) {
+  if (!exp || !exp.aff) return 0;
+  return AFF_KEYS.filter(function (k) { return !!exp.aff[k]; }).length;
+}
+
 function num(v) {
   const n = parseFloat(v);
   return isFinite(n) ? n : 0;
@@ -740,7 +778,7 @@ function score(c, K) {
   let extras = 0;
   c.extras.forEach(function (x) { extras += num(x.value); });
   const lv = K.expertise[Math.min(Math.max(Math.round(num(c.exp.level)), 0), K.expertise.length - 1)];
-  const E = lv.value * num(c.exp.affinities) + extras;
+  const E = lv.value * affCount(c.exp) + extras;
 
   const age = num(c.year) - num(c.birth);
   const total = P + R + I + M + E;
@@ -823,6 +861,12 @@ function fmt(n) {
     { k: "I", name: "Implemented meta strats", short: "Meta strats", color: "var(--s3)" },
     { k: "M", name: "Mythicality", short: "Mythicality", color: "var(--s4)" },
     { k: "E", name: "Expertise", short: "Expertise", color: "var(--s5)" }
+  ];
+  const AFF = [
+    { k: "U", name: "Ucaeman", color: "var(--aU)" },
+    { k: "I", name: "Ilesian", color: "var(--aI)" },
+    { k: "A", name: "Artican", color: "var(--aA)" },
+    { k: "T", name: "Taocian", color: "var(--aT)" }
   ];
   const TIER_COLOR = { C: "var(--tC)", B: "var(--tB)", A: "var(--tA)", S: "var(--tS)", G: "var(--tG)" };
   const MYTH_LABEL = ["None", "1", "2", "3+"];
@@ -921,11 +965,21 @@ function fmt(n) {
       exp: {
         level: d.exp && d.exp.level !== undefined ? d.exp.level : 0,
         name: d.exp && typeof d.exp.name === "string" ? d.exp.name : "",
-        affinities: d.exp && d.exp.affinities !== undefined ? d.exp.affinities : 1
+        aff: normAff(d.exp)
       },
       extras: Array.isArray(d.extras) ? d.extras.map(function (x) { return { label: x.label || "", value: x.value !== undefined ? x.value : 0 }; }) : [],
       order: d.order !== undefined ? d.order : 0
     };
+  }
+  function normAff(e) {
+    const o = { U: false, I: false, A: false, T: false };
+    if (e && e.aff && typeof e.aff === "object") {
+      AFF_KEYS.forEach(function (k) { o[k] = !!e.aff[k]; });
+      return o;
+    }
+    const n = e && e.affinities !== undefined ? Math.min(4, Math.max(0, Math.round(num(e.affinities)))) : 0;
+    AFF_KEYS.slice(0, n).forEach(function (k) { o[k] = true; });
+    return o;
   }
   function toDoc(c) {
     const o = clone(c);
@@ -941,7 +995,7 @@ function fmt(n) {
       birth: 1990,
       eras: [{ name: "Childhood", start: 1990, end: 2000, years: null, stress: "N", custom: 0, mult: 1 }],
       myth: 0,
-      exp: { level: 0, name: "", affinities: 1 },
+      exp: { level: 0, name: "", aff: {} },
       order: all.length ? Math.max.apply(null, all.map(function (c) { return num(c.order); })) + 1 : 0
     });
   }
@@ -1341,12 +1395,13 @@ function fmt(n) {
     }).join("");
     return '<section class="panel sec">' + secHead(TERMS[4], "Proficiency with their mark × affinities") +
       '<div class="sec-b"><div class="exp-grid">' +
-      '<label class="f"><span class="lbl">Tier</span><select class="field" id="f-exp-level" data-bind="exp.level" data-kind="int">' + lvOpts + "</select></label>" +
-      '<label class="f"><span class="lbl">Specialty</span>' + inp("exp.name", c.exp.name, "str", "", ' placeholder="e.g. Bagua"') + "</label>" +
-      '<div class="f"><span class="lbl">Affinities</span><div class="stepper" style="grid-template-columns:30px minmax(0,1fr) 30px">' +
-      '<button type="button" class="step-btn" data-step="exp.affinities" data-d="-1" aria-label="Fewer affinities">−</button>' +
-      inp("exp.affinities", c.exp.affinities, "int", "", ' min="0" aria-label="Affinity count"') +
-      '<button type="button" class="step-btn" data-step="exp.affinities" data-d="1" aria-label="More affinities">+</button></div></div>' +
+      '<label class="f g-tier"><span class="lbl">Tier</span><select class="field" id="f-exp-level" data-bind="exp.level" data-kind="int">' + lvOpts + "</select></label>" +
+      '<label class="f g-spec"><span class="lbl">Specialty</span>' + inp("exp.name", c.exp.name, "str", "", ' placeholder="e.g. Bagua"') + "</label>" +
+      '<div class="f g-aff"><div class="aff-head"><span class="lbl" id="aff-lbl">Affinities</span><span class="code" data-out="aff-count"></span></div>' +
+      '<div class="affs" role="group" aria-labelledby="aff-lbl">' + AFF.map(function (a) {
+        const on = !!c.exp.aff[a.k];
+        return '<button type="button" class="aff" id="f-aff-' + a.k + '" data-aff="' + a.k + '" aria-pressed="' + on + '" style="--aff:' + a.color + '"><span class="aff-d" aria-hidden="true"></span><span class="aff-name">' + a.name + "</span></button>";
+      }).join("") + "</div></div>" +
       "</div>" +
       '<div class="exp-line" data-out="exp-line"></div>' +
       '<div class="sub-h"><span class="lbl">Extra bonuses</span><p>Flat. Not multiplied by affinities.</p></div>' +
@@ -1402,7 +1457,9 @@ function fmt(n) {
 
     const lv = K.expertise[clampLevel(c.exp.level)];
     const extraSum = c.extras.reduce(function (a, x) { return a + num(x.value); }, 0);
-    setOut("exp-line", fmt(lv.value) + " × " + fmt(num(c.exp.affinities)) + (num(c.exp.affinities) === 1 ? " affinity" : " affinities") + " = " + fmtv(lv.value * num(c.exp.affinities)) + (c.extras.length ? "   + extras " + fmtv(extraSum) : "") + "   →   E = " + fmtv(s.E));
+    const na = affCount(c.exp);
+    setOut("aff-count", na + " of 4");
+    setOut("exp-line", fmt(lv.value) + " × " + na + (na === 1 ? " affinity" : " affinities") + " = " + fmtv(lv.value * na) + (c.extras.length ? "   + extras " + fmtv(extraSum) : "") + "   →   E = " + fmtv(s.E));
 
     const rail = document.getElementById("rail");
     if (rail) {
@@ -1522,7 +1579,10 @@ function fmt(n) {
     L.push("Mythicality: " + MYTH_LABEL[Math.min(Math.max(Math.round(num(c.myth)), 0), 3)] + " = " + fmt(s.M));
     const lv = K.expertise[clampLevel(c.exp.level)];
     L.push("Expertise: " + lv.label + (c.exp.name ? " (" + c.exp.name + ")" : ""));
-    L.push("  " + fmt(num(c.exp.affinities)) + "*" + fmt(lv.value) + " = " + fmt(lv.value * num(c.exp.affinities)));
+    const na = affCount(c.exp);
+    const names = AFF.filter(function (a) { return c.exp.aff[a.k]; }).map(function (a) { return a.name; }).join(", ");
+    L.push("  Affinities: " + AFF_KEYS.map(function (k) { return c.exp.aff[k] ? "◆" : "◇"; }).join("") + (names ? " (" + names + ")" : ""));
+    L.push("  " + na + "*" + fmt(lv.value) + " = " + fmt(lv.value * na));
     c.extras.forEach(function (x) { L.push("  + " + (x.label || "Bonus") + " " + fmt(num(x.value))); });
     L.push("--- Overall ---" + (c.note ? " (" + c.note.toUpperCase() + ")" : ""));
     L.push("P=" + fmt(s.P) + ", R=" + fmt(s.R) + ", I=" + fmt(s.I) + ", M=" + fmt(s.M) + ", E=" + fmt(s.E));
@@ -1641,6 +1701,18 @@ function fmt(n) {
     if (open) { S.selected = open.dataset.open; render(); return; }
     const openCmp = ev.target.closest("[data-open-cmp]");
     if (openCmp) { S.selected = openCmp.dataset.openCmp; S.tab = "characters"; tip.hidden = true; render(); window.scrollTo({ top: 0 }); return; }
+
+    const affB = ev.target.closest("[data-aff]");
+    if (affB) {
+      const c = cur();
+      if (!c || S.readOnly) return;
+      const k = affB.dataset.aff;
+      c.exp.aff[k] = !c.exp.aff[k];
+      affB.setAttribute("aria-pressed", String(c.exp.aff[k]));
+      refresh();
+      touch(c.id);
+      return;
+    }
 
     const step = ev.target.closest("[data-step]");
     if (step) {
