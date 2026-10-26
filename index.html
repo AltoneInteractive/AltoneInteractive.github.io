@@ -1111,7 +1111,11 @@
     function escapeHtml(text) {
       const div = document.createElement('div');
       div.textContent = text;
-      return div.innerHTML;
+      // innerHTML escapes & < > but NOT quotes. Since the result is also
+      // interpolated into an HTML attribute value (data-base-word="..."),
+      // escape quotes too so a word containing " / ' can't break out of the
+      // attribute and inject a new one (e.g. an onmouseover handler).
+      return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     // Update the English input display with variant markup
