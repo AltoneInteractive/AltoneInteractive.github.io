@@ -1,8 +1,8 @@
 # Ichrolic Dictionary
 
-Auto-generated from dictionary.json on Sat Nov  7 21:18:22 UTC 2026
+Auto-generated from dictionary.json on Sun Nov  8 12:25:39 UTC 2026
 
-## Translations (631 main entries + 1749 synonyms)
+## Translations (633 main entries + 1749 synonyms)
 
 - **a lot** → niya
 - **a** → sih
@@ -347,6 +347,8 @@ Auto-generated from dictionary.json on Sat Nov  7 21:18:22 UTC 2026
 - **making** → tepoìh
 - **many** → niya
 - **mark** → koyua
+- **master** → dzhakan
+- **mastery** → dzhaui
 - **maybe** → woyer
 - **me** → ali
 - **mind** → tewì
